@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -363,7 +362,6 @@ class DeploymentDetailActivity :
         // remove observer
         deployImageLiveData.removeObserver(deploymentImageObserve)
         val newImages = deploymentImageAdapter.getNewAttachImage()
-        Log.d("Comp", "$newImages")
         if (newImages.isNotEmpty()) {
             viewModel.insertImage(deployment, newImages)
             ImageSyncWorker.enqueue(this)

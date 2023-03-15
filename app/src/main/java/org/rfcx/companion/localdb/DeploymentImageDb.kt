@@ -1,6 +1,5 @@
 package org.rfcx.companion.localdb
 
-import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -126,7 +125,6 @@ class DeploymentImageDb(private val realm: Realm) {
                         imageLabel = attachImage.name,
                         deploymentServerId = dp.serverId
                     )
-                    Log.d("Comp", "insert $deploymentImage")
                     it.insertOrUpdate(deploymentImage)
                 }
             }

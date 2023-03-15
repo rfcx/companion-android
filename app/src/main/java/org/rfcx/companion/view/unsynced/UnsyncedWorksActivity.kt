@@ -121,10 +121,10 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
 
     private fun setObserve() {
         deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(this)
-        deploymentWorkInfoLiveData.observe(this, deploymentWorkInfoObserve)
+        deploymentWorkInfoLiveData.observeForever(deploymentWorkInfoObserve)
 
         registrationWorkInfoLiveData = RegisterGuardianWorker.workInfos(this)
-        registrationWorkInfoLiveData.observe(this, registrationWorkInfoObserve)
+        registrationWorkInfoLiveData.observeForever(registrationWorkInfoObserve)
 
         viewModel.getUnsyncedWorkLiveData().observe(
             this
