@@ -1,3 +1,2 @@
 Change logs
-- Fix duplicated sites not entire removed
-- Eye password icon in login screen
+- Send Image label to Device API
