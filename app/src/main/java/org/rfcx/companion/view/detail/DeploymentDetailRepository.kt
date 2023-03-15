@@ -30,9 +30,12 @@ class DeploymentDetailRepository(
         deployment: Deployment? = null,
         attachImages: List<String>
     ) {
-        localDataHelper.getDeploymentImageLocalDb().insertImage(deployment, attachImages.map {
-            Image(path =  it, name = "other", type = ImageType.OTHER, id = 0)
-        })
+        localDataHelper.getDeploymentImageLocalDb().insertImage(
+            deployment,
+            attachImages.map {
+                Image(path = it, name = "other", type = ImageType.OTHER, id = 0)
+            }
+        )
     }
 
     fun isExisted(name: String?): Boolean {

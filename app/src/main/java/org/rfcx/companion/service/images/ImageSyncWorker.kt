@@ -10,7 +10,6 @@ import io.realm.Realm
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import org.rfcx.companion.entity.request.AssetRequest
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.FileUtils.getMimeType

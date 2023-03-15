@@ -5,7 +5,6 @@ import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
 import org.rfcx.companion.entity.request.EditDeploymentRequest
-import org.rfcx.companion.entity.request.AssetRequest
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.DeploymentResponse
 import org.rfcx.companion.entity.response.StreamResponse
