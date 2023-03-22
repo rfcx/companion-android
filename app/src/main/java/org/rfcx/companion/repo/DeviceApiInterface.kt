@@ -51,7 +51,7 @@ interface DeviceApiInterface {
         @Header("Authorization") authUser: String,
         @Path("id") id: String,
         @Part file: MultipartBody.Part,
-        @Part("assetParameters") params: RequestBody? = null,
+        @Part("meta") params: RequestBody? = null,
     ): Call<ResponseBody>
 
     @GET("deployments/{id}/assets")

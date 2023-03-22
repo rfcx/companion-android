@@ -42,7 +42,7 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
             val gson = Gson()
             val obj = JsonObject()
             obj.addProperty("label", it.imageLabel)
-            val label = RequestBody.create(MediaType.parse("multipart/form-data"), gson.toJson(obj))
+            val label = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(obj))
 
             val result = ApiManager.getInstance().getDeviceApi()
                 .uploadAssets(token, it.deploymentServerId!!, body, label).execute()
