@@ -7,6 +7,8 @@ import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.view.deployment.Image
+import org.rfcx.companion.view.deployment.ImageType
 
 class DeploymentDetailRepository(
     private val deviceApiHelper: DeviceApiHelper,
@@ -28,7 +30,12 @@ class DeploymentDetailRepository(
         deployment: Deployment? = null,
         attachImages: List<String>
     ) {
-        localDataHelper.getDeploymentImageLocalDb().insertImage(deployment, attachImages)
+        localDataHelper.getDeploymentImageLocalDb().insertImage(
+            deployment,
+            attachImages.map {
+                Image(path = it, name = "other", type = ImageType.OTHER, id = 0)
+            }
+        )
     }
 
     fun isExisted(name: String?): Boolean {

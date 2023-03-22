@@ -43,7 +43,7 @@ class AudioMothDeploymentRepository(
 
     fun insertImage(
         deployment: Deployment? = null,
-        attachImages: List<String>
+        attachImages: List<Image>
     ) {
         localDataHelper.getDeploymentImageLocalDb().insertImage(deployment, attachImages)
     }

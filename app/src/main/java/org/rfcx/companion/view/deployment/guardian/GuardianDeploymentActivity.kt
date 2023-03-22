@@ -515,7 +515,7 @@ class GuardianDeploymentActivity :
 
     private fun saveImages(deployment: Deployment) {
         deploymentImageDb.deleteImages(deployment.id)
-        deploymentImageDb.insertImage(deployment, _images.filter { it.path != null }.map { it.path!! })
+        deploymentImageDb.insertImage(deployment, _images)
     }
 
     override fun startConnectGuardian() {
