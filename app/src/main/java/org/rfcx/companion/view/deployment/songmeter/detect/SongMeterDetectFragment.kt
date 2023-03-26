@@ -2,14 +2,12 @@ package org.rfcx.companion.view.deployment.songmeter.detect
 
 import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -46,7 +44,13 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     private var isReadyToSet = true
 
     private val requestMultiplePermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions -> }
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                if (it.key == "android.permission.BLUETOOTH_SCAN" && it.value == false) {
+                    showAlertPermission()
+                }
+            }
+        }
 
     private fun setViewModel() {
         songMeterViewModel = ViewModelProvider(
@@ -81,13 +85,6 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
 
         requestPermission()
 
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.BLUETOOTH_SCAN
-            ) == PackageManager.PERMISSION_DENIED
-        ) {
-            showAlertPermission()
-        }
         if (!songMeterViewModel.isBluetoothEnabled()) {
             showAlertBluetooth()
         }
