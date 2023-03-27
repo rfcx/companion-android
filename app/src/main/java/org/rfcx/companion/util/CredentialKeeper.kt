@@ -10,7 +10,7 @@ class CredentialKeeper(val context: Context) {
         // Required
         preferences.putString(Preferences.USER_GUID, user.guid)
         preferences.putString(Preferences.ID_TOKEN, user.idToken)
-        preferences.putLong(Preferences.TOKEN_EXPIRES_AT, user.expires * 1000)
+        preferences.putLong(Preferences.TOKEN_EXPIRES_AT, (user.expires * 1000) - (1000 * 60 * 60 * 24 * 7 * 1))
 
         // Optional
         if (user.accessToken != null) {
