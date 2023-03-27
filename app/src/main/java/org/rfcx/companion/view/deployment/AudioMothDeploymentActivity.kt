@@ -109,7 +109,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
         audioMothDeploymentViewModel.deleteImages(deployment.id)
         audioMothDeploymentViewModel.insertImage(
             deployment,
-            _images.filter { it.path != null }.map { it.path!! }
+            _images
         )
     }
 

@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import io.realm.Realm
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -34,8 +36,13 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
             val mimeType = file.getMimeType()
             val requestFile = RequestBody.create(MediaType.parse(mimeType), storage.compressFile(context, file))
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+
+            val gson = Gson()
+            val obj = JsonObject()
+            obj.addProperty("label", it.imageLabel)
+            val label = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(obj))
             val result = ApiManager.getInstance().getDeviceApi(context)
-                .uploadAssets(it.deploymentServerId!!, body).execute()
+                .uploadAssets(it.deploymentServerId!!, body, label).execute()
 
             if (result.isSuccessful) {
                 val assetPath = result.headers().get("Location")

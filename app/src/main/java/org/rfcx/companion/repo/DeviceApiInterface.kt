@@ -1,6 +1,7 @@
 package org.rfcx.companion.repo
 
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.request.DeploymentRequest
 import org.rfcx.companion.entity.request.EditDeploymentRequest
@@ -43,7 +44,8 @@ interface DeviceApiInterface {
     @POST("deployments/{id}/assets")
     fun uploadAssets(
         @Path("id") id: String,
-        @Part file: MultipartBody.Part
+        @Part file: MultipartBody.Part,
+        @Part("meta") params: RequestBody? = null,
     ): Call<ResponseBody>
 
     @GET("deployments/{id}/assets")

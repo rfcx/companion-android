@@ -208,7 +208,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     private fun saveImages(deployment: Deployment) {
         songMeterViewModel.deleteImages(deployment)
-        songMeterViewModel.insertImage(deployment, _images.filter { it.path != null }.map { it.path!! })
+        songMeterViewModel.insertImage(deployment, _images)
     }
 
     override fun setDeployLocation(stream: Stream, isExisted: Boolean) {
