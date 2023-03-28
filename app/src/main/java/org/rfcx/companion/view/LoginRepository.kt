@@ -8,5 +8,5 @@ class LoginRepository(
     private val localDataHelper: LocalDataHelper
 ) {
 
-    fun userTouch(token: String) = deviceApiHelper.userTouch(token)
+    fun userTouch() = deviceApiHelper.userTouch()
 }

@@ -46,8 +46,8 @@ class GuardianClassifierActivity : AppCompatActivity(), ClassifierListener {
             this,
             ViewModelFactory(
                 application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(this)),
+                CoreApiHelper(CoreApiServiceImpl(this)),
                 LocalDataHelper()
             )
         ).get(GuardianClassifierViewModel::class.java)

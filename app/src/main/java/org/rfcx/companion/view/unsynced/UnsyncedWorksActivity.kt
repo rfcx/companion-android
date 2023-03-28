@@ -112,8 +112,8 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
             this,
             ViewModelFactory(
                 application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(this)),
+                CoreApiHelper(CoreApiServiceImpl(this)),
                 LocalDataHelper()
             )
         ).get(UnsyncedWorksViewModel::class.java)

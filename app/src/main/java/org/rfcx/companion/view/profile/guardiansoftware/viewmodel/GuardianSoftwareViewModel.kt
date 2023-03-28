@@ -30,7 +30,7 @@ class GuardianSoftwareViewModel(
     private var softwareVersion: Map<String, String>? = null
 
     init {
-        checkSoftwareVersion("Bearer ${context.getIdToken()}")
+        checkSoftwareVersion()
     }
 
     fun getCurrentDownloadedAPKsVersions(): Map<String, Pair<String, String>> {
@@ -40,9 +40,9 @@ class GuardianSoftwareViewModel(
     fun getSoftwareVersion() = availableAPKs
     fun getSoftwareFileDownload() = downloadAPKs
 
-    private fun checkSoftwareVersion(userToken: String) {
+    private fun checkSoftwareVersion() {
         availableAPKs.postValue(Resource.loading(null))
-        guardianSoftwareRepository.checkSoftwareVersion(userToken)
+        guardianSoftwareRepository.checkSoftwareVersion()
             .enqueue(object : Callback<List<GuardianSoftwareResponse>> {
                 override fun onResponse(
                     call: Call<List<GuardianSoftwareResponse>>,

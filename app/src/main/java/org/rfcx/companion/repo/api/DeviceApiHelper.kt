@@ -4,31 +4,28 @@ package org.rfcx.companion.repo.api
 
 class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
     fun getProjects(
-        token: String,
         limit: Int = 100,
         offset: Int = 0,
         fields: List<String> = listOf("id", "name", "permissions")
-    ) = deviceApiService.getProjects(token, limit, offset, fields)
+    ) = deviceApiService.getProjects(limit, offset, fields)
 
-    fun getProjectsById(token: String, id: String) = deviceApiService.getProjectsById(token, id)
+    fun getProjectsById(id: String) = deviceApiService.getProjectsById(id)
 
     fun getDeletedProjects(
-        token: String,
         limit: Int = 100,
         offset: Int = 0,
         onlyDeleted: Boolean = true,
         fields: List<String> = listOf("id")
-    ) = deviceApiService.getDeletedProjects(token, limit, offset, onlyDeleted, fields)
+    ) = deviceApiService.getDeletedProjects(limit, offset, onlyDeleted, fields)
 
-    fun getProjectOffTime(token: String, projectId: String) = deviceApiService.getProjectOffTime(token, projectId)
+    fun getProjectOffTime(projectId: String) = deviceApiService.getProjectOffTime(projectId)
 
     fun getStreamAssets(
-        token: String,
         id: String
-    ) = deviceApiService.getStreamAssets(token, id)
+    ) = deviceApiService.getStreamAssets(id)
 
-    fun userTouch(token: String) = deviceApiService.userTouch(token)
+    fun userTouch() = deviceApiService.userTouch()
 
-    fun checkAvailableClassifier(authUser: String) = deviceApiService.checkAvailableClassifiers(authUser)
+    fun checkAvailableClassifier() = deviceApiService.checkAvailableClassifiers()
     fun downloadAPK(url: String) = deviceApiService.downloadFile(url)
 }

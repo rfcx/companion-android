@@ -15,7 +15,6 @@ import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.FileUtils.getMimeType
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.Storage
-import org.rfcx.companion.util.getIdToken
 import java.io.File
 
 class ImageSyncWorker(val context: Context, params: WorkerParameters) :
@@ -32,7 +31,6 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
         Log.d(TAG, "doWork: found ${deploymentImage.size} unsent")
         var someFailed = false
 
-        val token = "Bearer ${context.getIdToken()}"
         deploymentImage.forEach {
             val file = File(it.localPath)
             val mimeType = file.getMimeType()
@@ -43,9 +41,8 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
             val obj = JsonObject()
             obj.addProperty("label", it.imageLabel)
             val label = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(obj))
-
-            val result = ApiManager.getInstance().getDeviceApi()
-                .uploadAssets(token, it.deploymentServerId!!, body, label).execute()
+            val result = ApiManager.getInstance().getDeviceApi(context)
+                .uploadAssets(it.deploymentServerId!!, body, label).execute()
 
             if (result.isSuccessful) {
                 val assetPath = result.headers().get("Location")

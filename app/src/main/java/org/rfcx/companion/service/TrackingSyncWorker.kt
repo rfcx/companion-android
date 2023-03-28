@@ -12,7 +12,6 @@ import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.FileUtils.getMimeType
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 import java.io.File
 
 class TrackingSyncWorker(val context: Context, params: WorkerParameters) :
@@ -27,14 +26,13 @@ class TrackingSyncWorker(val context: Context, params: WorkerParameters) :
         var someFailed = false
         Log.d(TAG, "doWork: found ${tracking.size} unsent")
 
-        val token = "Bearer ${context.getIdToken()}"
         tracking.forEach {
             val file = File(it.localPath)
             val mimeType = file.getMimeType()
             val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
-            val result = ApiManager.getInstance().getDeviceApi()
-                .uploadAssets(token, it.deploymentServerId!!, body).execute()
+            val result = ApiManager.getInstance().getDeviceApi(context)
+                .uploadAssets(it.deploymentServerId!!, body).execute()
 
             if (result.isSuccessful) {
                 val assetPath = result.headers().get("Location")

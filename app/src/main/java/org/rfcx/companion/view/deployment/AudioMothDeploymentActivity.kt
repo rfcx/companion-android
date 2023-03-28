@@ -62,8 +62,8 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             this,
             ViewModelFactory(
                 application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(this)),
+                CoreApiHelper(CoreApiServiceImpl(this)),
                 LocalDataHelper()
             )
         ).get(AudioMothDeploymentViewModel::class.java)

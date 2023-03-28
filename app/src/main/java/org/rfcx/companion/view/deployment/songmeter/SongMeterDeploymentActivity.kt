@@ -90,8 +90,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             this,
             ViewModelFactory(
                 application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(this)),
+                CoreApiHelper(CoreApiServiceImpl(this)),
                 LocalDataHelper(),
                 BleHelper(BleDetectService(this), BleConnectDelegate(this))
             )
