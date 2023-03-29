@@ -419,6 +419,7 @@ class CompanionRealmMigration : RealmMigration {
         image?.apply {
             if (!this.hasField(DeploymentImage.FIELD_IMAGE_LABEL)) {
                 addField(DeploymentImage.FIELD_IMAGE_LABEL, String::class.java)
+                    .setNullable(DeploymentImage.FIELD_IMAGE_LABEL, false)
             }
         }
     }
