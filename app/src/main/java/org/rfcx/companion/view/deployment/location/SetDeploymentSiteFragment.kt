@@ -64,8 +64,8 @@ class SetDeploymentSiteFragment :
             this,
             ViewModelFactory(
                 requireActivity().application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(requireContext())),
+                CoreApiHelper(CoreApiServiceImpl(requireContext())),
                 LocalDataHelper()
             )
         ).get(AudioMothDeploymentViewModel::class.java)

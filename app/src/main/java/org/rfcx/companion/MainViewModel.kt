@@ -8,6 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import com.auth0.android.Auth0
+import com.auth0.android.authentication.AuthenticationAPIClient
+import com.auth0.android.authentication.AuthenticationException
+import com.auth0.android.callback.BaseCallback
+import com.auth0.android.result.Credentials
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.offline.OfflineManager
@@ -32,6 +37,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainViewModel(
     application: Application,
@@ -66,6 +73,21 @@ class MainViewModel(
         combinedData()
     }
 
+    private val auth0 by lazy {
+        val auth0 =
+            Auth0(
+                context.getString(R.string.auth0_client_id),
+                context.getString(R.string.auth0_domain)
+            )
+        auth0.isOIDCConformant = true
+        auth0.isLoggingEnabled = true
+        auth0
+    }
+
+    private val authentication by lazy {
+        AuthenticationAPIClient(auth0)
+    }
+
     init {
         fetchLiveData()
     }
@@ -88,7 +110,7 @@ class MainViewModel(
 
     fun fetchProjects() {
         projects.postValue(Resource.loading(null))
-        mainRepository.getProjectsFromRemote("Bearer ${context.getIdToken()}")
+        mainRepository.getProjectsFromRemote()
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (!context.isNetworkAvailable()) {
@@ -134,7 +156,7 @@ class MainViewModel(
         updateProjectBounds.map { projectBounds ->
             val token = "Bearer ${context?.getIdToken()}"
             projectBounds.serverId?.let { serverId ->
-                mainRepository.getProjectsByIdFromCore(token, serverId)
+                mainRepository.getProjectsByIdFromCore(serverId)
                     .enqueue(object : Callback<ProjectByIdResponse> {
                         override fun onFailure(call: Call<ProjectByIdResponse>, t: Throwable) {}
                         override fun onResponse(
@@ -158,7 +180,7 @@ class MainViewModel(
     }
 
     private fun fetchDeletedProjects() {
-        mainRepository.getDeletedProjectsFromRemote("Bearer ${context.getIdToken()}")
+        mainRepository.getDeletedProjectsFromRemote()
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (!context.isNetworkAvailable()) {
@@ -197,7 +219,7 @@ class MainViewModel(
         val projectsLocal =
             getProjectsFromLocal().filter { project -> project.serverId != null }
         projectsLocal.forEach {
-            mainRepository.getProjectOffTimeFromRemote("Bearer ${context.getIdToken()}", it.serverId!!)
+            mainRepository.getProjectOffTimeFromRemote(it.serverId!!)
                 .enqueue(object : Callback<ProjectOffTimeResponse> {
                     override fun onFailure(call: Call<ProjectOffTimeResponse>, t: Throwable) {
                         if (!context.isNetworkAvailable()) {
@@ -233,7 +255,7 @@ class MainViewModel(
 
     fun getStreamAssets(site: Stream) {
         tracks.postValue(Resource.loading(null))
-        mainRepository.getStreamAssets("Bearer ${context.getIdToken()}", site.serverId!!)
+        mainRepository.getStreamAssets(site.serverId!!)
             .enqueue(object : Callback<List<DeploymentAssetResponse>> {
                 override fun onResponse(
                     call: Call<List<DeploymentAssetResponse>>,
@@ -247,7 +269,6 @@ class MainViewModel(
                             fileCount += 1
                             GeoJsonUtils.downloadGeoJsonFile(
                                 context,
-                                "Bearer ${context.getIdToken()}",
                                 item,
                                 site.serverId!!,
                                 Date(),
@@ -469,5 +490,46 @@ class MainViewModel(
     fun onDestroy() {
         streamLiveData.removeObserver(streamObserve)
         deploymentLiveData.removeObserver(deploymentObserve)
+    }
+
+    suspend fun shouldBackToLogin(): Boolean {
+        val credentialKeeper = CredentialKeeper(context)
+        val credentialVerifier = CredentialVerifier(context)
+        val refreshToken = Preferences.getInstance(context).getString(Preferences.REFRESH_TOKEN)
+        val token = Preferences.getInstance(context).getString(Preferences.ID_TOKEN)
+
+        if (refreshToken == null) {
+            return true
+        }
+        if (token == null) {
+            return true
+        }
+        if (credentialKeeper.hasValidCredentials()) {
+            return false
+        }
+
+        return suspendCoroutine { cont ->
+            authentication.renewAuth(refreshToken).start(object : BaseCallback<Credentials, AuthenticationException> {
+                override fun onSuccess(credentials: Credentials?) {
+                    if (credentials == null) cont.resume(true)
+
+                    val result = credentialVerifier.verify(credentials!!)
+                    when (result) {
+                        is Err -> {
+                            cont.resume(true)
+                        }
+                        is Ok -> {
+                            val userAuthResponse = result.value
+                            credentialKeeper.save(userAuthResponse)
+                            cont.resume(false)
+                        }
+                    }
+                }
+
+                override fun onFailure(error: AuthenticationException) {
+                    cont.resume(true)
+                }
+            })
+        }
     }
 }

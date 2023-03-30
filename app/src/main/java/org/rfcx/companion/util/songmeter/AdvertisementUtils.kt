@@ -46,7 +46,7 @@ class AdvertisementUtils {
                 if (!readyToPair) timeRecordingPrefixes = binaryToPrefixes(prefixesBytes.toBinaryString())
             }
         }
-        if (!telemetryPrefixes.isNullOrBlank() && !timeRecordingPrefixes.isNullOrBlank()) {
+        if (telemetryPrefixes != null && timeRecordingPrefixes != null) {
             fullPrefixes = telemetryPrefixes + timeRecordingPrefixes
         }
 

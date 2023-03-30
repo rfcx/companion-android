@@ -81,8 +81,8 @@ class GuardianSoftwareActivity : AppCompatActivity() {
             this,
             ViewModelFactory(
                 application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(this)),
+                CoreApiHelper(CoreApiServiceImpl(this)),
                 LocalDataHelper()
             )
         ).get(GuardianSoftwareViewModel::class.java)

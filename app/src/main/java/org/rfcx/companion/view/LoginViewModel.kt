@@ -23,6 +23,7 @@ import org.rfcx.companion.entity.UserTouchResponse
 import org.rfcx.companion.entity.response.FirebaseAuthResponse
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.CredentialVerifier
+import org.rfcx.companion.util.Preferences
 import org.rfcx.companion.util.Resource
 import retrofit2.Call
 import retrofit2.Callback
@@ -131,8 +132,7 @@ class LoginViewModel(
     }
 
     fun userTouch(result: UserAuthResponse) {
-        val authUser = "Bearer ${result.idToken}"
-        loginRepository.userTouch(authUser)
+        loginRepository.userTouch()
             .enqueue(object : Callback<UserTouchResponse> {
                 override fun onFailure(call: Call<UserTouchResponse>, t: Throwable) {
                     userTouch.postValue(
@@ -150,7 +150,7 @@ class LoginViewModel(
 
                     response.body()?.let {
                         if (it.success) {
-                            userTouch.postValue(Resource.success(authUser))
+                            userTouch.postValue(Resource.success(result.idToken))
                         } else {
                             userTouch.postValue(
                                 Resource.error(
@@ -164,8 +164,8 @@ class LoginViewModel(
             })
     }
 
-    fun getFirebaseAuth(authUser: String) {
-        ApiManager.getInstance().apiFirebaseAuth.firebaseAuth(authUser)
+    fun getFirebaseAuth() {
+        ApiManager.getInstance().getApiFirebaseAuth(context).firebaseAuth()
             .enqueue(object : Callback<FirebaseAuthResponse> {
                 override fun onFailure(call: Call<FirebaseAuthResponse>, t: Throwable) {
                     firebaseAuth.postValue(
@@ -218,16 +218,8 @@ class LoginViewModel(
         return loginWithEmailPassword
     }
 
-    fun loginWithFacebookState(): LiveData<Resource<UserAuthResponse>> {
-        return loginWithFacebook
-    }
-
     fun loginWithGoogleState(): LiveData<Resource<UserAuthResponse>> {
         return loginWithGoogle
-    }
-
-    fun loginWithPhoneNumberState(): LiveData<Resource<UserAuthResponse>> {
-        return loginWithPhoneNumber
     }
 
     fun userTouchState(): LiveData<Resource<String>> {
@@ -240,5 +232,9 @@ class LoginViewModel(
 
     fun signInWithFirebaseTokenState(): LiveData<Resource<String>> {
         return firebaseAuth
+    }
+
+    fun getSelectedProject(): Int {
+        return Preferences.getInstance(context).getInt(Preferences.SELECTED_PROJECT)
     }
 }

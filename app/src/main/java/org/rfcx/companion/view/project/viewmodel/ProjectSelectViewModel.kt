@@ -9,7 +9,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.response.ProjectResponse
 import org.rfcx.companion.util.Resource
-import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
 import retrofit2.Call
@@ -31,7 +30,7 @@ class ProjectSelectViewModel(
 
     private fun fetchProjects() {
         projects.postValue(Resource.loading(null))
-        projectSelectRepository.getProjectsFromRemote("Bearer ${context.getIdToken()}")
+        projectSelectRepository.getProjectsFromRemote()
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (!context.isNetworkAvailable()) {
@@ -62,7 +61,7 @@ class ProjectSelectViewModel(
     }
 
     private fun fetchDeletedProjects() {
-        projectSelectRepository.getDeletedProjectsFromRemote("Bearer ${context.getIdToken()}")
+        projectSelectRepository.getDeletedProjectsFromRemote()
             .enqueue(object : Callback<List<ProjectResponse>> {
                 override fun onFailure(call: Call<List<ProjectResponse>>, t: Throwable) {
                     if (!context.isNetworkAvailable()) {

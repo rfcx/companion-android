@@ -12,7 +12,6 @@ import org.rfcx.companion.entity.response.GuardianClassifierResponse
 import org.rfcx.companion.util.Resource
 import org.rfcx.companion.util.file.ClassifierUtils
 import org.rfcx.companion.util.file.FileStatus
-import org.rfcx.companion.util.getIdToken
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.profile.classifier.repository.GuardianClassifierRepository
 import retrofit2.Call
@@ -33,7 +32,7 @@ class GuardianClassifierViewModel(
     private var cacheClassifiers: List<GuardianClassifierResponse>? = null
 
     init {
-        checkAvailableClassifiers("Bearer ${context.getIdToken()}")
+        checkAvailableClassifiers()
     }
 
     fun getDownloadedClassifiersLiveData() =
@@ -43,9 +42,9 @@ class GuardianClassifierViewModel(
     fun getDownloadedClassifiers() = guardianClassifierRepository.getDownloadedClassifier()
     fun getAvailableClassifiers() = availableClassifiers
 
-    private fun checkAvailableClassifiers(userToken: String) {
+    private fun checkAvailableClassifiers() {
         availableClassifiers.postValue(Resource.loading(null))
-        guardianClassifierRepository.checkAvailableClassifiers(userToken)
+        guardianClassifierRepository.checkAvailableClassifiers()
             .enqueue(object : Callback<List<GuardianClassifierResponse>> {
                 override fun onResponse(
                     call: Call<List<GuardianClassifierResponse>>,

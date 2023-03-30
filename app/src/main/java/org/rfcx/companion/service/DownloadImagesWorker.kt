@@ -9,7 +9,6 @@ import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 
 class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -27,8 +26,7 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
         }
 
         deployment?.let { dp ->
-            val token = "Bearer ${context.getIdToken()}"
-            val result = ApiManager.getInstance().getDeviceApi().getDeploymentAssets(token, dp.second!!).execute()
+            val result = ApiManager.getInstance().getDeviceApi(context).getDeploymentAssets(dp.second!!).execute()
             if (result.isSuccessful) {
                 val dpAssets = result.body()
                 dpAssets?.forEach { item ->

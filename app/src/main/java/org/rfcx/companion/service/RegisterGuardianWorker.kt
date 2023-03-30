@@ -9,7 +9,6 @@ import org.rfcx.companion.entity.RegisterGuardian
 import org.rfcx.companion.localdb.GuardianRegistrationDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 
 class RegisterGuardianWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -23,10 +22,9 @@ class RegisterGuardianWorker(val context: Context, params: WorkerParameters) :
         Log.d(TAG, "doWork: found ${registrations?.size ?: 0} unsent")
         var someFailed = false
 
-        val token = "Bearer ${context.getIdToken()}"
         registrations?.forEach {
-            val result = ApiManager.getInstance().getDeviceApi2(it.env == "production")
-                .registerGuardian(token, it.toRequest()).execute()
+            val result = ApiManager.getInstance().getDeviceApi2(it.env == "production", context)
+                .registerGuardian(it.toRequest()).execute()
 
             val error = result.errorBody()?.string()
             if (result.isSuccessful) {

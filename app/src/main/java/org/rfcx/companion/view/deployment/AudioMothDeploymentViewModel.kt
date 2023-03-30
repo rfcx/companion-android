@@ -121,7 +121,7 @@ class AudioMothDeploymentViewModel(
 
     fun insertImage(
         deployment: Deployment? = null,
-        attachImages: List<String>
+        attachImages: List<Image>
     ) {
         audioMothDeploymentRepository.insertImage(deployment, attachImages)
     }

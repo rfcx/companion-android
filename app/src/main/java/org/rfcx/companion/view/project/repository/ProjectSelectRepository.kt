@@ -10,7 +10,6 @@ class ProjectSelectRepository(
 ) {
 
     fun getProjectsFromRemote(
-        token: String,
         limit: Int = 100,
         offset: Int = 0,
         fields: List<String> = listOf(
@@ -20,15 +19,14 @@ class ProjectSelectRepository(
             "externalId",
             "permissions"
         )
-    ) = deviceApiHelper.getProjects(token, limit, offset, fields)
+    ) = deviceApiHelper.getProjects(limit, offset, fields)
 
     fun getDeletedProjectsFromRemote(
-        token: String,
         limit: Int = 100,
         offset: Int = 0,
         onlyDeleted: Boolean = true,
         fields: List<String> = listOf("id")
-    ) = deviceApiHelper.getDeletedProjects(token, limit, offset, onlyDeleted, fields)
+    ) = deviceApiHelper.getDeletedProjects(limit, offset, onlyDeleted, fields)
 
     fun getProjectsFromLocal() = localDataHelper.getProjectLocalDb().getProjects()
 

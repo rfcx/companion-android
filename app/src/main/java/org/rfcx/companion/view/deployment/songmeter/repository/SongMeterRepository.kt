@@ -6,6 +6,7 @@ import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.ble.BleHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
+import org.rfcx.companion.view.deployment.Image
 
 class SongMeterRepository(
     private val deviceApiHelper: DeviceApiHelper,
@@ -47,7 +48,7 @@ class SongMeterRepository(
 
     fun insertImage(
         deployment: Deployment? = null,
-        attachImages: List<String>
+        attachImages: List<Image>
     ) = localDataHelper.getDeploymentImageLocalDb()
         .insertImage(deployment, attachImages)
 

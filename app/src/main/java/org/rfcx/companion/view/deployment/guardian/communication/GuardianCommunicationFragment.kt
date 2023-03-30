@@ -303,6 +303,8 @@ class GuardianCommunicationFragment : Fragment() {
                 if (offTimes != null) {
                     if (currentOffTimes != offTimes) needCheckSha1 = true
                     GuardianSocketManager.sendSatOnlyPrefs(offTimes)
+                } else {
+                    GuardianSocketManager.sendSatOnlyPrefs()
                 }
             }
         }

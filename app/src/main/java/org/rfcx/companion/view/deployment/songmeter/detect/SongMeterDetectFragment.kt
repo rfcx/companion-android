@@ -1,10 +1,13 @@
 package org.rfcx.companion.view.deployment.songmeter.detect
 
+import android.Manifest
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -40,13 +43,22 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     private var currentStep = 1
     private var isReadyToSet = true
 
+    private val requestMultiplePermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                if (it.key == "android.permission.BLUETOOTH_SCAN" && it.value == false) {
+                    showAlertPermission()
+                }
+            }
+        }
+
     private fun setViewModel() {
         songMeterViewModel = ViewModelProvider(
             this,
             ViewModelFactory(
                 requireActivity().application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(requireContext())),
+                CoreApiHelper(CoreApiServiceImpl(requireContext())),
                 LocalDataHelper(),
                 BleHelper(BleDetectService(requireContext()), BleConnectDelegate(requireContext()))
             )
@@ -68,9 +80,11 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setViewModel()
         setupTopBar()
+
+        requestPermission()
+
         if (!songMeterViewModel.isBluetoothEnabled()) {
             showAlertBluetooth()
         }
@@ -291,6 +305,29 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
                 }
             }
         dialogBuilder.create().show()
+    }
+
+    private fun showAlertPermission() {
+        val dialogBuilder =
+            MaterialAlertDialogBuilder(requireContext(), R.style.BaseAlertDialog).apply {
+                setTitle(null)
+                setMessage(R.string.alert_bluetooth_songmeter)
+                setPositiveButton(R.string.go_back) { _, _ ->
+                    deploymentProtocol?.backStep()
+                }
+            }
+        dialogBuilder.create().show()
+    }
+
+    private fun requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            requestMultiplePermissions.launch(
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                )
+            )
+        }
     }
 
     override fun invoke(ads: Advertisement) {

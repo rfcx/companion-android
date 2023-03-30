@@ -17,26 +17,24 @@ class MainRepository(
     private val localDataHelper: LocalDataHelper
 ) {
     fun getProjectsFromRemote(
-        token: String,
         limit: Int = 100,
         offset: Int = 0,
         fields: List<String> = listOf("id", "name", "permissions")
     ) =
-        deviceApiHelper.getProjects(token, limit, offset, fields)
+        deviceApiHelper.getProjects(limit, offset, fields)
 
-    fun getProjectsByIdFromCore(token: String, id: String) = deviceApiHelper.getProjectsById(token, id)
+    fun getProjectsByIdFromCore(id: String) = deviceApiHelper.getProjectsById(id)
 
     fun getDeletedProjectsFromRemote(
-        token: String,
         limit: Int = 100,
         offset: Int = 0,
         onlyDeleted: Boolean = true,
         fields: List<String> = listOf("id")
-    ) = deviceApiHelper.getDeletedProjects(token, limit, offset, onlyDeleted, fields)
+    ) = deviceApiHelper.getDeletedProjects(limit, offset, onlyDeleted, fields)
 
-    fun getProjectOffTimeFromRemote(token: String, projectId: String) = deviceApiHelper.getProjectOffTime(token, projectId)
+    fun getProjectOffTimeFromRemote(projectId: String) = deviceApiHelper.getProjectOffTime(projectId)
 
-    fun getStreamAssets(token: String, id: String) = deviceApiHelper.getStreamAssets(token, id)
+    fun getStreamAssets(id: String) = deviceApiHelper.getStreamAssets(id)
 
     fun getProjectsFromLocal() = localDataHelper.getProjectLocalDb().getProjects()
 

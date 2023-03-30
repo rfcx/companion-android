@@ -90,8 +90,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             this,
             ViewModelFactory(
                 application,
-                DeviceApiHelper(DeviceApiServiceImpl()),
-                CoreApiHelper(CoreApiServiceImpl()),
+                DeviceApiHelper(DeviceApiServiceImpl(this)),
+                CoreApiHelper(CoreApiServiceImpl(this)),
                 LocalDataHelper(),
                 BleHelper(BleDetectService(this), BleConnectDelegate(this))
             )
@@ -208,7 +208,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     private fun saveImages(deployment: Deployment) {
         songMeterViewModel.deleteImages(deployment)
-        songMeterViewModel.insertImage(deployment, _images.filter { it.path != null }.map { it.path!! })
+        songMeterViewModel.insertImage(deployment, _images)
     }
 
     override fun setDeployLocation(stream: Stream, isExisted: Boolean) {
@@ -305,7 +305,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
                     CompleteFragment()
                 }
         completeFragment.isCancelable = false
-        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+        if (!completeFragment.isVisible) completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
     override fun setCurrentLocation(location: Location) {
@@ -344,11 +344,11 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
     }
 
     override fun showToolbar() {
-        toolbar.visibility = View.VISIBLE
+        toolbar?.visibility = View.VISIBLE
     }
 
     override fun hideToolbar() {
-        toolbar.visibility = View.GONE
+        toolbar?.visibility = View.GONE
     }
 
     override fun setMenuToolbar(isVisibility: Boolean) {

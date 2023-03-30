@@ -1,7 +1,7 @@
 package org.rfcx.companion.util.songmeter
 
 private val characterTable = mapOf(
-    0 to null,
+    0 to "",
     1 to "A",
     2 to "B",
     3 to "C",

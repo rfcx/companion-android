@@ -122,11 +122,11 @@ abstract class BaseDeploymentActivity :
     }
 
     override fun showToolbar() {
-        toolbar.visibility = View.VISIBLE
+        toolbar?.visibility = View.VISIBLE
     }
 
     override fun hideToolbar() {
-        toolbar.visibility = View.GONE
+        toolbar?.visibility = View.GONE
     }
 
     override fun setToolbarTitle() {

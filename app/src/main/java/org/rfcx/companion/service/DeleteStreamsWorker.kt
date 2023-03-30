@@ -13,7 +13,6 @@ import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.RealmHelper
-import org.rfcx.companion.util.getIdToken
 
 class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -30,12 +29,12 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
 
         Log.d(TAG, "doWork on DeleteStreams")
 
-        val token = "Bearer ${context.getIdToken()}"
-        val result = getStreams(token, currentStreamsLoading)
+        val result = getStreams(currentStreamsLoading)
         if (result) {
             val streamDb = StreamDb(Realm.getInstance(RealmHelper.migrationConfig()))
             val deploymentDb = DeploymentDb(Realm.getInstance(RealmHelper.migrationConfig()))
-            val savedStreams = streamDb.getStreams().filter { it.serverId != null && it.project?.serverId == PROJECT_ID }
+            val savedStreams = streamDb.getStreams()
+                .filter { it.serverId != null && it.project?.serverId == PROJECT_ID }
             val downloadedStreams = streams.map { it.toStream().serverId }
             val filteredStreams =
                 savedStreams.filter { stream -> !downloadedStreams.contains(stream.serverId) }
@@ -48,6 +47,19 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                 // force delete deployment on device-api
                 DeploymentSyncWorker.enqueue(context)
             }
+
+            val savedUnSyncedStreams = streamDb.getStreams()
+                .filter { it.serverId == null && it.project?.serverId == PROJECT_ID }
+            // unsynced site which same name (should not have this case in real life but just in case)
+            val filteredUnSyncedStreams = savedUnSyncedStreams.filter { stream ->
+                filteredStreams.map { it.name }.contains(stream.name)
+            }
+            if (filteredUnSyncedStreams.isNotEmpty()) {
+                filteredUnSyncedStreams.forEach {
+                    Log.d(TAG, "remove stream: ${it.id}")
+                    streamDb.deleteStream(it.id)
+                }
+            }
         } else {
             someFailed = true
         }
@@ -55,11 +67,11 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
         return if (someFailed) Result.retry() else Result.success()
     }
 
-    private suspend fun getStreams(token: String, offset: Int): Boolean =
+    private suspend fun getStreams(offset: Int): Boolean =
         withContext(Dispatchers.IO) {
             val projectId = PROJECT_ID?.let { listOf(it) }
-            val result = ApiManager.getInstance().getDeviceApi()
-                .getStreams(token, SITES_LIMIT_GETTING, offset, null, null, projectId)
+            val result = ApiManager.getInstance().getDeviceApi(context)
+                .getStreams(SITES_LIMIT_GETTING, offset, null, null, projectId)
                 .execute()
             if (result.isSuccessful) {
                 val resultBody = result.body()
@@ -67,7 +79,7 @@ class DeleteStreamsWorker(val context: Context, params: WorkerParameters) :
                     streams = streams + it
                     if (it.size == SITES_LIMIT_GETTING) {
                         currentStreamsLoading += SITES_LIMIT_GETTING
-                        return@withContext getStreams(token, currentStreamsLoading)
+                        return@withContext getStreams(currentStreamsLoading)
                     }
                 }
             } else {

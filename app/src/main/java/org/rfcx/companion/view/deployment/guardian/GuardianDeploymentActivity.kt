@@ -519,7 +519,7 @@ class GuardianDeploymentActivity :
 
     private fun saveImages(deployment: Deployment) {
         deploymentImageDb.deleteImages(deployment.id)
-        deploymentImageDb.insertImage(deployment, _images.filter { it.path != null }.map { it.path!! })
+        deploymentImageDb.insertImage(deployment, _images)
     }
 
     override fun startConnectGuardian() {
@@ -636,7 +636,8 @@ class GuardianDeploymentActivity :
                 ?: run {
                     CompleteFragment()
                 }
-        completeFragment.show(supportFragmentManager, CompleteFragment.tag)
+        completeFragment.isCancelable = false
+        if (!completeFragment.isVisible) completeFragment.show(supportFragmentManager, CompleteFragment.tag)
     }
 
     override fun hideLoading() {
