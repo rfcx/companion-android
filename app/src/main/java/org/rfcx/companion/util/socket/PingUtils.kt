@@ -314,12 +314,20 @@ object PingUtils {
         val listOfArchived = archived.split("|")
         return listOfArchived.map {
             val data = it.split("*")
+            var missing: List<String>? = null
+            if (data.size > 5) {
+                missing = data.subList(5, data.size)
+                if (missing.size == 1 && missing[0] == "") {
+                    missing = null
+                }
+            }
             GuardianArchived(
                 data[0].toLong(),
                 data[1].toLong(),
                 data[2].toInt(),
                 data[3].toInt(),
-                data[4].toInt()
+                data[4].toInt(),
+                if (missing.isNullOrEmpty()) null else missing
             )
         }
     }
