@@ -9,6 +9,7 @@ data class DeploymentImageView(
     val id: Int,
     val localPath: String,
     val remotePath: String?,
+    val label: String,
     var syncState: Int = 0 // syncToFireStoreState
 ) {
     val syncImage = when (syncState) {
@@ -26,6 +27,7 @@ fun DeploymentImage.toDeploymentImageView(): DeploymentImageView {
         id = this.id,
         localPath = this.localPath,
         remotePath = if (this.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + this.remotePath else null,
+        label = this.imageLabel,
         syncState = if (this.syncToFireStoreState != SyncState.Sent.key) {
             this.syncState
         } else {

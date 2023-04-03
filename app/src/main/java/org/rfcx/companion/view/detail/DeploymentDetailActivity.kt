@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -46,7 +47,7 @@ import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.
 import java.io.File
 
 class DeploymentDetailActivity :
-    AppCompatActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
+    AppCompatActivity(), OnMapReadyCallback {
 
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
@@ -205,6 +206,7 @@ class DeploymentDetailActivity :
                 list.removeAt(index)
                 list.add(0, selectedImage)
                 firebaseCrashlytics.setCustomKey(CrashlyticsKey.OnClickImage.key, selectedImage)
+                Log.d("Comp", deploymentImageView.label)
                 DisplayImageActivity.startActivity(
                     this@DeploymentDetailActivity,
                     list.toTypedArray()
@@ -417,18 +419,5 @@ class DeploymentDetailActivity :
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
-    }
-
-    override fun invoke(deploymentImage: DeploymentImageView) {
-        val list = deploymentImages.map {
-            if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
-        } as ArrayList
-
-        val index =
-            list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
-        list.removeAt(index)
-        list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
-
-        DisplayImageActivity.startActivity(this, list.toTypedArray())
     }
 }

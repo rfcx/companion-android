@@ -35,7 +35,8 @@ class DownloadImagesWorker(val context: Context, params: WorkerParameters) :
                         deploymentImageDb.insertOrUpdate(
                             item,
                             dp.first,
-                            dp.third
+                            dp.third,
+                            item.meta?.label
                         )
                     }
                 }

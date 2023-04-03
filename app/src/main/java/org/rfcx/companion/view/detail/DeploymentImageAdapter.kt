@@ -95,7 +95,7 @@ class DeploymentImageAdapter :
             }
 
             localPathImagesForAdd.forEach {
-                imagesSource.add(LocalImageItem(index, DeploymentImageView(id = 0, localPath = it, remotePath = null), true))
+                imagesSource.add(LocalImageItem(index, DeploymentImageView(id = 0, localPath = it, remotePath = null, label = "other"), true))
                 index++
             }
         } else {

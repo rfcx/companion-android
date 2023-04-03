@@ -178,7 +178,8 @@ class DeploymentImageDb(private val realm: Realm) {
     fun insertOrUpdate(
         deploymentAssetResponse: DeploymentAssetResponse,
         deploymentId: Int?,
-        device: String
+        device: String,
+        label: String?
     ) {
         realm.executeTransaction {
             val image =
@@ -196,6 +197,7 @@ class DeploymentImageDb(private val realm: Realm) {
                 deploymentImage.deploymentId = deploymentId
                 deploymentImage.syncState = SyncState.Sent.key
                 deploymentImage.device = device
+                deploymentImage.imageLabel = label ?: "other"
                 it.insert(deploymentImage)
             }
         }
