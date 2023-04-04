@@ -239,7 +239,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     override fun onImageClick(image: Image) {
         if (image.path == null) return
-        context?.let { DisplayImageActivity.startActivity(it, arrayOf("file://${image.path}")) }
+        context?.let { DisplayImageActivity.startActivity(it, arrayOf("file://${image.path}"), arrayOf(image.name)) }
     }
 
     override fun onDeleteClick(image: Image) {
