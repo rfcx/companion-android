@@ -16,6 +16,8 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -44,6 +46,8 @@ import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
+import org.rfcx.companion.view.deployment.Image
+import org.rfcx.companion.view.detail.image.AddImageActivity
 import java.io.File
 
 class DeploymentDetailActivity :
@@ -66,9 +70,13 @@ class DeploymentDetailActivity :
         updateDeploymentImages(deploymentImages)
     }
 
+    private var newImages: List<Image>? = null
+
     private var imageFile: File? = null
     private val cameraPermissions by lazy { CameraPermissions(this) }
     private val galleryPermissions by lazy { GalleryPermissions(this) }
+
+    private var toAddImage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +99,10 @@ class DeploymentDetailActivity :
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
                 ?.let { viewModel.getDeploymentById(it) }
+        newImages = intent.getSerializableExtra(NEW_IMAGES_EXTRA)?.let {
+            it as List<Image>
+        }
+        Log.d("Comp2", newImages.toString())
 
         setupToolbar()
         setupImageRecycler()
@@ -190,7 +202,14 @@ class DeploymentDetailActivity :
                     if (!cameraPermissions.allowed()) cameraPermissions.check { }
                     if (!galleryPermissions.allowed()) galleryPermissions.check { }
                 } else {
-                    startOpenGligarPicker()
+                    AddImageActivity.startActivity(
+                        this@DeploymentDetailActivity,
+                        deployment?.device!!,
+                        deployment?.id!!,
+                        newImages
+                    )
+                    toAddImage = true
+                    finish()
                 }
             }
 
@@ -200,7 +219,17 @@ class DeploymentDetailActivity :
                         if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
                     } + deploymentImageAdapter.getNewAttachImage().map { "file://$it" }
                     ) as ArrayList
+                if (!newImages.isNullOrEmpty()) {
+                    newImages?.reversed()?.forEach {
+                        list.add(0, "file://${it.path}")
+                    }
+                }
                 val labelList = deploymentImages.map { it.imageLabel } as ArrayList
+                if (!newImages.isNullOrEmpty()) {
+                    newImages?.reversed()?.forEach {
+                        labelList.add(0, it.name)
+                    }
+                }
                 val selectedImage =
                     deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
                 val index = list.indexOf(selectedImage)
@@ -307,7 +336,10 @@ class DeploymentDetailActivity :
 
     private fun updateDeploymentImages(deploymentImages: List<DeploymentImage>) {
         val items = deploymentImages.map { it.toDeploymentImageView() }
-        deploymentImageAdapter.setImages(items)
+        val newImages =
+            this.newImages?.map { DeploymentImageView(0, it.path!!, it.remotePath, it.name) }
+        val combined = if (newImages != null) newImages + items else items
+        deploymentImageAdapter.setImages(combined)
     }
 
     private fun setupImageRecycler() {
@@ -368,8 +400,8 @@ class DeploymentDetailActivity :
         super.onDestroy()
         // remove observer
         deployImageLiveData.removeObserver(deploymentImageObserve)
-        val newImages = deploymentImageAdapter.getNewAttachImage()
-        if (newImages.isNotEmpty()) {
+        val newImages = deploymentImageAdapter.getNewAttachImageTyped()
+        if (newImages.isNotEmpty() && !toAddImage) {
             viewModel.insertImage(deployment, newImages)
             ImageSyncWorker.enqueue(this)
         }
@@ -418,10 +450,17 @@ class DeploymentDetailActivity :
     companion object {
         const val DEPLOYMENT_REQUEST_CODE = 1001
         const val DEFAULT_ZOOM = 15.0
-
+        const val NEW_IMAGES_EXTRA = "NEW_IMAGES_EXTRA"
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DeploymentDetailActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            context.startActivity(intent)
+        }
+
+        fun startActivity(context: Context, deploymentId: Int, newImages: List<Image>) {
+            val intent = Intent(context, DeploymentDetailActivity::class.java)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            intent.putExtra(NEW_IMAGES_EXTRA, newImages as java.io.Serializable)
             context.startActivity(intent)
         }
     }

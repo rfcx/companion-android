@@ -32,6 +32,7 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
         var someFailed = false
 
         deploymentImage.forEach {
+            Log.d("Comp", it.imageLabel)
             val file = File(it.localPath)
             val mimeType = file.getMimeType()
             val requestFile = RequestBody.create(MediaType.parse(mimeType), storage.compressFile(context, file))

@@ -19,6 +19,8 @@ import org.rfcx.companion.view.detail.DeploymentDetailRepository
 import org.rfcx.companion.view.detail.DeploymentDetailViewModel
 import org.rfcx.companion.view.detail.EditLocationRepository
 import org.rfcx.companion.view.detail.EditLocationViewModel
+import org.rfcx.companion.view.detail.image.AddImageRepository
+import org.rfcx.companion.view.detail.image.AddImageViewModel
 import org.rfcx.companion.view.profile.classifier.repository.GuardianClassifierRepository
 import org.rfcx.companion.view.profile.classifier.viewmodel.GuardianClassifierViewModel
 import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
@@ -103,6 +105,12 @@ class ViewModelFactory(
                 return SongMeterViewModel(
                     application,
                     SongMeterRepository(deviceApiHelper, localDataHelper, bleHelper!!)
+                ) as T
+            }
+            modelClass.isAssignableFrom(AddImageViewModel::class.java) -> {
+                return AddImageViewModel(
+                    application,
+                    AddImageRepository(localDataHelper)
                 ) as T
             }
             else -> throw IllegalArgumentException("Unknown class name")

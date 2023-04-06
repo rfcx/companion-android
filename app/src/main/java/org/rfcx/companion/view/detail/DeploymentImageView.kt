@@ -4,6 +4,8 @@ import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.DeploymentImage
 import org.rfcx.companion.entity.SyncState
+import org.rfcx.companion.view.deployment.Image
+import org.rfcx.companion.view.deployment.ImageType
 
 data class DeploymentImageView(
     val id: Int,
@@ -33,5 +35,16 @@ fun DeploymentImage.toDeploymentImageView(): DeploymentImageView {
         } else {
             this.syncToFireStoreState
         }
+    )
+}
+
+fun DeploymentImage.toImage(): Image {
+    return Image(
+        this.id,
+        this.imageLabel,
+        if (this.imageLabel == "other") ImageType.OTHER else ImageType.NORMAL,
+        this.localPath,
+        this.remotePath,
+        false
     )
 }

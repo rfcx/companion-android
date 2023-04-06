@@ -13,6 +13,7 @@ import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.view.deployment.Image
+import java.util.*
 
 class DeploymentImageDb(private val realm: Realm) {
 
@@ -34,9 +35,11 @@ class DeploymentImageDb(private val realm: Realm) {
     }
 
     fun getImageByDeploymentId(id: Int): List<DeploymentImage> {
-        return realm.where(DeploymentImage::class.java)
-            .equalTo(FIELD_DEPLOYMENT_ID, id)
-            .findAll()
+        return realm.copyFromRealm(
+            realm.where(DeploymentImage::class.java)
+                .equalTo(FIELD_DEPLOYMENT_ID, id)
+                .findAll()
+        )
     }
 
     fun deleteImages(id: Int) {
@@ -103,6 +106,31 @@ class DeploymentImageDb(private val realm: Realm) {
             .equalTo(FIELD_DEPLOYMENT_ID, deploymentId)
             .equalTo(FIELD_DEVICE, device)
             .findAllAsync()
+    }
+
+    fun insertImage(deploymentId: Int, attachImages: List<Image>) {
+        realm.executeTransaction {
+            val deployment =
+                it.where(Deployment::class.java).equalTo(Deployment.FIELD_ID, deploymentId)
+                    .findFirst()
+            deployment?.let { dp ->
+                val imageCreateAt = Date()
+                attachImages.filter { it.path != null }.forEach { attachImage ->
+                    val imageId =
+                        (it.where(DeploymentImage::class.java).max(FIELD_ID)?.toInt() ?: 0) + 1
+                    val deploymentImage = DeploymentImage(
+                        id = imageId,
+                        deploymentId = dp.id,
+                        localPath = attachImage.path!!,
+                        createdAt = imageCreateAt,
+                        device = dp.device ?: "",
+                        imageLabel = attachImage.name,
+                        deploymentServerId = dp.serverId
+                    )
+                    it.insertOrUpdate(deploymentImage)
+                }
+            }
+        }
     }
 
     fun insertImage(

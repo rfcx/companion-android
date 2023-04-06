@@ -12,13 +12,21 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.fragment_deploy.*
+import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
+import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.repo.api.CoreApiHelper
+import org.rfcx.companion.repo.api.CoreApiServiceImpl
+import org.rfcx.companion.repo.api.DeviceApiHelper
+import org.rfcx.companion.repo.api.DeviceApiServiceImpl
+import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity
@@ -28,15 +36,16 @@ import org.rfcx.companion.view.deployment.ImageClickListener
 import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
+import org.rfcx.companion.view.detail.DeploymentDetailViewModel
 import org.rfcx.companion.view.detail.DisplayImageActivity
 import org.rfcx.companion.view.dialog.GuidelineButtonClickListener
 import org.rfcx.companion.view.dialog.PhotoGuidelineDialogFragment
 import java.io.File
+import java.io.Serializable
 
 class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButtonClickListener {
 
-    private val analytics by lazy { Analytics(this) }
-    private var screen: String? = null
+    private lateinit var viewModel: AddImageViewModel
 
     private var imageAdapter: ImageAdapter? = null
     private var filePath: String? = null
@@ -51,7 +60,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     private var imageExamples = listOf<String>()
 
     private var device: String? = ""
-    private var deploymentId: String? = ""
+    private var deploymentId: Int? = -1
+    private var newImages: List<Image>? = null
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -68,12 +78,15 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
 
     private fun initIntent() {
         device = intent?.getStringExtra(DEVICE_EXTRA)
-        deploymentId = intent?.getStringExtra(DEPLOYMENT_ID_EXTRA)
+        deploymentId = intent?.getIntExtra(DEPLOYMENT_ID_EXTRA, -1)
+        newImages = intent?.getSerializableExtra(NEW_IMAGES_EXTRA)?.let {
+            it as List<Image>
+        }
     }
 
     private fun getPlaceHolder() {
         when (device) {
-            Device.GUARDIAN.value -> {
+            Device.AUDIOMOTH.value -> {
                 imagePlaceHolders =
                     resources.getStringArray(R.array.audiomoth_placeholders).toList()
                 imageGuidelineTexts =
@@ -89,7 +102,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                 imageExamples =
                     resources.getStringArray(R.array.audiomoth_photos).toList()
             }
-            Device.SONGMETER.value + "-cell" -> {
+            Device.GUARDIAN.value + "-cell" -> {
                 imagePlaceHolders =
                     resources.getStringArray(R.array.cell_guardian_placeholders)
                         .toList()
@@ -99,7 +112,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                 imageExamples =
                     resources.getStringArray(R.array.cell_guardian_photos).toList()
             }
-            Device.SONGMETER.value + "-sat" -> {
+            Device.GUARDIAN.value + "-sat" -> {
                 imagePlaceHolders =
                     resources.getStringArray(R.array.sat_guardian_placeholders)
                         .toList()
@@ -112,6 +125,18 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
         }
     }
 
+    private fun setViewModel() {
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelFactory(
+                application,
+                DeviceApiHelper(DeviceApiServiceImpl(this)),
+                CoreApiHelper(CoreApiServiceImpl(this)),
+                LocalDataHelper()
+            )
+        ).get(AddImageViewModel::class.java)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         savedInstanceState?.let {
@@ -122,6 +147,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
 
         setContentView(R.layout.fragment_deploy)
         initIntent()
+        setViewModel()
         getPlaceHolder()
         setupImages()
 
@@ -147,13 +173,13 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     }
 
     private fun setupImages() {
-        val savedImages =
-            audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
-                ?: guardianDeploymentProtocol?.getImages()
-        if (savedImages != null && savedImages.isNotEmpty()) {
+        val savedImages = viewModel.getImages(deploymentId)
+        getImageAdapter().setPlaceHolders(imagePlaceHolders)
+        if (savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
-        } else {
-            getImageAdapter().setPlaceHolders(imagePlaceHolders)
+        }
+        if (!newImages.isNullOrEmpty()) {
+            getImageAdapter().updateImagesFromSavedImages(newImages!!)
         }
     }
 
@@ -192,8 +218,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     }
 
     private fun setCacheImages() {
-        val images = getImageAdapter().getCurrentImagePaths()
-        // save to db
+        val images = getImageAdapter().getCurrentNewImages()
+        DeploymentDetailActivity.startActivity(this, deploymentId!!, images)
     }
 
     private fun updatePhotoTakenNumber() {
@@ -207,8 +233,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     }
 
     override fun onImageClick(image: Image) {
-        if (image.path == null) return
-        DisplayImageActivity.startActivity(this, arrayOf("file://${image.path}"), arrayOf(image.name))
+        val path = if (image.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + image.remotePath else "file://${image.path}"
+        DisplayImageActivity.startActivity(this, arrayOf(path), arrayOf(image.name))
     }
 
     override fun onDeleteClick(image: Image) {
@@ -300,18 +326,24 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
 
     private fun handleNextStep() {
         setCacheImages()
+        finish()
+    }
 
+    override fun onBackPressed() {
+        handleNextStep()
     }
 
     companion object {
 
         const val DEVICE_EXTRA = "DEVICE_EXTRA"
         const val DEPLOYMENT_ID_EXTRA = "DEPLOYMENT_ID_EXTRA"
+        const val NEW_IMAGES_EXTRA = "NEW_IMAGES_EXTRA"
 
-        fun startActivity(context: Context, device: String, deploymentId: String) {
+        fun startActivity(context: Context, device: String, deploymentId: Int, newImages: List<Image>?) {
             val intent = Intent(context, AddImageActivity::class.java)
             intent.putExtra(DEVICE_EXTRA, device)
             intent.putExtra(DEPLOYMENT_ID_EXTRA, deploymentId)
+            intent.putExtra(NEW_IMAGES_EXTRA, newImages as? Serializable)
             context.startActivity(intent)
         }
     }

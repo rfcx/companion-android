@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -149,10 +150,9 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         val savedImages =
             audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
                 ?: guardianDeploymentProtocol?.getImages()
+        getImageAdapter().setPlaceHolders(imagePlaceHolders)
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
-        } else {
-            getImageAdapter().setPlaceHolders(imagePlaceHolders)
         }
     }
 
@@ -222,6 +222,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private fun setCacheImages() {
         val images = getImageAdapter().getCurrentImagePaths()
+        Log.d("Comp2", images.toString())
         audioMothDeploymentProtocol?.setImages(images)
         songMeterDeploymentProtocol?.setImages(images)
         guardianDeploymentProtocol?.setImages(images)

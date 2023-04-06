@@ -120,6 +120,14 @@ class DeploymentImageAdapter :
         }
     }
 
+    fun getNewAttachImageTyped(): List<DeploymentImageView> {
+        return imagesSource.filter {
+            (it is LocalImageItem && it.canDelete && it.deploymentImage.id == 0)
+        }.map {
+            (it as LocalImageItem).deploymentImage
+        }
+    }
+
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is LocalImageItem -> VIEW_TYPE_IMAGE
