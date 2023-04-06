@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,6 +43,7 @@ import org.rfcx.companion.view.dialog.GuidelineButtonClickListener
 import org.rfcx.companion.view.dialog.PhotoGuidelineDialogFragment
 import java.io.File
 import java.io.Serializable
+import kotlin.math.max
 
 class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButtonClickListener {
 
@@ -62,6 +64,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     private var device: String? = ""
     private var deploymentId: Int? = -1
     private var newImages: List<Image>? = null
+    private var maxImages = 10
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -93,6 +96,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                     resources.getStringArray(R.array.audiomoth_guideline_texts).toList()
                 imageExamples =
                     resources.getStringArray(R.array.audiomoth_photos).toList()
+                maxImages = if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
             Device.SONGMETER.value -> {
                 imagePlaceHolders =
@@ -101,6 +105,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                     resources.getStringArray(R.array.songmeter_guideline_texts).toList()
                 imageExamples =
                     resources.getStringArray(R.array.audiomoth_photos).toList()
+                maxImages = if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
             Device.GUARDIAN.value + "-cell" -> {
                 imagePlaceHolders =
@@ -111,6 +116,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                         .toList()
                 imageExamples =
                     resources.getStringArray(R.array.cell_guardian_photos).toList()
+                maxImages = if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
             Device.GUARDIAN.value + "-sat" -> {
                 imagePlaceHolders =
@@ -121,8 +127,10 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                         .toList()
                 imageExamples =
                     resources.getStringArray(R.array.sat_guardian_photos).toList()
+                maxImages = if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
         }
+        getImageAdapter().setMaxImages(maxImages)
     }
 
     private fun setViewModel() {
@@ -146,13 +154,34 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
         }
 
         setContentView(R.layout.fragment_deploy)
-        initIntent()
         setViewModel()
-        getPlaceHolder()
-        setupImages()
+        initIntent()
 
-        setupImageRecycler()
-        updatePhotoTakenNumber()
+        if (device == "guardian") {
+            val types = arrayOf("cell", "sat")
+            var index = 0
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Type of guardian")
+                .setSingleChoiceItems(types, index) { _, which ->
+                    index = which
+                }
+                .setPositiveButton("Ok") { _, _ ->
+                    device += "-${types[index]}"
+                    getPlaceHolder()
+                    setupImages()
+                    setupImageRecycler()
+                    updatePhotoTakenNumber()
+                }
+                .setNegativeButton("Cancel") { _, _ ->
+                    finish()
+                }
+                .show()
+        } else {
+            getPlaceHolder()
+            setupImages()
+            setupImageRecycler()
+            updatePhotoTakenNumber()
+        }
 
         finishButton.setOnClickListener {
             val missing = getImageAdapter().getMissingImages()
@@ -223,6 +252,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     }
 
     private fun updatePhotoTakenNumber() {
+        photoTakenTextView.visibility = View.VISIBLE
         val number = getImageAdapter().getExistingImages().size
         photoTakenTextView.text =
             getString(R.string.photo_taken, number, getImageAdapter().itemCount)

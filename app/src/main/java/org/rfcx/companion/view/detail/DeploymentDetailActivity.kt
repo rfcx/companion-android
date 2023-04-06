@@ -219,17 +219,8 @@ class DeploymentDetailActivity :
                         if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
                     } + deploymentImageAdapter.getNewAttachImage().map { "file://$it" }
                     ) as ArrayList
-                if (!newImages.isNullOrEmpty()) {
-                    newImages?.reversed()?.forEach {
-                        list.add(0, "file://${it.path}")
-                    }
-                }
-                val labelList = deploymentImages.map { it.imageLabel } as ArrayList
-                if (!newImages.isNullOrEmpty()) {
-                    newImages?.reversed()?.forEach {
-                        labelList.add(0, it.name)
-                    }
-                }
+
+                val labelList = (deploymentImages.map { it.imageLabel } + deploymentImageAdapter.getNewAttachImageTyped().map { it.label }) as ArrayList
                 val selectedImage =
                     deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
                 val index = list.indexOf(selectedImage)
@@ -240,6 +231,7 @@ class DeploymentDetailActivity :
                 labelList.add(0, selectedLabel)
                 firebaseCrashlytics.setCustomKey(CrashlyticsKey.OnClickImage.key, selectedImage)
                 Log.d("Comp", deploymentImageView.label)
+                Log.d("Comp", list.size.toString())
                 DisplayImageActivity.startActivity(
                     this@DeploymentDetailActivity,
                     list.toTypedArray(),

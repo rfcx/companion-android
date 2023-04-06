@@ -1,8 +1,5 @@
 package org.rfcx.companion.view.deployment
 
-import android.os.Parcel
-import android.os.Parcelable
-import android.provider.ContactsContract.CommonDataKinds.Im
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,9 +23,10 @@ class ImageAdapter(
     private var imageItems = arrayListOf<Image>()
     private var currentPosition = -1
     private var currentType: ImageType = ImageType.NORMAL
+    private var maxImages = 10
 
-    companion object {
-        private const val MAX_IMAGES = 10
+    fun setMaxImages(number: Int) {
+        maxImages = number
     }
 
     fun setPlaceHolders(type: List<String>) {
@@ -36,7 +34,7 @@ class ImageAdapter(
             imageItems.add(Image(index + 1, it, ImageType.NORMAL, null, null))
         }
         // For other images that out of type scoped
-        if (imageItems.size < MAX_IMAGES) {
+        if (imageItems.size < maxImages) {
             imageItems.add(
                 Image(
                     imageItems.size + 1,
@@ -54,7 +52,7 @@ class ImageAdapter(
         var tempCount = itemCount
         images.map { it.copy() }.forEach { image ->
             if (image.type == ImageType.OTHER) {
-                if (tempCount == MAX_IMAGES) {
+                if (tempCount == maxImages) {
                     imageItems.removeLast()
                 }
                 imageItems.add(
@@ -83,7 +81,7 @@ class ImageAdapter(
     fun updateTakeOrChooseImage(path: String) {
         if (currentPosition == -1) return
         if (currentType == ImageType.OTHER) {
-            if (itemCount == MAX_IMAGES) {
+            if (itemCount == maxImages) {
                 imageItems.removeLast()
             }
             imageItems.add(
@@ -122,7 +120,7 @@ class ImageAdapter(
 
     private fun getNormalCount() = imageItems.filter { it.type == ImageType.NORMAL }.size
     private fun getAvailableImagesLeft(): Int {
-        return (MAX_IMAGES - (getOtherCount() + getNormalCount()))
+        return (maxImages - (getOtherCount() + getNormalCount()))
     }
 
     fun getCurrentImagePaths() = imageItems
