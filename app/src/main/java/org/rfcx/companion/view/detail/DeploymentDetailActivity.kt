@@ -1,11 +1,9 @@
 package org.rfcx.companion.view.detail
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -16,8 +14,6 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -27,7 +23,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
-import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
@@ -102,7 +97,6 @@ class DeploymentDetailActivity :
         newImages = intent.getSerializableExtra(NEW_IMAGES_EXTRA)?.let {
             it as List<Image>
         }
-        Log.d("Comp2", newImages.toString())
 
         setupToolbar()
         setupImageRecycler()
@@ -220,7 +214,10 @@ class DeploymentDetailActivity :
                     } + deploymentImageAdapter.getNewAttachImage().map { "file://$it" }
                     ) as ArrayList
 
-                val labelList = (deploymentImages.map { it.imageLabel } + deploymentImageAdapter.getNewAttachImageTyped().map { it.label }) as ArrayList
+                val labelList = (
+                    deploymentImages.map { it.imageLabel } + deploymentImageAdapter.getNewAttachImageTyped()
+                        .map { it.label }
+                    ) as ArrayList
                 val selectedImage =
                     deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
                 val index = list.indexOf(selectedImage)
@@ -230,8 +227,6 @@ class DeploymentDetailActivity :
                 list.add(0, selectedImage)
                 labelList.add(0, selectedLabel)
                 firebaseCrashlytics.setCustomKey(CrashlyticsKey.OnClickImage.key, selectedImage)
-                Log.d("Comp", deploymentImageView.label)
-                Log.d("Comp", list.size.toString())
                 DisplayImageActivity.startActivity(
                     this@DeploymentDetailActivity,
                     list.toTypedArray(),
@@ -246,58 +241,6 @@ class DeploymentDetailActivity :
         }
 
         deploymentImageAdapter.setImages(arrayListOf())
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        handleGligarPickerResult(requestCode, resultCode, data)
-
-        if (requestCode == DEPLOYMENT_REQUEST_CODE) {
-            forceUpdateDeployment()
-        }
-    }
-
-    private fun handleTakePhotoResult(requestCode: Int, resultCode: Int) {
-        if (requestCode != ImageUtils.REQUEST_TAKE_PHOTO) return
-
-        if (resultCode == Activity.RESULT_OK) {
-            imageFile?.let {
-                val pathList = listOf(it.absolutePath)
-                deploymentImageAdapter.addImages(pathList)
-            }
-        } else {
-            // remove file image
-            imageFile?.let {
-                ImageFileUtils.removeFile(it)
-                this.imageFile = null
-            }
-        }
-    }
-
-    private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-        if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
-
-        val pathList = mutableListOf<String>()
-        val results = intentData.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
-        results?.forEach {
-            pathList.add(it)
-        }
-        deploymentImageAdapter.addImages(pathList)
-    }
-
-    private fun forceUpdateDeployment() {
-        if (this.deployment != null) {
-            this.deployment = viewModel.getDeploymentById(this.deployment!!.id)
-            this.deployment?.let { it1 ->
-                updateDeploymentDetailView(it1)
-                setLocationOnMap(it1)
-            }
-
-            supportActionBar?.apply {
-                title = deployment?.stream?.name ?: getString(R.string.title_deployment_detail)
-            }
-        }
     }
 
     private fun updateDeploymentDetailView(deployment: Deployment) {
@@ -427,16 +370,6 @@ class DeploymentDetailActivity :
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         super.onSaveInstanceState(outState, outPersistentState)
         mapView.onSaveInstanceState(outState)
-    }
-
-    private fun startOpenGligarPicker() {
-        val remainingImage =
-            DeploymentImageAdapter.MAX_IMAGE_SIZE - deploymentImageAdapter.getImageCount()
-        GligarPicker()
-            .requestCode(ImageUtils.REQUEST_GALLERY)
-            .limit(remainingImage)
-            .withActivity(this)
-            .show()
     }
 
     companion object {

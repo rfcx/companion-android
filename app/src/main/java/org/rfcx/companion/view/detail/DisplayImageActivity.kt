@@ -23,7 +23,7 @@ class DisplayImageActivity : AppCompatActivity() {
         imageViewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         imageViewPager.adapter = adapter
 
-        imageViewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+        imageViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 setupToolbarTitle(labels[position])

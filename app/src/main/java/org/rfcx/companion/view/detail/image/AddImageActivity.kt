@@ -4,15 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.provider.MediaStore
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -22,28 +17,24 @@ import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.Device
-import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
-import org.rfcx.companion.util.*
-import org.rfcx.companion.util.prefs.GuardianPlan
-import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity
+import org.rfcx.companion.util.CameraPermissions
+import org.rfcx.companion.util.GalleryPermissions
+import org.rfcx.companion.util.ImageFileUtils
+import org.rfcx.companion.util.ImageUtils
 import org.rfcx.companion.view.deployment.Image
 import org.rfcx.companion.view.deployment.ImageAdapter
 import org.rfcx.companion.view.deployment.ImageClickListener
-import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
-import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.detail.DeploymentDetailActivity
-import org.rfcx.companion.view.detail.DeploymentDetailViewModel
 import org.rfcx.companion.view.detail.DisplayImageActivity
 import org.rfcx.companion.view.dialog.GuidelineButtonClickListener
 import org.rfcx.companion.view.dialog.PhotoGuidelineDialogFragment
 import java.io.File
 import java.io.Serializable
-import kotlin.math.max
 
 class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButtonClickListener {
 
@@ -96,7 +87,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                     resources.getStringArray(R.array.audiomoth_guideline_texts).toList()
                 imageExamples =
                     resources.getStringArray(R.array.audiomoth_photos).toList()
-                maxImages = if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
+                maxImages =
+                    if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
             Device.SONGMETER.value -> {
                 imagePlaceHolders =
@@ -105,7 +97,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                     resources.getStringArray(R.array.songmeter_guideline_texts).toList()
                 imageExamples =
                     resources.getStringArray(R.array.audiomoth_photos).toList()
-                maxImages = if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
+                maxImages =
+                    if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
             Device.GUARDIAN.value + "-cell" -> {
                 imagePlaceHolders =
@@ -116,7 +109,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                         .toList()
                 imageExamples =
                     resources.getStringArray(R.array.cell_guardian_photos).toList()
-                maxImages = if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
+                maxImages =
+                    if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
             Device.GUARDIAN.value + "-sat" -> {
                 imagePlaceHolders =
@@ -127,7 +121,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                         .toList()
                 imageExamples =
                     resources.getStringArray(R.array.sat_guardian_photos).toList()
-                maxImages = if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
+                maxImages =
+                    if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
         }
         getImageAdapter().setMaxImages(maxImages)
@@ -263,7 +258,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     }
 
     override fun onImageClick(image: Image) {
-        val path = if (image.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + image.remotePath else "file://${image.path}"
+        val path =
+            if (image.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + image.remotePath else "file://${image.path}"
         DisplayImageActivity.startActivity(this, arrayOf(path), arrayOf(image.name))
     }
 
@@ -369,7 +365,12 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
         const val DEPLOYMENT_ID_EXTRA = "DEPLOYMENT_ID_EXTRA"
         const val NEW_IMAGES_EXTRA = "NEW_IMAGES_EXTRA"
 
-        fun startActivity(context: Context, device: String, deploymentId: Int, newImages: List<Image>?) {
+        fun startActivity(
+            context: Context,
+            device: String,
+            deploymentId: Int,
+            newImages: List<Image>?
+        ) {
             val intent = Intent(context, AddImageActivity::class.java)
             intent.putExtra(DEVICE_EXTRA, device)
             intent.putExtra(DEPLOYMENT_ID_EXTRA, deploymentId)

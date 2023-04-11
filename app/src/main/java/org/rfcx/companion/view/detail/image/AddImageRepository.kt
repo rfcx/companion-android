@@ -9,7 +9,7 @@ class AddImageRepository(
 ) {
 
     fun getImages(deploymentId: Int): List<DeploymentImage> {
-       return localDataHelper.getDeploymentImageLocalDb().getImageByDeploymentId(deploymentId)
+        return localDataHelper.getDeploymentImageLocalDb().getImageByDeploymentId(deploymentId)
     }
 
     fun saveImages(images: List<Image>, deploymentId: Int) {
