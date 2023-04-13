@@ -4,6 +4,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <include
+        android:id="@+id/toolbarLayout"
+        layout="@layout/toolbar_default" />
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/imageViewPager"
         android:layout_width="match_parent"

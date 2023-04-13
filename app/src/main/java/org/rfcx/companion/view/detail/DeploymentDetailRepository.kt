@@ -28,12 +28,12 @@ class DeploymentDetailRepository(
 
     fun insertImage(
         deployment: Deployment? = null,
-        attachImages: List<String>
+        attachImages: List<DeploymentImageView>
     ) {
         localDataHelper.getDeploymentImageLocalDb().insertImage(
             deployment,
             attachImages.map {
-                Image(path = it, name = "other", type = ImageType.OTHER, id = 0)
+                Image(path = it.localPath, name = it.label, type = ImageType.OTHER, id = 0, remotePath = it.remotePath)
             }
         )
     }

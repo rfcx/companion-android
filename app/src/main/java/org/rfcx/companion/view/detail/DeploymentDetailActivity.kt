@@ -1,6 +1,5 @@
 package org.rfcx.companion.view.detail
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,7 +23,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
-import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
@@ -43,10 +41,12 @@ import org.rfcx.companion.service.DownloadImagesWorker
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.AudioMothDeploymentActivity.Companion.EXTRA_DEPLOYMENT_ID
+import org.rfcx.companion.view.deployment.Image
+import org.rfcx.companion.view.detail.image.AddImageActivity
 import java.io.File
 
 class DeploymentDetailActivity :
-    AppCompatActivity(), OnMapReadyCallback, (DeploymentImageView) -> Unit {
+    AppCompatActivity(), OnMapReadyCallback {
 
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
@@ -65,9 +65,13 @@ class DeploymentDetailActivity :
         updateDeploymentImages(deploymentImages)
     }
 
+    private var newImages: List<Image>? = null
+
     private var imageFile: File? = null
     private val cameraPermissions by lazy { CameraPermissions(this) }
     private val galleryPermissions by lazy { GalleryPermissions(this) }
+
+    private var toAddImage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +94,9 @@ class DeploymentDetailActivity :
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
                 ?.let { viewModel.getDeploymentById(it) }
+        newImages = intent.getSerializableExtra(NEW_IMAGES_EXTRA)?.let {
+            it as List<Image>
+        }
 
         setupToolbar()
         setupImageRecycler()
@@ -189,7 +196,14 @@ class DeploymentDetailActivity :
                     if (!cameraPermissions.allowed()) cameraPermissions.check { }
                     if (!galleryPermissions.allowed()) galleryPermissions.check { }
                 } else {
-                    startOpenGligarPicker()
+                    AddImageActivity.startActivity(
+                        this@DeploymentDetailActivity,
+                        deployment?.device!!,
+                        deployment?.id!!,
+                        newImages
+                    )
+                    toAddImage = true
+                    finish()
                 }
             }
 
@@ -199,15 +213,24 @@ class DeploymentDetailActivity :
                         if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
                     } + deploymentImageAdapter.getNewAttachImage().map { "file://$it" }
                     ) as ArrayList
+
+                val labelList = (
+                    deploymentImages.map { it.imageLabel } + deploymentImageAdapter.getNewAttachImageTyped()
+                        .map { it.label }
+                    ) as ArrayList
                 val selectedImage =
                     deploymentImageView.remotePath ?: "file://${deploymentImageView.localPath}"
                 val index = list.indexOf(selectedImage)
+                val selectedLabel = labelList[index]
                 list.removeAt(index)
+                labelList.removeAt(index)
                 list.add(0, selectedImage)
+                labelList.add(0, selectedLabel)
                 firebaseCrashlytics.setCustomKey(CrashlyticsKey.OnClickImage.key, selectedImage)
                 DisplayImageActivity.startActivity(
                     this@DeploymentDetailActivity,
-                    list.toTypedArray()
+                    list.toTypedArray(),
+                    labelList.toTypedArray()
                 )
             }
 
@@ -218,58 +241,6 @@ class DeploymentDetailActivity :
         }
 
         deploymentImageAdapter.setImages(arrayListOf())
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        handleGligarPickerResult(requestCode, resultCode, data)
-
-        if (requestCode == DEPLOYMENT_REQUEST_CODE) {
-            forceUpdateDeployment()
-        }
-    }
-
-    private fun handleTakePhotoResult(requestCode: Int, resultCode: Int) {
-        if (requestCode != ImageUtils.REQUEST_TAKE_PHOTO) return
-
-        if (resultCode == Activity.RESULT_OK) {
-            imageFile?.let {
-                val pathList = listOf(it.absolutePath)
-                deploymentImageAdapter.addImages(pathList)
-            }
-        } else {
-            // remove file image
-            imageFile?.let {
-                ImageFileUtils.removeFile(it)
-                this.imageFile = null
-            }
-        }
-    }
-
-    private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-        if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
-
-        val pathList = mutableListOf<String>()
-        val results = intentData.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
-        results?.forEach {
-            pathList.add(it)
-        }
-        deploymentImageAdapter.addImages(pathList)
-    }
-
-    private fun forceUpdateDeployment() {
-        if (this.deployment != null) {
-            this.deployment = viewModel.getDeploymentById(this.deployment!!.id)
-            this.deployment?.let { it1 ->
-                updateDeploymentDetailView(it1)
-                setLocationOnMap(it1)
-            }
-
-            supportActionBar?.apply {
-                title = deployment?.stream?.name ?: getString(R.string.title_deployment_detail)
-            }
-        }
     }
 
     private fun updateDeploymentDetailView(deployment: Deployment) {
@@ -300,7 +271,10 @@ class DeploymentDetailActivity :
 
     private fun updateDeploymentImages(deploymentImages: List<DeploymentImage>) {
         val items = deploymentImages.map { it.toDeploymentImageView() }
-        deploymentImageAdapter.setImages(items)
+        val newImages =
+            this.newImages?.map { DeploymentImageView(0, it.path!!, it.remotePath, it.name) }
+        val combined = if (newImages != null) newImages + items else items
+        deploymentImageAdapter.setImages(combined)
     }
 
     private fun setupImageRecycler() {
@@ -361,8 +335,8 @@ class DeploymentDetailActivity :
         super.onDestroy()
         // remove observer
         deployImageLiveData.removeObserver(deploymentImageObserve)
-        val newImages = deploymentImageAdapter.getNewAttachImage()
-        if (newImages.isNotEmpty()) {
+        val newImages = deploymentImageAdapter.getNewAttachImageTyped()
+        if (newImages.isNotEmpty() && !toAddImage) {
             viewModel.insertImage(deployment, newImages)
             ImageSyncWorker.enqueue(this)
         }
@@ -398,37 +372,21 @@ class DeploymentDetailActivity :
         mapView.onSaveInstanceState(outState)
     }
 
-    private fun startOpenGligarPicker() {
-        val remainingImage =
-            DeploymentImageAdapter.MAX_IMAGE_SIZE - deploymentImageAdapter.getImageCount()
-        GligarPicker()
-            .requestCode(ImageUtils.REQUEST_GALLERY)
-            .limit(remainingImage)
-            .withActivity(this)
-            .show()
-    }
-
     companion object {
         const val DEPLOYMENT_REQUEST_CODE = 1001
         const val DEFAULT_ZOOM = 15.0
-
+        const val NEW_IMAGES_EXTRA = "NEW_IMAGES_EXTRA"
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DeploymentDetailActivity::class.java)
             intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
             context.startActivity(intent)
         }
-    }
 
-    override fun invoke(deploymentImage: DeploymentImageView) {
-        val list = deploymentImages.map {
-            if (it.remotePath != null) BuildConfig.DEVICE_API_DOMAIN + it.remotePath else "file://${it.localPath}"
-        } as ArrayList
-
-        val index =
-            list.indexOf(deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
-        list.removeAt(index)
-        list.add(0, deploymentImage.remotePath ?: "file://${deploymentImage.localPath}")
-
-        DisplayImageActivity.startActivity(this, list.toTypedArray())
+        fun startActivity(context: Context, deploymentId: Int, newImages: List<Image>) {
+            val intent = Intent(context, DeploymentDetailActivity::class.java)
+            intent.putExtra(EXTRA_DEPLOYMENT_ID, deploymentId)
+            intent.putExtra(NEW_IMAGES_EXTRA, newImages as java.io.Serializable)
+            context.startActivity(intent)
+        }
     }
 }

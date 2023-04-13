@@ -8,7 +8,8 @@ import org.rfcx.companion.entity.TrackingFile
  */
 data class DeploymentAssetResponse(
     var id: String = "",
-    var mimeType: String = ""
+    var mimeType: String = "",
+    var meta: AssetMeta?
 ) {
     fun toDeploymentImage(): DeploymentImage {
         return DeploymentImage(
@@ -22,3 +23,7 @@ data class DeploymentAssetResponse(
         )
     }
 }
+
+data class AssetMeta(
+    val label: String
+)

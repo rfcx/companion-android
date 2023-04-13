@@ -149,10 +149,9 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         val savedImages =
             audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
                 ?: guardianDeploymentProtocol?.getImages()
+        getImageAdapter().setPlaceHolders(imagePlaceHolders)
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
-        } else {
-            getImageAdapter().setPlaceHolders(imagePlaceHolders)
         }
     }
 
@@ -239,7 +238,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     override fun onImageClick(image: Image) {
         if (image.path == null) return
-        context?.let { DisplayImageActivity.startActivity(it, arrayOf("file://${image.path}")) }
+        context?.let { DisplayImageActivity.startActivity(it, arrayOf("file://${image.path}"), arrayOf(image.name)) }
     }
 
     override fun onDeleteClick(image: Image) {
