@@ -95,7 +95,7 @@ class DeploymentImageAdapter :
             }
 
             localPathImagesForAdd.forEach {
-                imagesSource.add(LocalImageItem(index, DeploymentImageView(id = 0, localPath = it, remotePath = null), true))
+                imagesSource.add(LocalImageItem(index, DeploymentImageView(id = 0, localPath = it, remotePath = null, label = "other"), true))
                 index++
             }
         } else {
@@ -117,6 +117,14 @@ class DeploymentImageAdapter :
             (it is LocalImageItem && it.canDelete && it.deploymentImage.id == 0)
         }.map {
             (it as LocalImageItem).deploymentImage.localPath
+        }
+    }
+
+    fun getNewAttachImageTyped(): List<DeploymentImageView> {
+        return imagesSource.filter {
+            (it is LocalImageItem && it.canDelete && it.deploymentImage.id == 0)
+        }.map {
+            (it as LocalImageItem).deploymentImage
         }
     }
 

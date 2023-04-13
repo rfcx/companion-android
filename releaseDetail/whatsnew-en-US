@@ -1,3 +1,2 @@
 Change logs
-- Renew token if 401 request occurred
-- Send Image label to Device API
+- Can add image with label in Deployment detail

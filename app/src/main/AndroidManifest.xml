@@ -120,6 +120,10 @@
             android:name=".view.profile.classifier.GuardianClassifierActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".view.detail.image.AddImageActivity"
+            android:screenOrientation="portrait"/>
+
         <service
             android:name=".service.LocationTrackerService"
             android:exported="false"

@@ -27,7 +27,7 @@ class DeploymentDetailViewModel(
 
     fun insertImage(
         deployment: Deployment? = null,
-        attachImages: List<String>
+        attachImages: List<DeploymentImageView>
     ) {
         deploymentDetailRepository.insertImage(deployment, attachImages)
     }

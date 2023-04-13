@@ -16,7 +16,7 @@ import jp.wasabeef.glide.transformations.BlurTransformation
 import org.rfcx.companion.R
 import org.rfcx.companion.util.Preferences
 
-fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean, token: String? = null, progressBar: ProgressBar) {
+fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean, token: String? = null, progressBar: ProgressBar? = null) {
     val preferences = Preferences.getInstance(context)
     val themeOption = this.resources.getStringArray(R.array.theme_more_than_9)
     val themeDevice = preferences.getString(Preferences.DISPLAY_THEME, themeOption[1])
@@ -25,7 +25,7 @@ fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean
         themeOption[1] -> placeholder = R.drawable.bg_placeholder_dark
     }
     if (fromServer) {
-        progressBar.visibility = View.VISIBLE
+        progressBar?.visibility = View.VISIBLE
 
         val glideUrl = GlideUrl(
             url,
@@ -43,7 +43,7 @@ fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean
                     target: Target<Drawable>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    progressBar.visibility = View.GONE
+                    progressBar?.visibility = View.GONE
                     return false
                 }
 
@@ -54,7 +54,7 @@ fun ImageView.setDeploymentImage(url: String, blur: Boolean, fromServer: Boolean
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    progressBar.visibility = View.GONE
+                    progressBar?.visibility = View.GONE
                     return false
                 }
             })
