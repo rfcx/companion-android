@@ -3,7 +3,7 @@
     <string name="back">back</string>
 
     <!-- LoginActivity -->
-    <string name="rfcx_companion">RFCx Companion</string>
+    <string name="rfcx_companion">Arbimon Companion</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login_sign_in_button_label">Sign In</string>
@@ -21,7 +21,7 @@
     <string name="format_deploys_uploaded">All deployments synced</string>
     <string name="menu_map">MAP</string>
     <string name="menu_profile">PROFILE</string>
-    <string name="setup_first_device">Welcome! %s \nGet started by adding your first \nRFCx device</string>
+    <string name="setup_first_device">Welcome! %s \nGet started by adding your first \nArbimon device</string>
 
     <!--    ConfigureFragment-->
     <string name="let_configure">Let’s configure the device</string>
@@ -40,7 +40,7 @@
     <string name="recommended">Recommended</string>
     <string name="custom">Custom</string>
     <string name="recommended_text">Record for 5 minutes, sleep for 10 minutes</string>
-    <string name="edge_device_battery">RFCx Edge device battery</string>
+    <string name="edge_device_battery">Arbimon Edge device battery</string>
     <string name="minimum_1_second">The minimum is 1 second</string>
     <string name="minimum_5_second">The minimum is 5 seconds</string>
 
