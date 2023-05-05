@@ -293,7 +293,7 @@
     </string-array>
 
     <string-array name="cell_guardian_placeholders">
-        <item>antennas</item>
+        <item>antenna connection</item>
         <item>cable tied box</item>
         <item>solar panel connection 1</item>
         <item>solar panel connection 2</item>
