@@ -29,11 +29,8 @@ object AudioCoverageUtils {
                 if (!tree.getAsJsonObject(year).getAsJsonObject(month).has(day)) {
                     tree.getAsJsonObject(year).getAsJsonObject(month).add(day, JsonObject())
                 }
-                if (!tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day)
-                        .has("maximum")
-                ) {
-                    tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day)
-                        .addProperty("maximum", file.maximumFileCount)
+                if (!tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day).has("maximum")) {
+                    tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day).addProperty("maximum", file.maximumFileCount)
                 } else {
                     val currentMaximum =
                         tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day)
@@ -41,9 +38,7 @@ object AudioCoverageUtils {
                     tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day)
                         .addProperty("maximum", (file.maximumFileCount + currentMaximum) / 2)
                 }
-                if (!tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day)
-                        .has(hour)
-                ) {
+                if (!tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day).has(hour)) {
                     tree.getAsJsonObject(year).getAsJsonObject(month).getAsJsonObject(day)
                         .addProperty(hour, 0)
                 }
@@ -102,7 +97,13 @@ object AudioCoverageUtils {
 
     fun getAvailableMonths(item: JsonObject): HashMap<Int, List<Int>> {
         val cal = Calendar.getInstance()
-        if (item.keySet().isEmpty()) return hashMapOf(cal.get(Calendar.YEAR) to listOf(cal.get(Calendar.MONTH)))
+        if (item.keySet().isEmpty()) return hashMapOf(
+            cal.get(Calendar.YEAR) to listOf(
+                cal.get(
+                    Calendar.MONTH
+                )
+            )
+        )
 
         val map = hashMapOf<Int, List<Int>>()
         item.keySet().forEach { year ->

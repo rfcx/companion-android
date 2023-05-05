@@ -19,10 +19,10 @@ class GuardianStorageFragment : Fragment() {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
-    private val archivedHeatmapAdapter by lazy { ArchivedHeatmapAdapter() }
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_guardian_storage, container, false)
     }
@@ -44,7 +44,7 @@ class GuardianStorageFragment : Fragment() {
         updateInternalStorage()
 
         audioCoverageButton.setOnClickListener {
-            val archived =  deploymentProtocol?.getArchived() ?: listOf()
+            val archived = deploymentProtocol?.getArchived() ?: listOf()
             HeatmapAudioCoverageActivity.startActivity(requireContext(), archived)
         }
     }

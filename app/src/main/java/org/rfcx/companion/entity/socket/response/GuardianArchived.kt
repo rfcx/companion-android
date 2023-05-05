@@ -17,7 +17,6 @@ data class GuardianArchived(
     val missing: List<String>?
 ) : Parcelable {
 
-
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
         parcel.readLong(),
