@@ -125,7 +125,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         locationNameEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val name = locationNameEditText.text.toString()
-                if (streams.contains(name)&& (stream?.name ?: getString(R.string.none)) != name) {
+                if (streams.contains(name) && (stream?.name ?: getString(R.string.none)) != name) {
                     locationNameTextInput.error = getString(R.string.site_name_exists)
                 } else {
                     locationNameTextInput.error = null
