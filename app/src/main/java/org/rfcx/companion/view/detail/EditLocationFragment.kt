@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +30,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.pluginscalebar.ScaleBarOptions
 import com.mapbox.pluginscalebar.ScaleBarPlugin
+import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
 import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
@@ -35,11 +38,16 @@ import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditTex
 import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Screen
+import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.DefaultSetupMap
+import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.convertLatLngLabel
 
 class EditLocationFragment : Fragment(), OnMapReadyCallback {
+    private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
+    private val streamDb by lazy { StreamDb(realm) }
+
     private var mapboxMap: MapboxMap? = null
     private lateinit var mapView: MapView
 
@@ -80,6 +88,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         setHideKeyboard()
 
         val stream = editLocationActivityListener?.getStream(streamId)
+        val streams = streamDb.getStreams().map{ it.name }
         locationNameEditText.setText(stream?.name ?: getString(R.string.none))
         altitudeEditText.setText(altitude.toString())
         locationValueTextView.text = context?.let { convertLatLngLabel(it, latitude, longitude) }
@@ -112,6 +121,22 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
             analytics?.trackChangeLocationGroupEvent(Screen.EDIT_LOCATION.id)
             editLocationActivityListener?.startLocationGroupPage()
         }
+
+        locationNameEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (streams.contains(locationNameEditText.text.toString()) && (stream?.name
+                        ?: getString(R.string.none)) != locationNameEditText.text.toString()
+                ) {
+                    locationNameTextInput.error = getString(R.string.site_name_exists)
+                } else {
+                    locationNameTextInput.error = null
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun openMapPickerPage() {
