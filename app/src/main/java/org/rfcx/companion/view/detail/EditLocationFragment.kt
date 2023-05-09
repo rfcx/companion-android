@@ -88,7 +88,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         setHideKeyboard()
 
         val stream = editLocationActivityListener?.getStream(streamId)
-        val streams = streamDb.getStreams().map{ it.name }
+        val streams = streamDb.getStreams().map { it.name }
         locationNameEditText.setText(stream?.name ?: getString(R.string.none))
         altitudeEditText.setText(altitude.toString())
         locationValueTextView.text = context?.let { convertLatLngLabel(it, latitude, longitude) }
@@ -124,9 +124,8 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
         locationNameEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (streams.contains(locationNameEditText.text.toString()) && (stream?.name
-                        ?: getString(R.string.none)) != locationNameEditText.text.toString()
-                ) {
+                val name = locationNameEditText.text.toString()
+                if (streams.contains(name)&& (stream?.name ?: getString(R.string.none)) != name) {
                     locationNameTextInput.error = getString(R.string.site_name_exists)
                 } else {
                     locationNameTextInput.error = null
