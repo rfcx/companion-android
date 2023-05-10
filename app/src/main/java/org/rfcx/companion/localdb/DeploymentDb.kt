@@ -25,6 +25,8 @@ class DeploymentDb(private val realm: Realm) {
             .equalTo(Deployment.FIELD_STATE, DeploymentState.Guardian.ReadyToUpload.key)
             .and()
             .notEqualTo(Deployment.FIELD_SYNC_STATE, SyncState.Sent.key)
+            .and()
+            .equalTo(Deployment.FIELD_IS_ACTIVE, true)
             .sort(Deployment.FIELD_ID, Sort.DESCENDING)
             .findAll()
     }
