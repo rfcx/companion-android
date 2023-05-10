@@ -81,4 +81,8 @@ class AudioMothDeploymentRepository(
     fun getDeploymentById(id: Int): Deployment? {
         return localDataHelper.getDeploymentLocalDb().getDeploymentById(id)
     }
+
+    fun deleteDeployment(id: Int) {
+        return localDataHelper.getDeploymentLocalDb().deleteDeployment(id)
+    }
 }
