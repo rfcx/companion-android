@@ -1,2 +1,4 @@
 Change logs
 - Can see Guardian archived audios coverage by year and month
+- Not show the deployment not active on the list when create deployment offline
+- Fixed create new site offline it create duplicate site
