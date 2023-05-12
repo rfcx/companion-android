@@ -480,7 +480,8 @@ class GuardianDeploymentActivity :
             if (useExistedLocation) {
                 this._stream?.let { locate ->
                     locate.deployments?.forEach { dp ->
-                        deploymentDb.updateIsActive(dp.id)
+                        deploymentImageDb.deleteImages(dp.id)
+                        deploymentDb.deleteDeployment(dp.id)
                     }
                 }
             }
