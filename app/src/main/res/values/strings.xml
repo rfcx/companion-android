@@ -234,6 +234,7 @@
     <!--  EditLocationActivity  -->
     <string name="edit_location">Edit site</string>
     <string name="save">save</string>
+    <string name="site_name_exists">This site name already exists.</string>
 
     <!-- SelectingExistedSiteFragment -->
     <string name="create_new_site">Create new site</string>

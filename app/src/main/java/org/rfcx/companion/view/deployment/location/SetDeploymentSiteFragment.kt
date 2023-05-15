@@ -156,8 +156,13 @@ class SetDeploymentSiteFragment :
                             0F
                         )
                     )
-                    existedSiteAdapter.setFilter(ArrayList(createNew + newList))
-                    existedSiteAdapter.isNewSite = true
+                    val list = newList.map { it.stream.name }
+                    if (list.contains(s.toString())) {
+                        existedSiteAdapter.setFilter(ArrayList(newList))
+                    } else {
+                        existedSiteAdapter.setFilter(ArrayList(createNew + newList))
+                        existedSiteAdapter.isNewSite = true
+                    }
                 }
             }
 

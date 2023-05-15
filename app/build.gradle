@@ -15,7 +15,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 175
-        versionName "1.9.0"
+        versionName "1.9.1"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
