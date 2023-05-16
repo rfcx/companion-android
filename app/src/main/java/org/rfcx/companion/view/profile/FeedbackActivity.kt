@@ -17,7 +17,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.activity_feedback.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
@@ -87,7 +86,7 @@ class FeedbackActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        handleGligarPickerResult(requestCode, resultCode, data)
+        handleChooseImage(requestCode, resultCode, data)
     }
 
     @SuppressLint("ResourceAsColor")
@@ -108,7 +107,7 @@ class FeedbackActivity : AppCompatActivity() {
                     if (!cameraPermissions.allowed()) cameraPermissions.check { }
                     if (!galleryPermissions.allowed()) galleryPermissions.check { }
                 } else {
-                    startOpenGligarPicker()
+                    startOpenChooseImage()
                 }
             }
             R.id.sendFeedbackView -> sendFeedback()
@@ -132,27 +131,26 @@ class FeedbackActivity : AppCompatActivity() {
         }
     }
 
-    private fun startOpenGligarPicker() {
+    private fun startOpenChooseImage() {
         if (feedbackImageAdapter.getImageCount() < FeedbackImageAdapter.MAX_IMAGE_SIZE) {
-            val remainingImage =
-                FeedbackImageAdapter.MAX_IMAGE_SIZE - feedbackImageAdapter.getImageCount()
-            GligarPicker()
-                .requestCode(ImageUtils.REQUEST_GALLERY)
-                .limit(remainingImage)
-                .withActivity(this)
-                .show()
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                .setType("image/*")
+                .addCategory(Intent.CATEGORY_OPENABLE)
+            startActivityForResult(intent, ImageUtils.REQUEST_GALLERY)
         } else {
             Toast.makeText(this, R.string.maximum_number_of_attachments, Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+    private fun handleChooseImage(requestCode: Int, resultCode: Int, intentData: Intent?) {
         if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
 
         val pathList = mutableListOf<String>()
-        val results = intentData.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
-        results?.forEach {
-            pathList.add(it)
+        intentData.data?.also {
+            val path = ImageUtils.createImageFile(it, this)
+            if (path != null) {
+                pathList.add(path)
+            }
         }
         analytics.trackAddFeedbackImagesEvent()
         feedbackImageAdapter.addImages(pathList)
