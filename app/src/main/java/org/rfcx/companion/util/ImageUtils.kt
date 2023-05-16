@@ -39,9 +39,8 @@ object ImageUtils {
 
     fun createImageFile(image: Uri, context: Context): String? {
         val contentResolver = context.contentResolver ?: return null
-        val filePath = (context.applicationInfo.dataDir + File.separator
-                + System.currentTimeMillis())
-
+        val filePath =
+            (context.applicationInfo.dataDir + File.separator + System.currentTimeMillis())
         val file = File(filePath)
         try {
             val inputStream = contentResolver.openInputStream(image) ?: return null
