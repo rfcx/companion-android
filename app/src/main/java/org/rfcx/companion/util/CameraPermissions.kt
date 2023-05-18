@@ -12,8 +12,12 @@ class CameraPermissions(private val activity: Activity) {
 
     fun allowed(): Boolean {
         val permissionCameraState = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)
-        val permissionStorageState = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        return permissionCameraState == PackageManager.PERMISSION_GRANTED && permissionStorageState == PackageManager.PERMISSION_GRANTED
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            val permissionStorageState =
+                ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            return permissionCameraState == PackageManager.PERMISSION_GRANTED && permissionStorageState == PackageManager.PERMISSION_GRANTED
+        }
+        return permissionCameraState == PackageManager.PERMISSION_GRANTED
     }
 
     fun check(onCompletionCallback: (Boolean) -> Unit) {

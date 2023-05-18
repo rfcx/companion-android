@@ -12,7 +12,6 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.opensooq.supernova.gligar.GligarPicker
 import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
@@ -115,7 +114,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         handleTakePhotoResult(requestCode, resultCode)
-        handleGligarPickerResult(requestCode, resultCode, data)
+        handleChooseImage(requestCode, resultCode, data)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -209,12 +208,14 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         }
     }
 
-    private fun handleGligarPickerResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+    private fun handleChooseImage(requestCode: Int, resultCode: Int, intentData: Intent?) {
         if (requestCode != ImageUtils.REQUEST_GALLERY || resultCode != Activity.RESULT_OK || intentData == null) return
 
-        val results = intentData.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
-        results?.forEach {
-            getImageAdapter().updateTakeOrChooseImage(it)
+        intentData.data?.also {
+            val path = ImageUtils.createImageFile(it, requireContext())
+            if (path != null) {
+                getImageAdapter().updateTakeOrChooseImage(path)
+            }
         }
         updatePhotoTakenNumber()
     }
@@ -251,7 +252,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     }
 
     override fun onChoosePhotoClick() {
-        openGligarPicker()
+        openPhotoPicker()
     }
 
     private fun startTakePhoto() {
@@ -274,8 +275,8 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         if (checkPermission()) startTakePhoto()
     }
 
-    private fun openGligarPicker() {
-        if (checkPermission()) startOpenGligarPicker()
+    private fun openPhotoPicker() {
+        if (checkPermission()) startOpenPhotoPicker()
     }
 
     private fun checkPermission(): Boolean {
@@ -289,13 +290,11 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         }
     }
 
-    private fun startOpenGligarPicker() {
-        GligarPicker()
-            .requestCode(ImageUtils.REQUEST_GALLERY)
-            .limit(1)
-            .withFragment(this)
-            .disableCamera(true)
-            .show()
+    private fun startOpenPhotoPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            .setType("image/*")
+            .addCategory(Intent.CATEGORY_OPENABLE)
+        startActivityForResult(intent, ImageUtils.REQUEST_GALLERY)
     }
 
     private fun showGuidelineDialog(position: Int) {
