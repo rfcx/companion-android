@@ -186,4 +186,8 @@ class SongMeterViewModel(
     fun insertOrUpdateTrackingFile(file: TrackingFile) {
         songMeterRepository.insertOrUpdateTrackingFile(file)
     }
+
+    fun deleteDeployment(id: Int) {
+        songMeterRepository.deleteDeployment(id)
+    }
 }

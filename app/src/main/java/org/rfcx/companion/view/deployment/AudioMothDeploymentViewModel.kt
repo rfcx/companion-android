@@ -146,6 +146,10 @@ class AudioMothDeploymentViewModel(
         audioMothDeploymentRepository.updateIsActive(id)
     }
 
+    fun deleteDeployment(id: Int) {
+        audioMothDeploymentRepository.deleteDeployment(id)
+    }
+
     fun getDeploymentById(id: Int): Deployment? {
         return audioMothDeploymentRepository.getDeploymentById(id)
     }

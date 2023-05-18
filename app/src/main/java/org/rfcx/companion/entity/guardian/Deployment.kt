@@ -55,6 +55,7 @@ open class Deployment(
         const val FIELD_STREAM = "stream"
         const val FIELD_UPDATED_AT = "updatedAt"
         const val FIELD_DELETED_AT = "deletedAt"
+        const val FIELD_IS_ACTIVE = "isActive"
         const val FIELD_DEVICE = "device"
         const val FIELD_PASSED_CHECKS = "passedChecks"
         const val FIELD_DEVICE_PARAMETERS = "deviceParameters"

@@ -118,4 +118,8 @@ class SongMeterRepository(
     fun getFirstTracking(): Tracking? {
         return localDataHelper.getTrackingLocalDb().getFirstTracking()
     }
+
+    fun deleteDeployment(id: Int) {
+        return localDataHelper.getDeploymentLocalDb().deleteDeployment(id)
+    }
 }

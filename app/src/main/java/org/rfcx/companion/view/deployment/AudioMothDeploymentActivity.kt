@@ -205,7 +205,8 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             if (useExistedLocation) {
                 this._stream?.let { locate ->
                     locate.deployments?.forEach { dp ->
-                        audioMothDeploymentViewModel.updateIsActive(dp.id)
+                        audioMothDeploymentViewModel.deleteImages(dp.id)
+                        audioMothDeploymentViewModel.deleteDeployment(dp.id)
                     }
                 }
             }

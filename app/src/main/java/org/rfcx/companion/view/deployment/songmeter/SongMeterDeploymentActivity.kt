@@ -238,7 +238,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
             if (useExistedLocation) {
                 this._stream?.let { locate ->
                     locate.deployments?.forEach { dp ->
-                        songMeterViewModel.updateIsActive(dp.id)
+                        songMeterViewModel.deleteImages(dp)
+                        songMeterViewModel.deleteDeployment(dp.id)
                     }
                 }
             }
