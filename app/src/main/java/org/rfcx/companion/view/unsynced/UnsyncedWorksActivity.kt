@@ -193,7 +193,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
             deploymentStatus == SyncInfo.Uploading || registrationStatus == SyncInfo.Uploading -> {
                 showSyncingState()
             }
-            deploymentStatus == SyncInfo.Uploaded && registrationStatus == SyncInfo.Uploaded && unsyncedWork?.size == 0 -> {
+            (deploymentStatus == SyncInfo.Uploaded || registrationStatus == SyncInfo.Uploaded) && unsyncedWork?.size == 0 -> {
                 showSyncedState()
                 hideBanner()
             }
