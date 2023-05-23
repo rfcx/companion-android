@@ -4,3 +4,4 @@ Change logs
 - Fixed create new site offline it create duplicate site
 - Make user cannot create site with existing names
 - Upgrade Companion target sdk to 33
+- Fixed loading bar not hide when done sync
