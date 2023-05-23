@@ -164,6 +164,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
                 bannerText.text = getString(R.string.all_works_synced)
                 unsyncedWorksAdapter.setUnsynceds(listOf())
                 noContentTextView.visibility = View.VISIBLE
+                unsyncedIndicator.visibility = View.GONE
                 hideBanner()
             }
             else -> {
