@@ -164,6 +164,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
                 bannerText.text = getString(R.string.all_works_synced)
                 unsyncedWorksAdapter.setUnsynceds(listOf())
                 noContentTextView.visibility = View.VISIBLE
+                unsyncedIndicator.visibility = View.GONE
                 hideBanner()
             }
             else -> {
@@ -192,7 +193,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
             deploymentStatus == SyncInfo.Uploading || registrationStatus == SyncInfo.Uploading -> {
                 showSyncingState()
             }
-            deploymentStatus == SyncInfo.Uploaded && registrationStatus == SyncInfo.Uploaded && unsyncedWork?.size == 0 -> {
+            (deploymentStatus == SyncInfo.Uploaded || registrationStatus == SyncInfo.Uploaded) && unsyncedWork?.size == 0 -> {
                 showSyncedState()
                 hideBanner()
             }
