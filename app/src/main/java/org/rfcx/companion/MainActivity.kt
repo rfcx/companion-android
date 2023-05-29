@@ -398,7 +398,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
         hideBottomAppBar()
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
-            mapFragment.moveToDeploymentMarker(lat, lng)
+//            mapFragment.moveToDeploymentMarker(lat, lng)
         }
     }
 

@@ -11,6 +11,7 @@ class RealmHelper {
             return RealmConfiguration.Builder().apply {
                 schemaVersion(schemaVersion)
                 migration(CompanionRealmMigration())
+                allowWritesOnUiThread(true)
             }.build()
         }
 

@@ -138,7 +138,7 @@
                     tools:text="ABCDEFGHIJKLM1234" />
             </LinearLayout>
 
-            <com.mapbox.mapboxsdk.maps.MapView
+            <View
                 android:id="@+id/mapBoxView"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/map_box_height"

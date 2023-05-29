@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.offline.*
+//import com.mapbox.mapboxsdk.geometry.LatLngBounds
+//import com.mapbox.mapboxsdk.maps.Style
+//import com.mapbox.mapboxsdk.offline.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,7 +27,7 @@ class ProjectOfflineMapViewModel(
     private var stateOfflineMap = MutableLiveData<String>()
     private var percentageDownloads = MutableLiveData<Int>()
     private var hideDownloadButton = MutableLiveData<Boolean>()
-    private lateinit var definition: OfflineTilePyramidRegionDefinition
+//    private lateinit var definition: OfflineTilePyramidRegionDefinition
 
     private lateinit var projectsLiveData: LiveData<List<Project>>
     private val projectsObserve = Observer<List<Project>> {
@@ -81,7 +81,7 @@ class ProjectOfflineMapViewModel(
     }
 
     fun offlineMapBox(project: Project) {
-        val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
+//        val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
         val minLat = project.minLatitude
         val maxLat = project.maxLatitude
         val minLng = project.minLongitude
@@ -89,22 +89,22 @@ class ProjectOfflineMapViewModel(
 
         stateOfflineMap.postValue(OfflineMapState.DOWNLOADING_STATE.key)
 
-        offlineManager?.setOfflineMapboxTileCountLimit(10000)
-        val style = Style.OUTDOORS
-        if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
-            val latLngBounds: LatLngBounds = LatLngBounds.from(
-                maxLat.toDouble(),
-                maxLng.toDouble(),
-                minLat.toDouble(),
-                minLng.toDouble()
-            )
-            definition = OfflineTilePyramidRegionDefinition(
-                style,
-                latLngBounds,
-                10.0,
-                15.0,
-                context?.resources?.displayMetrics?.density ?: 0.0F
-            )
+//        offlineManager?.setOfflineMapboxTileCountLimit(10000)
+//        val style = Style.OUTDOORS
+//        if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
+//            val latLngBounds: LatLngBounds = LatLngBounds.from(
+//                maxLat.toDouble(),
+//                maxLng.toDouble(),
+//                minLat.toDouble(),
+//                minLng.toDouble()
+//            )
+//            definition = OfflineTilePyramidRegionDefinition(
+//                style,
+//                latLngBounds,
+//                10.0,
+//                15.0,
+//                context?.resources?.displayMetrics?.density ?: 0.0F
+//            )
 
             val metadata: ByteArray? = try {
                 val jsonObject = JSONObject()
@@ -116,108 +116,108 @@ class ProjectOfflineMapViewModel(
                 null
             }
 
-            if (metadata != null) {
-                offlineManager?.createOfflineRegion(
-                    definition, metadata,
-                    object : OfflineManager.CreateOfflineRegionCallback {
-                        override fun onCreate(offlineRegion: OfflineRegion) {
-                            hideDownloadButton.postValue(true)
-                            CoroutineScope(Dispatchers.IO).launch {
-                                createOfflineRegion(
-                                    offlineRegion,
-                                    project
-                                )
-                            }
-                        }
-
-                        override fun onError(error: String) {
-                            stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
-                            Log.e(OfflineMapFragment.TAG, "Error: $error")
-                        }
-                    }
-                )
-            }
-        }
+//            if (metadata != null) {
+//                offlineManager?.createOfflineRegion(
+//                    definition, metadata,
+//                    object : OfflineManager.CreateOfflineRegionCallback {
+//                        override fun onCreate(offlineRegion: OfflineRegion) {
+//                            hideDownloadButton.postValue(true)
+//                            CoroutineScope(Dispatchers.IO).launch {
+//                                createOfflineRegion(
+//                                    offlineRegion,
+//                                    project
+//                                )
+//                            }
+//                        }
+//
+//                        override fun onError(error: String) {
+//                            stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
+//                            Log.e(OfflineMapFragment.TAG, "Error: $error")
+//                        }
+//                    }
+//                )
+//            }
+//        }
     }
 
-    private fun createOfflineRegion(offlineRegion: OfflineRegion, project: Project) {
-        offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
-        offlineRegion.setObserver(object : OfflineRegion.OfflineRegionObserver {
-            private var percentageNumber: Int = -1
+//    private fun createOfflineRegion(offlineRegion: OfflineRegion, project: Project) {
+//        offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+//        offlineRegion.setObserver(object : OfflineRegion.OfflineRegionObserver {
+//            private var percentageNumber: Int = -1
+//
+//            override fun onStatusChanged(status: OfflineRegionStatus) {
+//                val required = status.requiredResourceCount
+//                val oldPercentage = this.percentageNumber
+//                val megabybtes = status.completedResourceSize / 1048576
+//                val percentage: Int = when {
+//                    status.isComplete -> {
+//                        101
+//                    }
+//                    required > 0L ->
+//                        (100 * status.completedResourceCount / required).toInt()
+//                    else -> 0
+//                }
+//                this.percentageNumber = percentage
+//                if (percentage > oldPercentage) {
+//                    percentageDownloads.postValue(percentage)
+//                }
+//            }
+//
+//            override fun onError(error: OfflineRegionError) {
+//                stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
+//            }
+//
+//            override fun mapboxTileCountLimitExceeded(limit: Long) {
+//                Log.e(OfflineMapFragment.TAG, "Mapbox tile count limit exceeded: $limit")
+//            }
+//        })
+//    }
 
-            override fun onStatusChanged(status: OfflineRegionStatus) {
-                val required = status.requiredResourceCount
-                val oldPercentage = this.percentageNumber
-                val megabybtes = status.completedResourceSize / 1048576
-                val percentage: Int = when {
-                    status.isComplete -> {
-                        101
-                    }
-                    required > 0L ->
-                        (100 * status.completedResourceCount / required).toInt()
-                    else -> 0
-                }
-                this.percentageNumber = percentage
-                if (percentage > oldPercentage) {
-                    percentageDownloads.postValue(percentage)
-                }
-            }
+//    fun deleteOfflineRegion(project: Project) {
+//        stateOfflineMap.postValue(OfflineMapState.DELETING_STATE.key)
+//
+//        val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
+//        offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+//            override fun onList(offlineRegions: Array<out OfflineRegion>?) {
+//                if (!offlineRegions.isNullOrEmpty()) {
+//                    offlineRegions.map {
+//                        if (getRegionName(it) == project.name) {
+//                            hideDownloadButton.postValue(true)
+//                            onDeleteOfflineRegion(it, project)
+//                        }
+//                    }
+//                }
+//            }
+//
+//            override fun onError(error: String?) {
+//                stateOfflineMap.postValue(OfflineMapState.DOWNLOADED_STATE.key)
+//                updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
+//            }
+//        })
+//    }
 
-            override fun onError(error: OfflineRegionError) {
-                stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
-            }
+//    fun onDeleteOfflineRegion(offRegion: OfflineRegion, project: Project) {
+//        offRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
+//            override fun onDelete() {
+//                stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
+//                updateOfflineState(OfflineMapState.DOWNLOAD_STATE.key, project.serverId ?: "")
+//            }
+//
+//            override fun onError(error: String) {
+//                stateOfflineMap.postValue(OfflineMapState.DOWNLOADED_STATE.key)
+//                updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
+//            }
+//        })
+//    }
 
-            override fun mapboxTileCountLimitExceeded(limit: Long) {
-                Log.e(OfflineMapFragment.TAG, "Mapbox tile count limit exceeded: $limit")
-            }
-        })
-    }
-
-    fun deleteOfflineRegion(project: Project) {
-        stateOfflineMap.postValue(OfflineMapState.DELETING_STATE.key)
-
-        val offlineManager: OfflineManager? = context?.let { OfflineManager.getInstance(it) }
-        offlineManager?.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-            override fun onList(offlineRegions: Array<out OfflineRegion>?) {
-                if (!offlineRegions.isNullOrEmpty()) {
-                    offlineRegions.map {
-                        if (getRegionName(it) == project.name) {
-                            hideDownloadButton.postValue(true)
-                            onDeleteOfflineRegion(it, project)
-                        }
-                    }
-                }
-            }
-
-            override fun onError(error: String?) {
-                stateOfflineMap.postValue(OfflineMapState.DOWNLOADED_STATE.key)
-                updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
-            }
-        })
-    }
-
-    fun onDeleteOfflineRegion(offRegion: OfflineRegion, project: Project) {
-        offRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
-            override fun onDelete() {
-                stateOfflineMap.postValue(OfflineMapState.DOWNLOAD_STATE.key)
-                updateOfflineState(OfflineMapState.DOWNLOAD_STATE.key, project.serverId ?: "")
-            }
-
-            override fun onError(error: String) {
-                stateOfflineMap.postValue(OfflineMapState.DOWNLOADED_STATE.key)
-                updateOfflineState(OfflineMapState.DOWNLOADED_STATE.key, project.serverId ?: "")
-            }
-        })
-    }
-
-    private fun getRegionName(offlineRegion: OfflineRegion): String {
-        val metadata = offlineRegion.metadata
-        val json = String(metadata)
-        val jsonObject = JSONObject(json)
-        return jsonObject.getString("regionName")
-    }
+//    private fun getRegionName(offlineRegion: OfflineRegion): String {
+//        val metadata = offlineRegion.metadata
+//        val json = String(metadata)
+//        val jsonObject = JSONObject(json)
+//        return jsonObject.getString("regionName")
+//    }
 
     fun onDestroy() {
-        projectsLiveData.removeObserver(projectsObserve)
+//        projectsLiveData.removeObserver(projectsObserve)
     }
 }

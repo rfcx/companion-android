@@ -55,6 +55,14 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="${enableCrashReporting}" />
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD24njZ-oIXuBLTF521CTtL31tJrrt9Hk0" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <activity android:name=".view.profile.offlinemap.OfflineMapActivity"
             android:screenOrientation="portrait"/>
 

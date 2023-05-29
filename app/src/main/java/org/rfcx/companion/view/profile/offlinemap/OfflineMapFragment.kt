@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mapbox.mapboxsdk.offline.*
+//import com.mapbox.mapboxsdk.offline.*
 import kotlinx.android.synthetic.main.fragment_offline_map.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -181,7 +181,7 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
                 OfflineMapState.DELETING_STATE.key,
                 project.serverId ?: ""
             )
-            projectOfflineMapViewModel.deleteOfflineRegion(project)
+//            projectOfflineMapViewModel.deleteOfflineRegion(project)
         } else {
             Toast.makeText(
                 context,

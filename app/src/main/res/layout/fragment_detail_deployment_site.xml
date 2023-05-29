@@ -24,7 +24,7 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.7" />
 
-            <com.mapbox.mapboxsdk.maps.MapView
+            <View
                 android:id="@+id/mapBoxView"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"

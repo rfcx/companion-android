@@ -3,7 +3,7 @@ package org.rfcx.companion.util
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import com.mapbox.mapboxsdk.geometry.LatLng
+//import com.mapbox.mapboxsdk.geometry.LatLng
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DDM_FORMAT
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DD_FORMAT
@@ -110,11 +110,11 @@ fun Location.saveLastLocation(context: Context) {
     preferences.putFloat(Preferences.LAST_LONGITUDE, this.longitude.toFloat())
 }
 
-fun LatLng.saveLastLocation(context: Context) {
-    val preferences = Preferences.getInstance(context)
-    preferences.putFloat(Preferences.LAST_LATITUDE, this.latitude.toFloat())
-    preferences.putFloat(Preferences.LAST_LONGITUDE, this.longitude.toFloat())
-}
+//fun LatLng.saveLastLocation(context: Context) {
+//    val preferences = Preferences.getInstance(context)
+//    preferences.putFloat(Preferences.LAST_LATITUDE, this.latitude.toFloat())
+//    preferences.putFloat(Preferences.LAST_LONGITUDE, this.longitude.toFloat())
+//}
 
 fun Context.getLastLocation(): Location? {
     val preferences = Preferences.getInstance(this)
@@ -130,10 +130,10 @@ fun Context.getLastLocation(): Location? {
     return lastLocate
 }
 
-fun Location.toLatLng(): LatLng {
-    return LatLng(this.latitude, this.longitude)
-}
-
-fun Stream.toLatLng(): LatLng {
-    return LatLng(this.latitude, this.longitude)
-}
+//fun Location.toLatLng(): LatLng {
+//    return LatLng(this.latitude, this.longitude)
+//}
+//
+//fun Stream.toLatLng(): LatLng {
+//    return LatLng(this.latitude, this.longitude)
+//}
