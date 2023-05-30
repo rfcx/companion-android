@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PointF
 import android.location.Location
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -79,6 +81,7 @@ import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -99,7 +102,13 @@ import java.util.*
 import kotlin.collections.set
 
 class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Boolean) -> Unit {
-// , OnMapReadyCallback
+
+    // Google map
+    private lateinit var map: GoogleMap
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+
+    /* Old code TODO: #Tree delete this line */
     private lateinit var mainViewModel: MainViewModel
 
     // map
@@ -110,13 +119,10 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 //    private var lineSource: GeoJsonSource? = null
 //    private var mapFeatures: FeatureCollection? = null
 
-    // Google map
-    private lateinit var map: GoogleMap
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val trackingDb by lazy { TrackingDb(realm) }
+    private val streamDb by lazy { StreamDb(realm) }
 
     // data
     private var streams = listOf<Stream>()
@@ -144,9 +150,11 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     // for animate line string
 //    private var routeCoordinateList = listOf<Point>()
     private var routeIndex = 0
-//    private var markerLinePointList = arrayListOf<ArrayList<Point>>()
+
+    //    private var markerLinePointList = arrayListOf<ArrayList<Point>>()
     private var currentAnimator: Animator? = null
-//    private var queue = arrayListOf<List<Point>>()
+
+    //    private var queue = arrayListOf<List<Point>>()
     private var queueColor = arrayListOf<String>()
     private var queuePivot = 0
 
@@ -204,6 +212,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                     mainViewModel.updateProjectBounds()
 //                    mainViewModel.updateStatusOfflineMap()
                 }
+
                 else -> updateSyncInfo(isSites = true)
             }
         }
@@ -213,6 +222,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         when (it.status) {
             Status.LOADING -> {
             }
+
             Status.SUCCESS -> {
                 mainViewModel.updateProjectBounds()
                 projectSwipeRefreshView.isRefreshing = false
@@ -225,6 +235,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                 combinedData()
 //                mainViewModel.updateStatusOfflineMap()
             }
+
             Status.ERROR -> {
                 combinedData()
                 projectSwipeRefreshView.isRefreshing = false
@@ -251,6 +262,37 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     private val getUnsyncedDeploymentsObserver = Observer<Int> {
         unsyncedDeploymentCount = it ?: 0
         updateUnsyncedCount(unsyncedDeploymentCount)
+    }
+
+
+    /* New code TODO: #Tree delete this line */
+    override fun onMapReady(p0: GoogleMap) {
+        map = p0
+    }
+
+    private fun setMarker(mapMarker: List<MapMarker>) {
+        mapMarker.map {
+            when (it) {
+                is MapMarker.DeploymentMarker -> {
+                    setMarker(LatLng(it.latitude, it.longitude), it.locationName)
+                }
+                is MapMarker.SiteMarker -> {
+                    setMarker(LatLng(it.latitude, it.longitude), it.name)
+                }
+            }
+        }
+    }
+
+    private fun setMarker(latlng: LatLng, name: String) {
+        // Add Marker
+        map.addMarker(
+            MarkerOptions()
+                .position(latlng)
+                .title(name)
+        )
+
+        // Move Camera
+        map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
     }
 
     override fun onAttach(context: Context) {
@@ -991,11 +1033,14 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
     private fun combinedData() {
 //        handleMarker(deploymentMarkers + streamMarkers)
+        Log.i("setMarker","combinedData ${deploymentMarkers.size}")
+        Log.i("setMarker","combinedData ${streamMarkers.size}")
+        setMarker(deploymentMarkers + streamMarkers)
 
-        val state = listener?.getBottomSheetState() ?: 0
-
-        if (deploymentMarkers.isNotEmpty() && state != BottomSheetBehavior.STATE_EXPANDED) {
-            val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
+//        val state = listener?.getBottomSheetState() ?: 0
+//
+//        if (deploymentMarkers.isNotEmpty() && state != BottomSheetBehavior.STATE_EXPANDED) {
+//            val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
 //            mapboxMap?.let {
 //                it.moveCamera(
 //                    CameraUpdateFactory.newLatLngZoom(
@@ -1007,27 +1052,27 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 //                    )
 //                )
 //            }
-        }
-
-        val currentLocation = currentUserLocation
-        if (currentLocation != null) {
-            adapterOfSearchSite = getListSite(
-                currentLocation,
-                streams
-            )
-            context?.let { currentLocation.saveLastLocation(it) }
-        } else {
-            adapterOfSearchSite = getListSiteWithOutCurrentLocation(
-                streams
-            )
-        }
-        siteAdapter.items = adapterOfSearchSite ?: listOf()
-
-        if (adapterOfSearchSite.isNullOrEmpty()) {
-            showLabel(false)
-        } else {
-            hideLabel()
-        }
+//        }
+//
+//        val currentLocation = currentUserLocation
+//        if (currentLocation != null) {
+//            adapterOfSearchSite = getListSite(
+//                currentLocation,
+//                streams
+//            )
+//            context?.let { currentLocation.saveLastLocation(it) }
+//        } else {
+//            adapterOfSearchSite = getListSiteWithOutCurrentLocation(
+//                streams
+//            )
+//        }
+//        siteAdapter.items = adapterOfSearchSite ?: listOf()
+//
+//        if (adapterOfSearchSite.isNullOrEmpty()) {
+//            showLabel(false)
+//        } else {
+//            hideLabel()
+//        }
     }
 
 //    private fun getFurthestSiteFromCurrentLocation(
@@ -1057,6 +1102,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                 when (it.status) {
                     Status.LOADING -> {
                     }
+
                     Status.SUCCESS -> {
 //                        showTrackOnMap(
 //                            site.id,
@@ -1065,6 +1111,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 //                            markerId
 //                        )
                     }
+
                     Status.ERROR -> {
                         showToast(it.message ?: getString(R.string.error_has_occurred))
                     }
@@ -1107,6 +1154,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                 }
                 statusView.onShow(msg)
             }
+
             SyncInfo.Uploaded -> {
                 val msg = if (isSites) {
                     getString(R.string.sites_synced)
@@ -1560,7 +1608,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
 
-        // 1. Check if permissions are granted, if so, enable the my location layer
+        // Check if permissions are granted, if so, enable the my location layer
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -1569,29 +1617,11 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d("qddddd","map.isMyLocationEnabled = true\n")
-
             map.isMyLocationEnabled = true
             return
         }
 
-        // 2. If if a permission rationale dialog should be shown
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        ) {
-            Log.d("qddddd","uulmlml")
-//            PermissionUtils.RationaleDialog.newInstance(
-//                LOCATION_PERMISSION_REQUEST_CODE, true
-//            ).show(supportFragmentManager, "dialog")
-//            return
-        }
-
-        // 3. Otherwise, request permission
+        // Otherwise, request permission
         ActivityCompat.requestPermissions(
             requireActivity(),
             arrayOf(
@@ -1602,35 +1632,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         )
     }
 
-        override fun onLockImageClicked() {
+    override fun onLockImageClicked() {
         Toast.makeText(context, R.string.not_have_permission, Toast.LENGTH_LONG).show()
-    }
-
-    override fun onMapReady(p0: GoogleMap) {
-        map = p0
-        p0.addMarker(
-            MarkerOptions()
-                .position(LatLng(0.0, 0.0))
-                .title("Marker")
-        )
-        if (locationPermissions?.allowed() == false) {
-            locationPermissions?.check { /* do nothing */ }
-        } else {
-            enableMyLocation()
-        }
-
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location : Location? ->
-                // Got last known location. In some rare situations this can be null.
-                val australiaBounds = LatLngBounds(
-                    LatLng((-44.0), location?.latitude ?: 0.0),  // SW bounds
-                    LatLng((-10.0), location?.longitude ?: 0.0) // NE bounds
-                )
-                map.moveCamera(CameraUpdateFactory.newLatLngBounds(australiaBounds, 0))
-                map.uiSettings.isZoomControlsEnabled = true
-
-            }
-
-
     }
 }
