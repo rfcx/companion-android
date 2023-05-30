@@ -1,8 +1,11 @@
 package org.rfcx.companion.view.map
 
+import android.Manifest
 import android.animation.Animator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -18,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -26,10 +30,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -101,6 +109,10 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 //    private var mapSource: GeoJsonSource? = null
 //    private var lineSource: GeoJsonSource? = null
 //    private var mapFeatures: FeatureCollection? = null
+
+    // Google map
+    private lateinit var map: GoogleMap
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -271,6 +283,8 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
 //        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
     }
 
@@ -282,6 +296,8 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+
 
         setViewModel()
         setObserver()
@@ -1437,6 +1453,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         private const val POINT_COUNT = "point_count"
         private const val DEPLOYMENT_COUNT = "deployment.count"
         private const val WITHIN_TIME = (60 * 3) // 3 hr
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
 
         private const val DURATION = 700
 
@@ -1540,15 +1557,80 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         }
     }
 
-    override fun onLockImageClicked() {
+    @SuppressLint("MissingPermission")
+    private fun enableMyLocation() {
+
+        // 1. Check if permissions are granted, if so, enable the my location layer
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d("qddddd","map.isMyLocationEnabled = true\n")
+
+            map.isMyLocationEnabled = true
+            return
+        }
+
+        // 2. If if a permission rationale dialog should be shown
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) || ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        ) {
+            Log.d("qddddd","uulmlml")
+//            PermissionUtils.RationaleDialog.newInstance(
+//                LOCATION_PERMISSION_REQUEST_CODE, true
+//            ).show(supportFragmentManager, "dialog")
+//            return
+        }
+
+        // 3. Otherwise, request permission
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
+
+        override fun onLockImageClicked() {
         Toast.makeText(context, R.string.not_have_permission, Toast.LENGTH_LONG).show()
     }
 
     override fun onMapReady(p0: GoogleMap) {
+        map = p0
         p0.addMarker(
             MarkerOptions()
                 .position(LatLng(0.0, 0.0))
                 .title("Marker")
         )
+        if (locationPermissions?.allowed() == false) {
+            locationPermissions?.check { /* do nothing */ }
+        } else {
+            enableMyLocation()
+        }
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location : Location? ->
+                // Got last known location. In some rare situations this can be null.
+                val australiaBounds = LatLngBounds(
+                    LatLng((-44.0), location?.latitude ?: 0.0),  // SW bounds
+                    LatLng((-10.0), location?.longitude ?: 0.0) // NE bounds
+                )
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(australiaBounds, 0))
+                map.uiSettings.isZoomControlsEnabled = true
+
+            }
+
+
     }
 }
