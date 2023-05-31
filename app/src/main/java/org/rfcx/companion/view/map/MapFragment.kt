@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonSyntaxException
@@ -101,7 +102,8 @@ import java.io.File
 import java.util.*
 import kotlin.collections.set
 
-class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Boolean) -> Unit {
+class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
+    GoogleMap.OnInfoWindowClickListener, (Stream, Boolean) -> Unit {
 
     // Google map
     private lateinit var map: GoogleMap
@@ -267,8 +269,16 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
     /* New code TODO: #Tree delete this line */
     override fun onMapReady(p0: GoogleMap) {
+        p0.setOnInfoWindowClickListener(this)
         map = p0
         mainViewModel.retrieveLocations()
+    }
+
+    override fun onInfoWindowClick(p0: Marker) {
+        Toast.makeText(
+            requireContext(), "Info window clicked ${p0.title}",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun setMarker(mapMarker: List<MapMarker>) {
