@@ -268,6 +268,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     /* New code TODO: #Tree delete this line */
     override fun onMapReady(p0: GoogleMap) {
         map = p0
+        mainViewModel.retrieveLocations()
     }
 
     private fun setMarker(mapMarker: List<MapMarker>) {
@@ -335,7 +336,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 //        mapView = view.findViewById(R.id.mapView)
 //        mapView.onCreate(savedInstanceState)
 //        mapView.getMapAsync(this)
-
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -347,6 +347,10 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         fetchJobSyncing()
         showSearchBar(false)
         hideLabel()
+
+        Log.d("hideLabel","${mainViewModel.getProjectsFromLocal()}")
+        Log.d("hideLabel","size ${streamDb.getStreams().size}")
+        Log.d("hideLabel","${streamDb.getStreams()}")
 
         context?.let { setTextTrackingButton(LocationTrackingManager.isTrackingOn(it)) }
         projectNameTextView.text =
