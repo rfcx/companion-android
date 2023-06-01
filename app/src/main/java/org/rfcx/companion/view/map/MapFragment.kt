@@ -272,6 +272,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         p0.setOnInfoWindowClickListener(this)
         map = p0
         mainViewModel.retrieveLocations()
+        map.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
     }
 
     override fun onInfoWindowClick(p0: Marker) {
