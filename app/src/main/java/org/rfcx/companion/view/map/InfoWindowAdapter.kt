@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
+import com.google.gson.Gson
 import org.rfcx.companion.R
 
 class InfoWindowAdapter(mContext: Context) : GoogleMap.InfoWindowAdapter {
@@ -14,18 +15,20 @@ class InfoWindowAdapter(mContext: Context) : GoogleMap.InfoWindowAdapter {
 
     private fun setInfoWindowText(marker: Marker) {
         val title = marker.title
-        val tvTitle = mWindow.findViewById<TextView>(R.id.tvTitle)
+        val data = Gson().fromJson(marker.snippet, MapMarker.DeploymentMarker::class.java)
+
+        val tvTitle = mWindow.findViewById<TextView>(R.id.createdAtValue)
         if (!TextUtils.isEmpty(title)) {
-            tvTitle.text = title
+            tvTitle.text = data.deploymentKey
         }
     }
 
-    override fun getInfoWindow(p0: Marker): View? {
+    override fun getInfoWindow(p0: Marker): View {
         setInfoWindowText(p0)
         return mWindow
     }
 
-    override fun getInfoContents(p0: Marker): View? {
+    override fun getInfoContents(p0: Marker): View {
         setInfoWindowText(p0)
         return mWindow
     }

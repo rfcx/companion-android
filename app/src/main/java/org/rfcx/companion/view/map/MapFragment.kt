@@ -6,15 +6,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.PointF
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -24,7 +18,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -37,14 +30,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.gson.JsonSyntaxException
+import com.google.gson.Gson
 //import com.mapbox.android.core.location.*
 //import com.mapbox.geojson.Feature
 //import com.mapbox.geojson.FeatureCollection
@@ -93,14 +83,11 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
-import org.rfcx.companion.view.detail.DeploymentDetailActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectAdapter
 import org.rfcx.companion.view.profile.locationgroup.ProjectListener
 import org.rfcx.companion.view.unsynced.UnsyncedWorksActivity
-import java.io.File
 import java.util.*
-import kotlin.collections.set
 
 class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     GoogleMap.OnInfoWindowClickListener, (Stream, Boolean) -> Unit {
@@ -286,23 +273,40 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         mapMarker.map {
             when (it) {
                 is MapMarker.DeploymentMarker -> {
-                    setMarker(LatLng(it.latitude, it.longitude), it.locationName)
+                    setMarker(it)
                 }
                 is MapMarker.SiteMarker -> {
-                    setMarker(LatLng(it.latitude, it.longitude), it.name)
+                    setMarker(it)
                 }
             }
         }
     }
 
-    private fun setMarker(latlng: LatLng, name: String) {
+    private fun setMarker(data: MapMarker.SiteMarker) {
         // Add Marker
+        val latlng = LatLng(data.latitude, data.longitude)
         map.addMarker(
             MarkerOptions()
                 .position(latlng)
-                .title(name)
+                .title(data.name)
+                .snippet(
+                    Gson().toJson(data))
         )
 
+        // Move Camera
+        map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+    }
+
+    private fun setMarker(data: MapMarker.DeploymentMarker) {
+        // Add Marker
+        val latlng = LatLng(data.latitude, data.longitude)
+        map.addMarker(
+            MarkerOptions()
+                .position(latlng)
+                .title(data.locationName)
+                .snippet(
+                    Gson().toJson(data))
+        )
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
     }
