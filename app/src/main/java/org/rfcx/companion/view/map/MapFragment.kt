@@ -6,6 +6,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -30,6 +33,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -63,6 +68,7 @@ import com.google.gson.Gson
 //import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 //import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
+import io.realm.Realm.getApplicationContext
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
@@ -275,6 +281,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
                 is MapMarker.DeploymentMarker -> {
                     setMarker(it)
                 }
+
                 is MapMarker.SiteMarker -> {
                     setMarker(it)
                 }
@@ -285,13 +292,12 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     private fun setMarker(data: MapMarker.SiteMarker) {
         // Add Marker
         val latlng = LatLng(data.latitude, data.longitude)
-        map.addMarker(
-            MarkerOptions()
-                .position(latlng)
-                .title(data.name)
-                .snippet(
-                    Gson().toJson(data))
-        )
+        val marker = MarkerOptions()
+            .position(latlng)
+            .title(data.name)
+            .snippet(Gson().toJson(data))
+        marker.icon(bitmapFromVector(requireContext(), R.drawable.ic_pin_map_grey))
+        map.addMarker(marker)
 
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
@@ -300,15 +306,44 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     private fun setMarker(data: MapMarker.DeploymentMarker) {
         // Add Marker
         val latlng = LatLng(data.latitude, data.longitude)
-        map.addMarker(
-            MarkerOptions()
-                .position(latlng)
-                .title(data.locationName)
-                .snippet(
-                    Gson().toJson(data))
-        )
+        val marker = MarkerOptions()
+            .position(latlng)
+            .title(data.locationName)
+            .snippet(Gson().toJson(data))
+        val pin = if (data.pin == Pin.PIN_GREEN) {
+            R.drawable.ic_pin_map
+        } else {
+            R.drawable.ic_pin_map_grey
+        }
+        marker.icon(bitmapFromVector(requireContext(), pin))
+        map.addMarker(marker)
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+    }
+
+    private fun bitmapFromVector(context: Context, vectorResId: Int): BitmapDescriptor {
+        //drawable generator
+        val vectorDrawable: Drawable = ContextCompat.getDrawable(context, vectorResId)!!
+        vectorDrawable.setBounds(
+            0,
+            0,
+            vectorDrawable.intrinsicWidth,
+            vectorDrawable.intrinsicHeight
+        )
+        //bitmap genarator
+        val bitmap: Bitmap =
+            Bitmap.createBitmap(
+                vectorDrawable.intrinsicWidth,
+                vectorDrawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+        //canvas genaret
+        //pass bitmap in canvas constructor
+        val canvas: Canvas = Canvas(bitmap)
+        //pass canvas in drawable
+        vectorDrawable.draw(canvas)
+        //return BitmapDescriptorFactory
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
     override fun onAttach(context: Context) {
@@ -362,10 +397,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         fetchJobSyncing()
         showSearchBar(false)
         hideLabel()
-
-        Log.d("hideLabel","${mainViewModel.getProjectsFromLocal()}")
-        Log.d("hideLabel","size ${streamDb.getStreams().size}")
-        Log.d("hideLabel","${streamDb.getStreams()}")
 
         context?.let { setTextTrackingButton(LocationTrackingManager.isTrackingOn(it)) }
         projectNameTextView.text =
@@ -634,7 +665,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         override fun run() {
             context?.let {
                 trackingTextView.text = "${
-                LocationTrackingManager.getDistance(trackingDb).setFormatLabel()
+                    LocationTrackingManager.getDistance(trackingDb).setFormatLabel()
                 }  ${LocationTrackingManager.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
@@ -1052,8 +1083,8 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 
     private fun combinedData() {
 //        handleMarker(deploymentMarkers + streamMarkers)
-        Log.i("setMarker","combinedData ${deploymentMarkers.size}")
-        Log.i("setMarker","combinedData ${streamMarkers.size}")
+        Log.i("setMarker", "combinedData ${deploymentMarkers.size}")
+        Log.i("setMarker", "combinedData ${streamMarkers.size}")
         setMarker(deploymentMarkers + streamMarkers)
 
 //        val state = listener?.getBottomSheetState() ?: 0
