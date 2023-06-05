@@ -301,6 +301,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+        map.animateCamera(CameraUpdateFactory.zoomTo( 13.0f ));
     }
 
     private fun setMarker(data: MapMarker.DeploymentMarker) {
