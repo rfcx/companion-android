@@ -68,7 +68,6 @@ import com.google.gson.Gson
 //import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 //import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.realm.Realm
-import io.realm.Realm.getApplicationContext
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
@@ -89,6 +88,7 @@ import org.rfcx.companion.service.DeploymentSyncWorker
 import org.rfcx.companion.service.DownloadStreamsWorker
 import org.rfcx.companion.util.*
 import org.rfcx.companion.view.deployment.locate.SiteWithLastDeploymentItem
+import org.rfcx.companion.view.detail.DeploymentDetailActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectAdapter
 import org.rfcx.companion.view.profile.locationgroup.ProjectListener
@@ -269,10 +269,23 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     }
 
     override fun onInfoWindowClick(p0: Marker) {
-        Toast.makeText(
-            requireContext(), "Info window clicked ${p0.title}",
-            Toast.LENGTH_SHORT
-        ).show()
+        if (p0.snippet == null) return
+        val isDeployment = p0.snippet!!.contains("deploymentKey")
+
+        if (isDeployment) {
+            val data = Gson().fromJson(p0.snippet, MapMarker.DeploymentMarker::class.java)
+
+            context?.let {
+                firebaseCrashlytics.setCustomKey(
+                    CrashlyticsKey.OnClickSeeDetail.key,
+                    "Site: ${data.locationName}, Project: ${data.projectName}"
+                )
+                DeploymentDetailActivity.startActivity(it, data.id)
+                analytics?.trackSeeDetailEvent()
+            }
+        } else {
+            return
+        }
     }
 
     private fun setMarker(mapMarker: List<MapMarker>) {
@@ -301,7 +314,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-        map.animateCamera(CameraUpdateFactory.zoomTo( 13.0f ));
+        map.animateCamera(CameraUpdateFactory.zoomTo(13.0f));
     }
 
     private fun setMarker(data: MapMarker.DeploymentMarker) {
