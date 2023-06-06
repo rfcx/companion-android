@@ -432,15 +432,11 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         }
 
         zoomOutButton.setOnClickListener {
-//            mapboxMap?.let {
-//                it.animateCamera(CameraUpdateFactory.zoomOut(), DURATION)
-//            }
+            map.animateCamera(CameraUpdateFactory.zoomOut())
         }
 
         zoomInButton.setOnClickListener {
-//            mapboxMap?.let {
-//                it.animateCamera(CameraUpdateFactory.zoomIn(), DURATION)
-//            }
+            map.animateCamera(CameraUpdateFactory.zoomIn())
         }
 
         projectNameTextView.setOnClickListener {
