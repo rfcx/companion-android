@@ -51,6 +51,7 @@ class InfoWindowAdapter(var mContext: Context) : GoogleMap.InfoWindowAdapter {
 
                 deploymentSiteTitle.text = data.locationName
                 projectName.text = data.projectName
+                deploymentStreamId.visibility = View.VISIBLE
                 deploymentStreamId.text = data.deploymentKey
                 deploymentTypeName.text = data.device
                 deployedAt.text = data.deploymentAt.toTimeAgo(mContext)
