@@ -36,6 +36,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -266,6 +267,27 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         map = p0
         mainViewModel.retrieveLocations()
         map.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
+
+        if (locationPermissions?.allowed() == false) {
+            locationPermissions?.check { /* do nothing */ }
+        } else {
+            enableMyLocation()
+        }
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                // Got last known location. In some rare situations this can be null.
+                val australiaBounds = LatLngBounds(
+                    LatLng((-44.0), location?.latitude ?: 0.0),  // SW bounds
+                    LatLng((-10.0), location?.longitude ?: 0.0) // NE bounds
+                )
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(australiaBounds, 0))
+                map.uiSettings.isZoomControlsEnabled = true
+                map.uiSettings.isMyLocationButtonEnabled = false
+                context?.let { location?.saveLastLocation(it) }
+                currentUserLocation = location
+            }
+
     }
 
     override fun onInfoWindowClick(p0: Marker) {
@@ -420,15 +442,9 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         searchLayoutSearchEditText.hint = getString(R.string.site_name_hint)
 
         currentLocationButton.setOnClickListener {
-//            mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
-//                if (it) {
-//                    moveCameraToCurrentLocation()
-//                } else {
-//                    mapboxMap?.style?.let { style ->
-//                        checkThenAccquireLocation(style)
-//                    }
-//                }
-//            }
+            currentUserLocation?.let {
+                map.moveCamera(CameraUpdateFactory.newLatLng(LatLng(it.latitude, it.longitude)))
+            }
         }
 
         zoomOutButton.setOnClickListener {
