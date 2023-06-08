@@ -65,9 +65,10 @@ class InfoWindowAdapter(var mContext: Context) : GoogleMap.InfoWindowAdapter {
 
     override fun getInfoWindow(p0: Marker): View {
         if (p0.snippet == null) return mWindow
-        if (p0.snippet!!.contains("deploymentKey")) {
-            mWindow =
-                LayoutInflater.from(mContext).inflate(R.layout.layout_deployment_window_info, null)
+        mWindow = if (p0.snippet!!.contains("deploymentKey")) {
+            LayoutInflater.from(mContext).inflate(R.layout.layout_deployment_window_info, null)
+        } else {
+            LayoutInflater.from(mContext).inflate(R.layout.layout_map_window_info, null)
         }
         setInfoWindowText(p0)
         return mWindow

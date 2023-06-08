@@ -1,5 +1,32 @@
 package org.rfcx.companion.view.map
 
+//import com.mapbox.android.core.location.*
+//import com.mapbox.geojson.Feature
+//import com.mapbox.geojson.FeatureCollection
+//import com.mapbox.geojson.LineString
+//import com.mapbox.geojson.Point
+//import com.mapbox.mapboxsdk.Mapbox
+//import com.mapbox.mapboxsdk.annotations.BubbleLayout
+//import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+//import com.mapbox.mapboxsdk.geometry.LatLng
+//import com.mapbox.mapboxsdk.geometry.LatLngBounds
+//import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+//import com.mapbox.mapboxsdk.location.LocationComponentOptions
+//import com.mapbox.mapboxsdk.location.modes.CameraMode
+//import com.mapbox.mapboxsdk.location.modes.RenderMode
+//import com.mapbox.mapboxsdk.maps.MapView
+//import com.mapbox.mapboxsdk.maps.MapboxMap
+//import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+//import com.mapbox.mapboxsdk.maps.Style
+//import com.mapbox.mapboxsdk.style.expressions.Expression.*
+//import com.mapbox.mapboxsdk.style.layers.CircleLayer
+//import com.mapbox.mapboxsdk.style.layers.LineLayer
+//import com.mapbox.mapboxsdk.style.layers.Property.*
+//import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
+//import com.mapbox.mapboxsdk.style.layers.SymbolLayer
+//import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
+//import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+//import com.mapbox.mapboxsdk.utils.BitmapUtils
 import android.Manifest
 import android.animation.Animator
 import android.annotation.SuppressLint
@@ -38,36 +65,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
-//import com.mapbox.android.core.location.*
-//import com.mapbox.geojson.Feature
-//import com.mapbox.geojson.FeatureCollection
-//import com.mapbox.geojson.LineString
-//import com.mapbox.geojson.Point
-//import com.mapbox.mapboxsdk.Mapbox
-//import com.mapbox.mapboxsdk.annotations.BubbleLayout
-//import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-//import com.mapbox.mapboxsdk.geometry.LatLng
-//import com.mapbox.mapboxsdk.geometry.LatLngBounds
-//import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-//import com.mapbox.mapboxsdk.location.LocationComponentOptions
-//import com.mapbox.mapboxsdk.location.modes.CameraMode
-//import com.mapbox.mapboxsdk.location.modes.RenderMode
-//import com.mapbox.mapboxsdk.maps.MapView
-//import com.mapbox.mapboxsdk.maps.MapboxMap
-//import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-//import com.mapbox.mapboxsdk.maps.Style
-//import com.mapbox.mapboxsdk.style.expressions.Expression.*
-//import com.mapbox.mapboxsdk.style.layers.CircleLayer
-//import com.mapbox.mapboxsdk.style.layers.LineLayer
-//import com.mapbox.mapboxsdk.style.layers.Property.*
-//import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
-//import com.mapbox.mapboxsdk.style.layers.SymbolLayer
-//import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
-//import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-//import com.mapbox.mapboxsdk.utils.BitmapUtils
+import com.google.maps.android.clustering.ClusterManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
@@ -102,6 +102,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     // Google map
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var mClusterManager: ClusterManager<MarkerItem>
 
 
     /* Old code TODO: #Tree delete this line */
@@ -266,7 +267,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         p0.setOnInfoWindowClickListener(this)
         map = p0
         mainViewModel.retrieveLocations()
-        map.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
+        setUpClusterer()
 
         if (locationPermissions?.allowed() == false) {
             locationPermissions?.check { /* do nothing */ }
@@ -288,6 +289,15 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
                 currentUserLocation = location
             }
 
+    }
+
+    private fun setUpClusterer() {
+        mClusterManager = ClusterManager(requireContext(), map)
+        map.setOnCameraIdleListener(mClusterManager)
+        map.setOnMarkerClickListener(mClusterManager)
+        mClusterManager.markerCollection.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
+        map.setInfoWindowAdapter(mClusterManager.markerManager)
+        combinedData()
     }
 
     override fun onInfoWindowClick(p0: Marker) {
@@ -327,12 +337,8 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     private fun setMarker(data: MapMarker.SiteMarker) {
         // Add Marker
         val latlng = LatLng(data.latitude, data.longitude)
-        val marker = MarkerOptions()
-            .position(latlng)
-            .title(data.name)
-            .snippet(Gson().toJson(data))
-        marker.icon(bitmapFromVector(requireContext(), R.drawable.ic_pin_map_grey))
-        map.addMarker(marker)
+        val item = MarkerItem(data.latitude, data.longitude, data.name, Gson().toJson(data))
+        mClusterManager.addItem(item)
 
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
@@ -342,17 +348,9 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     private fun setMarker(data: MapMarker.DeploymentMarker) {
         // Add Marker
         val latlng = LatLng(data.latitude, data.longitude)
-        val marker = MarkerOptions()
-            .position(latlng)
-            .title(data.locationName)
-            .snippet(Gson().toJson(data))
-        val pin = if (data.pin == Pin.PIN_GREEN) {
-            R.drawable.ic_pin_map
-        } else {
-            R.drawable.ic_pin_map_grey
-        }
-        marker.icon(bitmapFromVector(requireContext(), pin))
-        map.addMarker(marker)
+        val item = MarkerItem(data.latitude, data.longitude, data.locationName, Gson().toJson(data))
+        mClusterManager.addItem(item)
+
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
     }
@@ -1111,6 +1109,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 //        handleMarker(deploymentMarkers + streamMarkers)
         Log.i("setMarker", "combinedData ${deploymentMarkers.size}")
         Log.i("setMarker", "combinedData ${streamMarkers.size}")
+        mClusterManager.clearItems()
         setMarker(deploymentMarkers + streamMarkers)
 
 //        val state = listener?.getBottomSheetState() ?: 0
