@@ -268,6 +268,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         mainViewModel.retrieveLocations()
         mainViewModel.fetchProjects()
         setUpClusterer()
+        setupSearch()
 
         if (locationPermissions?.allowed() == false) {
             locationPermissions?.check { /* do nothing */ }
@@ -1127,25 +1128,25 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 //            }
 //        }
 //
-//        val currentLocation = currentUserLocation
-//        if (currentLocation != null) {
-//            adapterOfSearchSite = getListSite(
-//                currentLocation,
-//                streams
-//            )
-//            context?.let { currentLocation.saveLastLocation(it) }
-//        } else {
-//            adapterOfSearchSite = getListSiteWithOutCurrentLocation(
-//                streams
-//            )
-//        }
-//        siteAdapter.items = adapterOfSearchSite ?: listOf()
-//
-//        if (adapterOfSearchSite.isNullOrEmpty()) {
-//            showLabel(false)
-//        } else {
-//            hideLabel()
-//        }
+        val currentLocation = currentUserLocation
+        if (currentLocation != null) {
+            adapterOfSearchSite = getListSite(
+                currentLocation,
+                streams
+            )
+            context?.let { currentLocation.saveLastLocation(it) }
+        } else {
+            adapterOfSearchSite = getListSiteWithOutCurrentLocation(
+                streams
+            )
+        }
+        siteAdapter.items = adapterOfSearchSite ?: listOf()
+
+        if (adapterOfSearchSite.isNullOrEmpty()) {
+            showLabel(false)
+        } else {
+            hideLabel()
+        }
     }
 
 //    private fun getFurthestSiteFromCurrentLocation(
