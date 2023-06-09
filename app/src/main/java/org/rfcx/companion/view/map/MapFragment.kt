@@ -41,7 +41,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -267,6 +266,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         p0.setOnInfoWindowClickListener(this)
         map = p0
         mainViewModel.retrieveLocations()
+        mainViewModel.fetchProjects()
         setUpClusterer()
 
         if (locationPermissions?.allowed() == false) {
@@ -1107,8 +1107,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 
     private fun combinedData() {
 //        handleMarker(deploymentMarkers + streamMarkers)
-        Log.i("setMarker", "combinedData ${deploymentMarkers.size}")
-        Log.i("setMarker", "combinedData ${streamMarkers.size}")
         mClusterManager.clearItems()
         setMarker(deploymentMarkers + streamMarkers)
 
@@ -1484,11 +1482,11 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     }
 
     fun showButtonOnMap() {
-//        buttonOnMapGroup.visibility = View.VISIBLE
+        buttonOnMapGroup.visibility = View.VISIBLE
     }
 
     fun hideButtonOnMap() {
-//        buttonOnMapGroup.visibility = View.GONE
+        buttonOnMapGroup.visibility = View.GONE
     }
 
     override fun onStart() {
