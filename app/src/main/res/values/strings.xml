@@ -606,4 +606,7 @@
     <string name="hour_less_than_10">0%d</string>
     <string name="audio_coverage">Audio Coverage</string>
     <string name="coverage_on">Audio coverage on %s %d</string>
+
+    <string name="type_title">type:</string>
+    <string name="id_title">id:</string>
 </resources>

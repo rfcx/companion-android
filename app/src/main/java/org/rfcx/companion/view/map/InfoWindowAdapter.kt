@@ -1,5 +1,6 @@
 package org.rfcx.companion.view.map
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import org.rfcx.companion.util.toTimeAgo
 class InfoWindowAdapter(var mContext: Context) : GoogleMap.InfoWindowAdapter {
     var mWindow: View = LayoutInflater.from(mContext).inflate(R.layout.layout_map_window_info, null)
 
+    @SuppressLint("SetTextI18n")
     private fun setInfoWindowText(marker: Marker) {
         if (marker.snippet == null) return
         val isDeployment = marker.snippet!!.contains("deploymentKey")
@@ -52,8 +54,8 @@ class InfoWindowAdapter(var mContext: Context) : GoogleMap.InfoWindowAdapter {
                 deploymentSiteTitle.text = data.locationName
                 projectName.text = data.projectName
                 deploymentStreamId.visibility = View.VISIBLE
-                deploymentStreamId.text = data.deploymentKey
-                deploymentTypeName.text = data.device
+                deploymentStreamId.text = mContext.getString(R.string.id_title) + data.deploymentKey
+                deploymentTypeName.text = mContext.getString(R.string.type_title) + data.device.toUpperCase()
                 deployedAt.text = data.deploymentAt.toTimeAgo(mContext)
                 val latLngText = "${data.latitude.latitudeCoordinates(mContext)}, ${
                     data.longitude.longitudeCoordinates(mContext)
