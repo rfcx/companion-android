@@ -289,12 +289,28 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     }
 
     private fun setUpClusterer() {
-        mClusterManager = ClusterManager(requireContext(), map)
+        // Create the ClusterManager class and set the custom renderer.
+        mClusterManager = ClusterManager<MarkerItem>(requireContext(), map)
+        mClusterManager.renderer =
+            MarkerRenderer(
+                requireContext(),
+                map,
+                mClusterManager
+            )
+
+        // Set custom info window adapter
+        mClusterManager.markerCollection.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
+
         map.setOnCameraIdleListener(mClusterManager)
         map.setOnMarkerClickListener(mClusterManager)
         mClusterManager.markerCollection.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
         map.setInfoWindowAdapter(mClusterManager.markerManager)
         combinedData()
+
+        // can re-cluster when zooming in and out.
+        map.setOnCameraIdleListener {
+            mClusterManager.onCameraIdle()
+        }
     }
 
     override fun onInfoWindowClick(p0: Marker) {
@@ -340,6 +356,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         val latlng = LatLng(data.latitude, data.longitude)
         val item = MarkerItem(data.latitude, data.longitude, data.name, Gson().toJson(data))
         mClusterManager.addItem(item)
+        mClusterManager.cluster()
 
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
@@ -351,34 +368,10 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         val latlng = LatLng(data.latitude, data.longitude)
         val item = MarkerItem(data.latitude, data.longitude, data.locationName, Gson().toJson(data))
         mClusterManager.addItem(item)
+        mClusterManager.cluster()
 
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-    }
-
-    private fun bitmapFromVector(context: Context, vectorResId: Int): BitmapDescriptor {
-        //drawable generator
-        val vectorDrawable: Drawable = ContextCompat.getDrawable(context, vectorResId)!!
-        vectorDrawable.setBounds(
-            0,
-            0,
-            vectorDrawable.intrinsicWidth,
-            vectorDrawable.intrinsicHeight
-        )
-        //bitmap genarator
-        val bitmap: Bitmap =
-            Bitmap.createBitmap(
-                vectorDrawable.intrinsicWidth,
-                vectorDrawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
-            )
-        //canvas genaret
-        //pass bitmap in canvas constructor
-        val canvas: Canvas = Canvas(bitmap)
-        //pass canvas in drawable
-        vectorDrawable.draw(canvas)
-        //return BitmapDescriptorFactory
-        return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
     override fun onAttach(context: Context) {
