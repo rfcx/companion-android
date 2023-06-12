@@ -303,7 +303,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 
     override fun onInfoWindowClick(p0: Marker) {
         if (p0.snippet == null) return
-        val isDeployment = p0.snippet!!.contains("deploymentKey")
+        val isDeployment = isDeployment(p0.snippet!!)
 
         if (isDeployment) {
             val data = Gson().fromJson(p0.snippet, MapMarker.DeploymentMarker::class.java)
@@ -319,6 +319,10 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         } else {
             return
         }
+    }
+
+    private fun isDeployment(data: String): Boolean {
+        return data.contains("deploymentKey")
     }
 
     private fun setMarker(mapMarker: List<MapMarker>) {
@@ -1590,6 +1594,15 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
     override fun invoke(stream: Stream, isNew: Boolean) {
         view?.hideKeyboard()
         showSearchBar(false)
+
+        val latLng = LatLng(stream.latitude, stream.longitude)
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+
+        mClusterManager.markerCollection.markers.forEach {
+            if (it.snippet!!.contains(stream.name)) {
+                it.showInfoWindow()
+            }
+        }
 
 //        val features = this.mapFeatures?.features()
 //        val selectingDeployment = features?.firstOrNull { feature ->
