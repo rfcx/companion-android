@@ -1603,47 +1603,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
                 it.showInfoWindow()
             }
         }
-
-//        val features = this.mapFeatures?.features()
-//        val selectingDeployment = features?.firstOrNull { feature ->
-//            feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE) == stream.name
-//        }
-//        val selectingSite = features?.firstOrNull { feature ->
-//            feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME) == stream.name
-//        }
-//
-//        if (selectingDeployment == null) {
-//            if (selectingSite == null) return
-//            setSiteDetail(selectingSite)
-//            setFeatureSelectState(selectingSite, true)
-//        } else {
-//            setDeploymentDetail(selectingDeployment)
-//            setFeatureSelectState(selectingDeployment, true)
-//        }
-
-//        val item = mainViewModel.getStreamById(stream.id)
-//        item?.let {
-//            val pointF = mapboxMap?.projection?.toScreenLocation(it.getLatLng()) ?: PointF()
-//            val clusterFeatures = mapboxMap?.queryRenderedFeatures(pointF, "$DEPLOYMENT_CLUSTER-0")
-//            var zoom = mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM
-//            zoom = if (zoom > DefaultSetupMap.DEFAULT_ZOOM) zoom else DefaultSetupMap.DEFAULT_ZOOM
-//
-//            if (!clusterFeatures.isNullOrEmpty()) {
-//                val pinCount =
-//                    if (clusterFeatures[0].getProperty(POINT_COUNT) != null) clusterFeatures[0].getProperty(
-//                        POINT_COUNT
-//                    ).asInt else 0
-//                if (pinCount > 0) {
-//                    zoom += 3
-//                }
-//            }
-//            mapboxMap?.animateCamera(
-//                CameraUpdateFactory.newLatLngZoom(
-//                    it.getLatLng(),
-//                    zoom
-//                )
-//            )
-//        }
     }
 
     override fun onClicked(project: Project) {
