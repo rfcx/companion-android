@@ -269,6 +269,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
         mainViewModel.fetchProjects()
         setUpClusterer()
         setupSearch()
+        setObserver()
 
         if (locationPermissions?.allowed() == false) {
             locationPermissions?.check { /* do nothing */ }
@@ -278,12 +279,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
-                // Got last known location. In some rare situations this can be null.
-                val australiaBounds = LatLngBounds(
-                    LatLng((-44.0), location?.latitude ?: 0.0),  // SW bounds
-                    LatLng((-10.0), location?.longitude ?: 0.0) // NE bounds
-                )
-                map.moveCamera(CameraUpdateFactory.newLatLngBounds(australiaBounds, 0))
+                map.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)))
                 map.uiSettings.isZoomControlsEnabled = true
                 map.uiSettings.isMyLocationButtonEnabled = false
                 context?.let { location?.saveLastLocation(it) }
@@ -431,7 +427,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 
 
         setViewModel()
-        setObserver()
 
         fetchJobSyncing()
         showSearchBar(false)
