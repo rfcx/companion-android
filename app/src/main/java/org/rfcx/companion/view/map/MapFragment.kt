@@ -33,9 +33,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -59,13 +56,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
+import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
@@ -95,8 +90,10 @@ import org.rfcx.companion.view.profile.locationgroup.ProjectListener
 import org.rfcx.companion.view.unsynced.UnsyncedWorksActivity
 import java.util.*
 
-class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
-    GoogleMap.OnInfoWindowClickListener, (Stream, Boolean) -> Unit {
+
+class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Boolean) -> Unit, ClusterManager.OnClusterClickListener<MarkerItem>,
+    ClusterManager.OnClusterItemClickListener<MarkerItem>,
+    ClusterManager.OnClusterItemInfoWindowClickListener<MarkerItem> {
 
     // Google map
     private lateinit var map: GoogleMap
@@ -263,7 +260,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
 
     /* New code TODO: #Tree delete this line */
     override fun onMapReady(p0: GoogleMap) {
-        p0.setOnInfoWindowClickListener(this)
         map = p0
         mainViewModel.retrieveLocations()
         mainViewModel.fetchProjects()
@@ -297,28 +293,53 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback,
                 map,
                 mClusterManager
             )
-
         // Set custom info window adapter
         mClusterManager.markerCollection.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
-
-        map.setOnCameraIdleListener(mClusterManager)
-        map.setOnMarkerClickListener(mClusterManager)
-        mClusterManager.markerCollection.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
-        map.setInfoWindowAdapter(mClusterManager.markerManager)
-        combinedData()
-
         // can re-cluster when zooming in and out.
         map.setOnCameraIdleListener {
             mClusterManager.onCameraIdle()
         }
+
+        map.setOnMarkerClickListener(mClusterManager);
+        map.setInfoWindowAdapter(mClusterManager.markerManager);
+        map.setOnInfoWindowClickListener(mClusterManager);
+        mClusterManager.setOnClusterClickListener(this);
+        mClusterManager.setOnClusterItemClickListener(this);
+        mClusterManager.setOnClusterItemInfoWindowClickListener(this);
+
+        combinedData()
     }
 
-    override fun onInfoWindowClick(p0: Marker) {
-        if (p0.snippet == null) return
-        val isDeployment = isDeployment(p0.snippet!!)
+
+    override fun onClusterClick(cluster: Cluster<MarkerItem>?): Boolean {
+        val builder = LatLngBounds.builder()
+        val markers: Collection<MarkerItem> = cluster!!.items
+
+        for (item in markers) {
+            val position = item.position
+            builder.include(position)
+        }
+
+        val bounds = builder.build()
+
+        try {
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        } catch (error: Exception) {
+            return true
+        }
+        return true
+    }
+
+    override fun onClusterItemClick(item: MarkerItem?): Boolean {
+        return false
+    }
+
+    override fun onClusterItemInfoWindowClick(item: MarkerItem?) {
+        if (item?.snippet == null) return
+        val isDeployment = isDeployment(item.snippet)
 
         if (isDeployment) {
-            val data = Gson().fromJson(p0.snippet, MapMarker.DeploymentMarker::class.java)
+            val data = Gson().fromJson(item.snippet, MapMarker.DeploymentMarker::class.java)
 
             context?.let {
                 firebaseCrashlytics.setCustomKey(
