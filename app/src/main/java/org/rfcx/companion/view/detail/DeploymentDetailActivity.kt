@@ -13,6 +13,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 //import com.mapbox.mapboxsdk.Mapbox
 //import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -46,15 +51,12 @@ import org.rfcx.companion.view.detail.image.AddImageActivity
 import java.io.File
 
 class DeploymentDetailActivity :
-    AppCompatActivity() {
-
-//    , OnMapReadyCallback
-
+    AppCompatActivity(), OnMapReadyCallback {
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 
-//    private lateinit var mapView: MapView
-//    private lateinit var mapBoxMap: MapboxMap
+    private lateinit var map: GoogleMap
+
     private val analytics by lazy { Analytics(this) }
     private val firebaseCrashlytics by lazy { Crashlytics() }
 
@@ -77,7 +79,6 @@ class DeploymentDetailActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_deployment_detail)
         setViewModel()
 
@@ -88,10 +89,8 @@ class DeploymentDetailActivity :
         deleteButton.visibility =
             if (project?.permissions == Permissions.ADMIN.value) View.VISIBLE else View.GONE
 
-        // Setup Mapbox
-//        mapView = findViewById(R.id.mapBoxView)
-//        mapView.onCreate(savedInstanceState)
-//        mapView.getMapAsync(this)
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
@@ -288,37 +287,12 @@ class DeploymentDetailActivity :
         deploymentImageAdapter.setImages(arrayListOf())
     }
 
-//    override fun onMapReady(mapboxMap: MapboxMap) {
-//        mapBoxMap = mapboxMap
-//        mapboxMap.uiSettings.apply {
-//            setAllGesturesEnabled(false)
-//            isAttributionEnabled = false
-//            isLogoEnabled = false
-//        }
-//
-//        mapboxMap.setStyle(Style.OUTDOORS) {
-//            setupScale()
-//            deployment?.let { it1 -> setLocationOnMap(it1) }
-//        }
-//    }
-
-//    private fun setupScale() {
-//        val scaleBarPlugin = ScaleBarPlugin(mapView, mapBoxMap)
-//        scaleBarPlugin.create(ScaleBarOptions(this))
-//    }
-
-    private fun setLocationOnMap(deployment: Deployment) {
-//        val location = deployment.stream
-//        location?.let { locate ->
-//            val latLng = LatLng(locate.latitude, locate.longitude)
-//            moveCamera(latLng, DEFAULT_ZOOM)
-//        }
+    override fun onMapReady(p0: GoogleMap) {
+        map = p0
+        val latlng = LatLng(deployment?.stream?.latitude ?: 0.0, deployment?.stream?.longitude  ?: 0.0)
+        map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+        map.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
     }
-
-//    private fun moveCamera(latLng: LatLng, zoom: Double) {
-//        mapBoxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
-//    }
-
     private fun setupToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
@@ -376,7 +350,7 @@ class DeploymentDetailActivity :
 
     companion object {
         const val DEPLOYMENT_REQUEST_CODE = 1001
-        const val DEFAULT_ZOOM = 15.0
+        const val DEFAULT_ZOOM = 15.0f
         const val NEW_IMAGES_EXTRA = "NEW_IMAGES_EXTRA"
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DeploymentDetailActivity::class.java)
