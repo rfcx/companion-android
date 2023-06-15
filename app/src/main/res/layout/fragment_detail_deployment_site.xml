@@ -24,8 +24,9 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.7" />
 
-            <View
-                android:id="@+id/mapBoxView"
+            <androidx.fragment.app.FragmentContainerView
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:id="@+id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -36,10 +37,10 @@
                 android:id="@+id/viewMapBox"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
-                app:layout_constraintEnd_toEndOf="@id/mapBoxView"
-                app:layout_constraintStart_toStartOf="@id/mapBoxView"
-                app:layout_constraintTop_toTopOf="@id/mapBoxView" />
+                app:layout_constraintBottom_toBottomOf="@id/mapView"
+                app:layout_constraintEnd_toEndOf="@id/mapView"
+                app:layout_constraintStart_toStartOf="@id/mapView"
+                app:layout_constraintTop_toTopOf="@id/mapView" />
 
             <LinearLayout
                 android:id="@+id/currentLocate"
@@ -49,7 +50,7 @@
                 android:background="@drawable/bg_button_green_outline"
                 android:gravity="center"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+                app:layout_constraintBottom_toBottomOf="@id/mapView"
                 app:layout_constraintEnd_toEndOf="parent">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -58,7 +59,7 @@
                     android:layout_height="20dp"
                     android:src="@drawable/ic_pin_map"
                     android:tint="@color/colorPrimary"
-                    app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+                    app:layout_constraintBottom_toBottomOf="@id/mapView"
                     app:layout_constraintEnd_toStartOf="@id/arrowIcon" />
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -68,7 +69,7 @@
                     android:rotation="180"
                     android:src="@drawable/ic_baseline_arrow_back_24"
                     android:tint="@color/colorPrimary"
-                    app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+                    app:layout_constraintBottom_toBottomOf="@id/mapView"
                     app:layout_constraintEnd_toStartOf="@id/currentLocationIcon" />
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -77,7 +78,7 @@
                     android:layout_height="20dp"
                     android:src="@drawable/ic_current_location"
                     android:tint="@color/colorPrimary"
-                    app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
+                    app:layout_constraintBottom_toBottomOf="@id/mapView"
                     app:layout_constraintEnd_toEndOf="parent" />
 
             </LinearLayout>
@@ -95,7 +96,7 @@
                 android:text="@string/within"
                 android:textSize="@dimen/text_xsmall"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/mapBoxView" />
+                app:layout_constraintTop_toBottomOf="@id/mapView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/siteTitleTextView"
