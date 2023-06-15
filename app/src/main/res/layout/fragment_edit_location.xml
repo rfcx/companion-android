@@ -43,8 +43,9 @@
                     android:textSize="@dimen/text_small" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <View
-                android:id="@+id/mapBoxView"
+            <androidx.fragment.app.FragmentContainerView
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:id="@+id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/map_box_height"
                 android:layout_marginStart="@dimen/margin_padding_large"
@@ -60,19 +61,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_pin_map"
-                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
-                app:layout_constraintEnd_toEndOf="@id/mapBoxView"
-                app:layout_constraintStart_toStartOf="@id/mapBoxView"
-                app:layout_constraintTop_toTopOf="@id/mapBoxView" />
+                app:layout_constraintBottom_toBottomOf="@id/mapView"
+                app:layout_constraintEnd_toEndOf="@id/mapView"
+                app:layout_constraintStart_toStartOf="@id/mapView"
+                app:layout_constraintTop_toTopOf="@id/mapView" />
 
             <View
                 android:id="@+id/viewMapBox"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="@id/mapBoxView"
-                app:layout_constraintEnd_toEndOf="@id/mapBoxView"
-                app:layout_constraintStart_toStartOf="@id/mapBoxView"
-                app:layout_constraintTop_toTopOf="@id/mapBoxView" />
+                app:layout_constraintBottom_toBottomOf="@id/mapView"
+                app:layout_constraintEnd_toEndOf="@id/mapView"
+                app:layout_constraintStart_toStartOf="@id/mapView"
+                app:layout_constraintTop_toTopOf="@id/mapView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationTitleTextView"
@@ -83,7 +84,7 @@
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:text="@string/coordinates"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/mapBoxView" />
+                app:layout_constraintTop_toBottomOf="@id/mapView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/locationValueTextView"

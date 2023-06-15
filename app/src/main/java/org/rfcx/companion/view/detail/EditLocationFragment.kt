@@ -1,7 +1,6 @@
 package org.rfcx.companion.view.detail
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Rect
@@ -17,19 +16,12 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-//import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-//import com.mapbox.mapboxsdk.geometry.LatLng
-//import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-//import com.mapbox.mapboxsdk.location.LocationComponentOptions
-//import com.mapbox.mapboxsdk.location.modes.RenderMode
-//import com.mapbox.mapboxsdk.maps.MapView
-//import com.mapbox.mapboxsdk.maps.MapboxMap
-//import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-//import com.mapbox.mapboxsdk.maps.Style
-//import com.mapbox.pluginscalebar.ScaleBarOptions
-//import com.mapbox.pluginscalebar.ScaleBarPlugin
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_edit_location.*
 import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
@@ -44,13 +36,11 @@ import org.rfcx.companion.util.DefaultSetupMap
 import org.rfcx.companion.util.RealmHelper
 import org.rfcx.companion.util.convertLatLngLabel
 
-class EditLocationFragment : Fragment() {
-//    , OnMapReadyCallback
+class EditLocationFragment : Fragment(), OnMapReadyCallback {
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val streamDb by lazy { StreamDb(realm) }
 
-//    private var mapboxMap: MapboxMap? = null
-//    private lateinit var mapView: MapView
+    private lateinit var map: GoogleMap
 
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -81,9 +71,10 @@ class EditLocationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        mapView = view.findViewById(R.id.mapBoxView)
-//        mapView.onCreate(savedInstanceState)
-//        mapView.getMapAsync(this)
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
         view.viewTreeObserver.addOnGlobalLayoutListener { setOnFocusEditText() }
 
         setHideKeyboard()
@@ -183,6 +174,18 @@ class EditLocationFragment : Fragment() {
         }
     }
 
+    override fun onMapReady(p0: GoogleMap) {
+        map = p0
+
+        val latLng = LatLng(latitude, longitude)
+        moveCamera(latLng, DefaultSetupMap.DEFAULT_ZOOM)
+    }
+
+    private fun moveCamera(latLng: LatLng, zoom: Float) {
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        map.animateCamera(CameraUpdateFactory.zoomTo(zoom))
+    }
+
 //    override fun onMapReady(mapboxMap: MapboxMap) {
 //        this.mapboxMap = mapboxMap
 //
@@ -232,11 +235,6 @@ class EditLocationFragment : Fragment() {
 //        }
 //    }
 
-//    private fun setupScale() {
-//        val scaleBarPlugin = ScaleBarPlugin(mapView, mapboxMap!!)
-//        val options = ScaleBarOptions(requireContext())
-//        scaleBarPlugin.create(options)
-//    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -248,10 +246,6 @@ class EditLocationFragment : Fragment() {
             }
         }
     }
-
-//    private fun moveCamera(latLng: LatLng, zoom: Double) {
-//        mapboxMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
-//    }
 
     private fun View.hideKeyboard() = this.let {
         val inputManager =
@@ -280,39 +274,13 @@ class EditLocationFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-//        mapView.onStart()
-    }
-
     override fun onResume() {
         super.onResume()
-//        mapView.onResume()
-
         editLocationActivityListener?.let {
             locationGroupValueTextView.text = it.getStream(streamId).project?.name
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-//        mapView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-//        mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-//        mapView.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-//        mapView.onDestroy()
-    }
 
     companion object {
         private const val ARG_LATITUDE = "ARG_LATITUDE"
