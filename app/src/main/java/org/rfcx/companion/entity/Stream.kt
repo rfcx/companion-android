@@ -1,5 +1,6 @@
 package org.rfcx.companion.entity
 
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.Expose
 //import com.mapbox.mapboxsdk.geometry.LatLng
 import io.realm.RealmModel
@@ -35,7 +36,7 @@ open class Stream(
         return this.deployments?.filter { dp -> dp.isActive }?.getOrNull(0)
     }
 
-//    fun getLatLng(): LatLng = LatLng(latitude, longitude)
+    fun getLatLng(): LatLng = LatLng(latitude, longitude)
 
     companion object {
         const val TABLE_NAME = "Locate"

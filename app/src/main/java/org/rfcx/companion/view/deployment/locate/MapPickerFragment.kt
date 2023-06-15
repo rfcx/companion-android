@@ -141,6 +141,7 @@ class MapPickerFragment :
                 .addOnSuccessListener { location: Location? ->
                     map.uiSettings.isZoomControlsEnabled = false
                     map.uiSettings.isMyLocationButtonEnabled = false
+                    map.isMyLocationEnabled = true
                     context?.let { location?.saveLastLocation(it) }
                     currentUserLocation = location
                     showLoading(false)
@@ -165,7 +166,7 @@ class MapPickerFragment :
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Float) {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
     }
 
     private fun hasPermissions(): Boolean {
