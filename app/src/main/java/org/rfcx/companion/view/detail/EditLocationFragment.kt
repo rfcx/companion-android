@@ -176,6 +176,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(p0: GoogleMap) {
         map = p0
+        map.uiSettings.setAllGesturesEnabled(false)
 
         val latLng = LatLng(latitude, longitude)
         moveCamera(latLng, DefaultSetupMap.DEFAULT_ZOOM)

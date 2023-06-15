@@ -289,6 +289,8 @@ class DeploymentDetailActivity :
 
     override fun onMapReady(p0: GoogleMap) {
         map = p0
+        map.uiSettings.setAllGesturesEnabled(false)
+
         val latlng = LatLng(deployment?.stream?.latitude ?: 0.0, deployment?.stream?.longitude  ?: 0.0)
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
         map.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
