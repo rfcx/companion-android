@@ -19,7 +19,7 @@ interface BaseDeploymentProtocol {
     fun getStream(id: Int): Stream?
     fun getProject(id: Int): Project?
     fun getImages(): List<Image>
-    fun getCurrentLocation(): Location
+    fun getCurrentLocation(): Location?
 
     fun setDeployLocation(stream: Stream, isExisted: Boolean)
     fun setSiteItem(items: List<SiteWithLastDeploymentItem>)

@@ -106,8 +106,8 @@ abstract class BaseDeploymentActivity :
         return this._images
     }
 
-    override fun getCurrentLocation(): Location =
-        currentLocate ?: Location(LocationManager.GPS_PROVIDER)
+    override fun getCurrentLocation(): Location? =
+        currentLocate
 
     override fun setCurrentLocation(location: Location) {
         this.currentLocate = location

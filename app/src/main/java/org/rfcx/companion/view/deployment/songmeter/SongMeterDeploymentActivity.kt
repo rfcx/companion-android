@@ -9,6 +9,8 @@ import android.view.Menu
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.toolbar_default.*
@@ -47,6 +49,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
     private var currentCheck = 0
     private var passedChecks = RealmList<Int>()
     private var useExistedLocation: Boolean = false
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private lateinit var songMeterViewModel: SongMeterViewModel
 
@@ -77,12 +80,18 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_song_meter_deployment)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         setupToolbar()
         startCheckList()
         setViewModel()
         setObserver()
         preferences.clearSelectedProject()
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                location?.let { setCurrentLocation(it) }
+            }
     }
 
     private fun setViewModel() {
