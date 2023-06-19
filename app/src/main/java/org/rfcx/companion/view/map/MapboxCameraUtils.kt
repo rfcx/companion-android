@@ -25,6 +25,6 @@ object MapboxCameraUtils {
                 .build()
             return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
         }
-        return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+        return CameraUpdateFactory.newLatLngZoom(nearestSite, zoom)
     }
 }
