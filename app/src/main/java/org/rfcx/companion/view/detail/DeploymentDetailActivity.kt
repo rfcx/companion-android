@@ -311,6 +311,7 @@ class DeploymentDetailActivity :
     }
 
     private fun moveCamera() {
+        if (map == null) return
         val latlng = LatLng(deployment?.stream?.latitude ?: 0.0, deployment?.stream?.longitude  ?: 0.0)
         map?.moveCamera(CameraUpdateFactory.newLatLng(latlng))
         map?.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
@@ -340,36 +341,6 @@ class DeploymentDetailActivity :
             viewModel.insertImage(deployment, newImages)
             ImageSyncWorker.enqueue(this)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-//        mapView.onStart()
-    }
-
-    override fun onResume() {
-        super.onResume()
-//        mapView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-//        mapView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-//        mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-//        mapView.onLowMemory()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-//        mapView.onSaveInstanceState(outState)
     }
 
     companion object {

@@ -291,14 +291,14 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateView() {
         if (!isCreateNew) site = site ?: audioMothDeploymentViewModel.getStreamById(siteId)
+        if (currentUserLocation == null ) {
+            currentUserLocation = context?.getLastLocation()
+        }
         if (latitude != 0.0 && longitude != 0.0) {
             val alt = currentUserLocation?.altitude
             setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
             pinLocation = LatLng(latitude, longitude)
         } else if (isCreateNew) {
-            if (currentUserLocation == null ) {
-                currentUserLocation = context?.getLastLocation()
-            }
             currentUserLocation?.let {
                 setLatLngLabel(it.toLatLng(), it.altitude)
                 pinLocation = it.toLatLng()
@@ -367,6 +367,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         } else {
             moveCamera(curLoc, DefaultSetupMap.DEFAULT_ZOOM)
             createSiteSymbol(curLoc)
+            setWithinText()
             pinLocation = curLoc
         }
     }
