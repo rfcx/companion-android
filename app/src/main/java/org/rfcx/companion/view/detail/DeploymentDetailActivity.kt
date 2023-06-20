@@ -55,7 +55,7 @@ class DeploymentDetailActivity :
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 
-    private lateinit var map: GoogleMap
+    private var map: GoogleMap? = null
 
     private val analytics by lazy { Analytics(this) }
     private val firebaseCrashlytics by lazy { Crashlytics() }
@@ -77,10 +77,27 @@ class DeploymentDetailActivity :
 
     private var toAddImage = false
 
+    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
+    private val deploymentObserve = Observer<List<Deployment>> {
+        deployment?.let {
+            val data = viewModel.getDeploymentById(it.id)
+            if (data != null) {
+                deployment = data
+                updateDeploymentDetailView(data)
+            }
+        }
+        moveCamera()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment_detail)
         setViewModel()
+
+        deploymentLiveData = Transformations.map(
+            viewModel.getAllDeploymentLocateResultsAsync().asLiveData()
+        ) { it }
+        deploymentLiveData.observeForever(deploymentObserve)
 
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
@@ -289,11 +306,14 @@ class DeploymentDetailActivity :
 
     override fun onMapReady(p0: GoogleMap) {
         map = p0
-        map.uiSettings.setAllGesturesEnabled(false)
+        map?.uiSettings?.setAllGesturesEnabled(false)
+        moveCamera()
+    }
 
+    private fun moveCamera() {
         val latlng = LatLng(deployment?.stream?.latitude ?: 0.0, deployment?.stream?.longitude  ?: 0.0)
-        map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-        map.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+        map?.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+        map?.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
     }
     private fun setupToolbar() {
         setSupportActionBar(toolbar)
@@ -313,6 +333,8 @@ class DeploymentDetailActivity :
         super.onDestroy()
         // remove observer
         deployImageLiveData.removeObserver(deploymentImageObserve)
+        deploymentLiveData.removeObserver(deploymentObserve)
+
         val newImages = deploymentImageAdapter.getNewAttachImageTyped()
         if (newImages.isNotEmpty() && !toAddImage) {
             viewModel.insertImage(deployment, newImages)
