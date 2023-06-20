@@ -296,6 +296,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
             pinLocation = LatLng(latitude, longitude)
         } else if (isCreateNew) {
+            if (currentUserLocation == null ) {
+                currentUserLocation = context?.getLastLocation()
+            }
             currentUserLocation?.let {
                 setLatLngLabel(it.toLatLng(), it.altitude)
                 pinLocation = it.toLatLng()
@@ -362,6 +365,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 pinLocation = latLng
             }
         } else {
+            moveCamera(curLoc, DefaultSetupMap.DEFAULT_ZOOM)
             createSiteSymbol(curLoc)
             pinLocation = curLoc
         }
