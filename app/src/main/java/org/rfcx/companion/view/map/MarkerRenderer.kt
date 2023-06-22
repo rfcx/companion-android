@@ -3,6 +3,7 @@ package org.rfcx.companion.view.map
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
@@ -46,6 +47,10 @@ class MarkerRenderer(
             .position(item.position)
             .snippet(item.snippet)
             .icon(bitmapFromVector(context, pin))
+    }
+
+    override fun getColor(clusterSize: Int): Int {
+        return Color.parseColor("#2AA841")
     }
 
     private fun bitmapFromVector(context: Context, vectorResId: Int): BitmapDescriptor {
