@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.maps.android.SphericalUtil
+import com.google.android.gms.maps.model.LatLng
 //import com.mapbox.mapboxsdk.geometry.LatLng
 import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.service.LocationTrackerService
@@ -106,13 +108,14 @@ class LocationTrackingManager {
             var distance = 0.0
             trackingDb.getFirstTracking()?.let { tracking ->
                 tracking.points.forEachIndexed { index, element ->
-//                    if (index != 0 && tracking.points[index - 1] != null) {
-//                        val latLng = LatLng(
-//                            tracking.points[index - 1]?.latitude ?: 0.0,
-//                            tracking.points[index - 1]?.longitude ?: 0.0
-//                        )
-//                        distance += LatLng(element.latitude, element.longitude).distanceTo(latLng)
-//                    }
+                    if (index != 0 && tracking.points[index - 1] != null) {
+                        val latLng = LatLng(
+                            tracking.points[index - 1]?.latitude ?: 0.0,
+                            tracking.points[index - 1]?.longitude ?: 0.0
+                        )
+
+                        distance += SphericalUtil.computeDistanceBetween(latLng, LatLng(element.latitude, element.longitude))
+                    }
                 }
             }
             return distance
