@@ -532,7 +532,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
             projectRecyclerView.visibility = View.GONE
             projectSwipeRefreshView.visibility = View.GONE
             searchButton.visibility = View.VISIBLE
-            trackingLayout.visibility = View.GONE // tree View.VISIBLE
+            trackingLayout.visibility = View.VISIBLE
             showButtonOnMap()
             listener?.showBottomAppBar()
         } else {
@@ -635,7 +635,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         siteSwipeRefreshView.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
         searchButton.visibility = if (show) View.GONE else View.VISIBLE
-        trackingLayout.visibility = View.GONE // tree  if (show) View.GONE else View.VISIBLE
+        trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
 
         if (show) {
             setSearchView()
