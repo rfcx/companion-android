@@ -58,14 +58,15 @@ class StreamDb(private val realm: Realm) {
         }
     }
 
-    fun updateSiteServerId(deploymentId: Int, serverId: String) {
+    fun updateSiteServerId(deploymentId: Int, siteServerId: String, deploymentServerId: String) {
         realm.executeTransaction {
             // update server id in track
             it.where(TrackingFile::class.java)
                 .equalTo(TrackingFile.FIELD_DEPLOYMENT_ID, deploymentId)
                 .findFirst()?.apply {
-                    this.siteServerId = serverId
-                    this.syncState = SyncState.Sent.key
+                    this.siteServerId = siteServerId
+                    this.deploymentServerId = deploymentServerId
+//                    this.syncState = SyncState.Sent.key
                 }
 
             // update server id in site

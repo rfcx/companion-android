@@ -73,7 +73,7 @@ class TrackingFileDb(private val realm: Realm) {
             if (file.id == 0) {
                 val id =
                     (
-                        realm.where(Tracking::class.java).max(Tracking.TRACKING_ID)
+                        realm.where(TrackingFile::class.java).max(TrackingFile.FIELD_ID)
                             ?.toInt() ?: 0
                         ) + 1
                 file.id = id
