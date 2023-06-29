@@ -67,6 +67,10 @@ class TrackingFileDb(private val realm: Realm) {
             .equalTo(TrackingFile.FIELD_SITE_ID, id)
             .findAll()
     }
+    fun getTrackingFile(): RealmResults<TrackingFile> {
+        return realm.where(TrackingFile::class.java)
+            .findAll()
+    }
 
     fun insertOrUpdate(file: TrackingFile) {
         realm.executeTransaction {

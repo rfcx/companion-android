@@ -33,6 +33,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -50,6 +51,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
+import com.google.android.gms.common.Feature
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -58,8 +60,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import io.realm.Realm
@@ -72,8 +76,10 @@ import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
+import org.rfcx.companion.entity.socket.response.AdminPing
 import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.localdb.TrackingDb
+import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -88,10 +94,12 @@ import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 import org.rfcx.companion.view.profile.locationgroup.ProjectAdapter
 import org.rfcx.companion.view.profile.locationgroup.ProjectListener
 import org.rfcx.companion.view.unsynced.UnsyncedWorksActivity
+import java.io.File
 import java.util.*
 
 
-class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Boolean) -> Unit, ClusterManager.OnClusterClickListener<MarkerItem>,
+class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Boolean) -> Unit,
+    ClusterManager.OnClusterClickListener<MarkerItem>,
     ClusterManager.OnClusterItemClickListener<MarkerItem>,
     ClusterManager.OnClusterItemInfoWindowClickListener<MarkerItem> {
 
@@ -116,6 +124,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val trackingDb by lazy { TrackingDb(realm) }
     private val streamDb by lazy { StreamDb(realm) }
+    private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
     // data
     private var streams = listOf<Stream>()
@@ -275,7 +284,14 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
-                map.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)))
+                map.moveCamera(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(
+                            location?.latitude ?: 0.0,
+                            location?.longitude ?: 0.0
+                        )
+                    )
+                )
                 map.uiSettings.isZoomControlsEnabled = true
                 map.uiSettings.isMyLocationButtonEnabled = false
                 context?.let { location?.saveLastLocation(it) }
@@ -331,6 +347,13 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     }
 
     override fun onClusterItemClick(item: MarkerItem?): Boolean {
+        val isDeployment = item?.let { isDeployment(it.snippet) } ?: false
+        if (isDeployment) {
+            val data = Gson().fromJson(item!!.snippet, MapMarker.DeploymentMarker::class.java)
+            val deployment = mainViewModel.getDeploymentById(data.id)
+            val site = mainViewModel.getStreamById(deployment?.stream?.id ?: -1)
+            gettingTracksAndMoveToPin(site, "${data.locationName}.${data.id}")
+        }
         return false
     }
 
@@ -1191,12 +1214,12 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                     }
 
                     Status.SUCCESS -> {
-//                        showTrackOnMap(
-//                            site.id,
-//                            site.latitude,
-//                            site.longitude,
-//                            markerId
-//                        )
+                        showTrackOnMap(
+                            site.id,
+                            site.latitude,
+                            site.longitude,
+                            markerId
+                        )
                     }
 
                     Status.ERROR -> {
@@ -1445,38 +1468,33 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 //        }
 //    }
 
-//    fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
+    @SuppressLint("Range")
+    fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
 //        // remove the previous one
 //        hideTrackOnMap()
-//        val tracks = mainViewModel.getTrackingFileBySiteId(id)
-//        try {
-//            if (tracks.isNotEmpty()) {
-//                // get all track first
-//                if (currentMarkId == markerLocationId) {
-//                    val tempTrack = arrayListOf<Feature>()
-//                    tracks.forEach { track ->
-//                        val json = File(track.localPath).readText()
-//                        val featureCollection = FeatureCollection.fromJson(json)
-//                        val feature = featureCollection.features()?.get(0)
-//                        feature?.let {
-//                            tempTrack.add(it)
-//                        }
-//                        // track always has 1 item so using get(0) is okay - also it can only be LineString
-//                        val lineString = feature?.geometry() as LineString
-//                        queue.add(lineString.coordinates().toList())
-//                    }
-//                    lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
-//
-//                    // move camera to pin
-//                    moveToDeploymentMarker(lat, lng)
-//                }
-//            } else {
-//                moveToDeploymentMarker(lat, lng)
-//            }
-//        } catch (e: JsonSyntaxException) {
+        val tracks = mainViewModel.getTrackingFileBySiteId(id)
+        try {
+            val tempTrack = arrayListOf<Feature>()
+            tracks.forEach { track ->
+                val json = File(track.localPath).readText()
+                val f = Gson().fromJson(json, FeatureCollection::class.java)
+                val latlngList = mutableListOf<LatLng>()
+                f.features.forEach {
+                    it.geometry.coordinates.forEach { c ->
+                        latlngList.add(LatLng(c[1], c[0]))
+                    }
+                    map.addPolyline(
+                        PolylineOptions()
+                            .clickable(false)
+                            .addAll(latlngList)
+                            .color(Color.parseColor(f.features[0].properties.color))
+                    )
+                }
+            }
+        } catch (e: JsonSyntaxException) {
 //            moveToDeploymentMarker(lat, lng)
-//        }
-//    }
+        }
+    }
 
 //    private fun hideTrackOnMap() {
 //        // reset source
