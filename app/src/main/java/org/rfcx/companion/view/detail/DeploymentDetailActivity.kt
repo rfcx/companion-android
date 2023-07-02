@@ -84,6 +84,7 @@ class DeploymentDetailActivity :
             if (data != null) {
                 deployment = data
                 updateDeploymentDetailView(data)
+                setupToolbar()
             }
         }
         moveCamera()
