@@ -208,6 +208,7 @@ class MapPickerFragment :
     }
 
     private fun setupSearch() {
+        searchLayoutSearchEditText.visibility = View.GONE
         searchLayoutCardView.setOnClickListener {
             searchLayoutSearchEditText.clearFocus()
         }

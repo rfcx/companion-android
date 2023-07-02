@@ -42,7 +42,6 @@
                 android:hint="@string/search_box_hint"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:visibility="gone"
                 android:maxLines="1"
                 android:padding="@dimen/search_input_padding"
                 android:textSize="@dimen/text_large" />
