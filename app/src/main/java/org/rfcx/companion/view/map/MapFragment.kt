@@ -60,6 +60,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
@@ -155,6 +156,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
     //    private var markerLinePointList = arrayListOf<ArrayList<Point>>()
     private var currentAnimator: Animator? = null
+    private var polyline: Polyline? = null
 
     //    private var queue = arrayListOf<List<Point>>()
     private var queueColor = arrayListOf<String>()
@@ -322,6 +324,10 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         mClusterManager.setOnClusterClickListener(this);
         mClusterManager.setOnClusterItemClickListener(this);
         mClusterManager.setOnClusterItemInfoWindowClickListener(this);
+
+        map.setOnMapClickListener {
+            polyline?.remove()
+        }
 
         combinedData()
     }
@@ -1483,12 +1489,11 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                     it.geometry.coordinates.forEach { c ->
                         latlngList.add(LatLng(c[1], c[0]))
                     }
-                    map.addPolyline(
-                        PolylineOptions()
-                            .clickable(false)
-                            .addAll(latlngList)
-                            .color(Color.parseColor(f.features[0].properties.color))
-                    )
+                    polyline = map.addPolyline(PolylineOptions()
+                        .clickable(false)
+                        .addAll(latlngList)
+                        .color(Color.parseColor(f.features[0].properties.color)))
+
                 }
             }
         } catch (e: JsonSyntaxException) {
@@ -1623,6 +1628,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         showSearchBar(false)
 
         val latLng = LatLng(stream.latitude, stream.longitude)
+        map.moveCamera(CameraUpdateFactory.zoomTo(DefaultSetupMap.DEFAULT_ZOOM))
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
 
         mClusterManager.markerCollection.markers.forEach {
