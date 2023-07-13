@@ -476,15 +476,10 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
-//        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        mapView = view.findViewById(R.id.mapView)
-//        mapView.onCreate(savedInstanceState)
-//        mapView.getMapAsync(this)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -1170,8 +1165,9 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     }
 
     private fun combinedData() {
-//        handleMarker(deploymentMarkers + streamMarkers)
         mClusterManager.clearItems()
+        mClusterManager.cluster()
+
         setMarker(deploymentMarkers + streamMarkers)
 
 //        val state = listener?.getBottomSheetState() ?: 0
@@ -1673,29 +1669,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
         projectNameTextView.text = project.name
         mainViewModel.combinedData()
-//        val latLngBounds =
-//            project.streams?.map { LatLng(it.latitude, it.longitude) } ?: listOf()
-//        if (latLngBounds.isNotEmpty()) {
-//            if (latLngBounds.size > 1) {
-//                moveCameraWithLatLngList(latLngBounds)
-//            } else {
-//                moveCamera(
-//                    LatLng(latLngBounds[0].latitude, latLngBounds[0].longitude),
-//                    null,
-//                    DefaultSetupMap.DEFAULT_ZOOM
-//                )
-//            }
-//        } else {
-//            currentUserLocation?.let { current ->
-//                moveCamera(
-//                    LatLng(
-//                        current.latitude,
-//                        current.longitude
-//                    ),
-//                    null, DefaultSetupMap.DEFAULT_ZOOM
-//                )
-//            }
-//        }
 
         if (siteRecyclerView.visibility == View.VISIBLE) {
             searchLayout.visibility = View.VISIBLE
