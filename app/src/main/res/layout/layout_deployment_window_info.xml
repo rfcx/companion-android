@@ -57,7 +57,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_padding_normal"
+        android:layout_marginTop="@dimen/margin_padding_small"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -69,15 +69,7 @@
             android:tint="@color/grey_active" />
 
         <TextView
-            android:id="@+id/deployedAtLabel"
-            style="@style/AudioMothText.Body.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_padding_xsmall"
-            android:text="@string/deployed_at" />
-
-        <TextView
-            android:id="@+id/deployedAt"
+            android:id="@+id/dateAt"
             style="@style/AudioMothText.Body.Secondary"
             android:text="26/04/2021 09:38"
             android:layout_width="wrap_content"
@@ -107,21 +99,16 @@
             android:layout_marginStart="@dimen/margin_padding_xsmall" />
     </LinearLayout>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/seeDeploymentDetail"
+        style="@style/AudioMothText.Body.Small"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:layout_marginTop="@dimen/margin_padding_normal"
         android:layout_marginBottom="@dimen/margin_padding_xsmall"
-        android:orientation="horizontal">
-
-        <TextView
-            style="@style/AudioMothText.Body.Small"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/see_deployment_detail"
-            android:textAllCaps="true"
-            android:textColor="@color/colorPrimary"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:text="@string/see_deployment_detail"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold" />
 </LinearLayout>

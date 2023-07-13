@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.InfoWindowMarker
 import org.rfcx.companion.entity.MarkerItem
 import org.rfcx.companion.util.Pin
 
@@ -32,15 +33,11 @@ class MarkerRenderer(
         item: MarkerItem,
         markerOptions: MarkerOptions
     ) {
-        val isDeployment = item.snippet.contains("deploymentKey")
-        var pin = R.drawable.ic_pin_map_grey
-        if (isDeployment) {
-            val data = Gson().fromJson(item.snippet, MapMarker.DeploymentMarker::class.java)
-            pin = if (data.pin == Pin.PIN_GREEN) {
-                R.drawable.ic_pin_map
-            } else {
-                R.drawable.ic_pin_map_grey
-            }
+        val data = Gson().fromJson(item.snippet, InfoWindowMarker::class.java)
+        val pin = if (data.pin == Pin.PIN_GREEN) {
+            R.drawable.ic_pin_map
+        } else {
+            R.drawable.ic_pin_map_grey
         }
 
         markerOptions.title(item.title)

@@ -9,69 +9,48 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.gson.Gson
 import org.rfcx.companion.R
+import org.rfcx.companion.entity.InfoWindowMarker
 import org.rfcx.companion.util.latitudeCoordinates
 import org.rfcx.companion.util.longitudeCoordinates
 import org.rfcx.companion.util.toTimeAgo
 
 class InfoWindowAdapter(var mContext: Context) : GoogleMap.InfoWindowAdapter {
-    var mWindow: View = LayoutInflater.from(mContext).inflate(R.layout.layout_map_window_info, null)
+    var mWindow: View = LayoutInflater.from(mContext).inflate(R.layout.layout_deployment_window_info, null)
 
     @SuppressLint("SetTextI18n")
     private fun setInfoWindowText(marker: Marker) {
         if (marker.snippet == null) return
-        val isDeployment = marker.snippet!!.contains("deploymentKey")
+        val data = Gson().fromJson(marker.snippet, InfoWindowMarker::class.java)
 
-        val data = if (isDeployment) {
-            Gson().fromJson(marker.snippet, MapMarker.DeploymentMarker::class.java)
+        val deploymentSiteTitle = mWindow.findViewById<TextView>(R.id.deploymentSiteTitle)
+        val projectName = mWindow.findViewById<TextView>(R.id.projectName)
+        val deploymentStreamId = mWindow.findViewById<TextView>(R.id.deploymentStreamId)
+        val deploymentTypeName = mWindow.findViewById<TextView>(R.id.deploymentTypeName)
+        val dateAt = mWindow.findViewById<TextView>(R.id.dateAt)
+        val latLngTextView = mWindow.findViewById<TextView>(R.id.latLngTextView)
+        val seeDeploymentDetail = mWindow.findViewById<TextView>(R.id.seeDeploymentDetail)
+
+        deploymentStreamId.visibility = if (data.isDeployment) View.VISIBLE else View.GONE
+        deploymentTypeName.visibility = if (data.isDeployment) View.VISIBLE else View.GONE
+        seeDeploymentDetail.visibility = if (data.isDeployment) View.VISIBLE else View.GONE
+
+        deploymentSiteTitle.text = data.locationName
+        projectName.text = data.projectName
+        deploymentStreamId.text = mContext.getString(R.string.id_title) + data.deploymentKey
+        deploymentTypeName.text = mContext.getString(R.string.type_title) + data.device?.toUpperCase()
+        if (data.isDeployment) {
+            dateAt.text = "${mContext.getString(R.string.deployed_at)} ${data.deploymentAt?.toTimeAgo(mContext)}"
         } else {
-            Gson().fromJson(marker.snippet, MapMarker.SiteMarker::class.java)
+            dateAt.text = "${mContext.getString(R.string.created_at)} ${data.createdAt.toTimeAgo(mContext)}"
         }
-
-        when (data) {
-            is MapMarker.SiteMarker -> {
-                val title = mWindow.findViewById<TextView>(R.id.infoWindowTitle)
-                val project = mWindow.findViewById<TextView>(R.id.infoWindowDescription)
-                val createdAt = mWindow.findViewById<TextView>(R.id.createdAtValue)
-                val latLng = mWindow.findViewById<TextView>(R.id.latLngValue)
-
-                title.text = data.name
-                project.text = data.projectName
-                createdAt.text = data.createdAt.toTimeAgo(mContext)
-                val latLngText = "${data.latitude.latitudeCoordinates(mContext)}, ${
-                    data.longitude.longitudeCoordinates(mContext)
-                }"
-                latLng.text = latLngText
-            }
-
-            is MapMarker.DeploymentMarker -> {
-                val deploymentSiteTitle = mWindow.findViewById<TextView>(R.id.deploymentSiteTitle)
-                val projectName = mWindow.findViewById<TextView>(R.id.projectName)
-                val deploymentStreamId = mWindow.findViewById<TextView>(R.id.deploymentStreamId)
-                val deploymentTypeName = mWindow.findViewById<TextView>(R.id.deploymentTypeName)
-                val deployedAt = mWindow.findViewById<TextView>(R.id.deployedAt)
-                val latLngTextView = mWindow.findViewById<TextView>(R.id.latLngTextView)
-
-                deploymentSiteTitle.text = data.locationName
-                projectName.text = data.projectName
-                deploymentStreamId.visibility = View.VISIBLE
-                deploymentStreamId.text = mContext.getString(R.string.id_title) + data.deploymentKey
-                deploymentTypeName.text = mContext.getString(R.string.type_title) + data.device.toUpperCase()
-                deployedAt.text = data.deploymentAt.toTimeAgo(mContext)
-                val latLngText = "${data.latitude.latitudeCoordinates(mContext)}, ${
-                    data.longitude.longitudeCoordinates(mContext)
-                }"
-                latLngTextView.text = latLngText
-            }
-        }
+        val latLngText = "${data.latitude.latitudeCoordinates(mContext)}, ${
+            data.longitude.longitudeCoordinates(mContext)
+        }"
+        latLngTextView.text = latLngText
     }
 
     override fun getInfoWindow(p0: Marker): View {
         if (p0.snippet == null) return mWindow
-        mWindow = if (p0.snippet!!.contains("deploymentKey")) {
-            LayoutInflater.from(mContext).inflate(R.layout.layout_deployment_window_info, null)
-        } else {
-            LayoutInflater.from(mContext).inflate(R.layout.layout_map_window_info, null)
-        }
         setInfoWindowText(p0)
         return mWindow
     }

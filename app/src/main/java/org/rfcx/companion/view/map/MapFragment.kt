@@ -404,7 +404,12 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     private fun setMarker(data: MapMarker.SiteMarker) {
         // Add Marker
         val latlng = LatLng(data.latitude, data.longitude)
-        val item = MarkerItem(data.latitude, data.longitude, data.name, Gson().toJson(data))
+        val item = MarkerItem(
+            data.latitude,
+            data.longitude,
+            data.name,
+            Gson().toJson(data.toInfoWindowMarker())
+        )
         mClusterManager.addItem(item)
         mClusterManager.cluster()
 
@@ -416,7 +421,12 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     private fun setMarker(data: MapMarker.DeploymentMarker) {
         // Add Marker
         val latlng = LatLng(data.latitude, data.longitude)
-        val item = MarkerItem(data.latitude, data.longitude, data.locationName, Gson().toJson(data))
+        val item = MarkerItem(
+            data.latitude,
+            data.longitude,
+            data.locationName,
+            Gson().toJson(data.toInfoWindowMarker())
+        )
         mClusterManager.addItem(item)
         mClusterManager.cluster()
 
@@ -1489,10 +1499,12 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                     it.geometry.coordinates.forEach { c ->
                         latlngList.add(LatLng(c[1], c[0]))
                     }
-                    polyline = map.addPolyline(PolylineOptions()
-                        .clickable(false)
-                        .addAll(latlngList)
-                        .color(Color.parseColor(f.features[0].properties.color)))
+                    polyline = map.addPolyline(
+                        PolylineOptions()
+                            .clickable(false)
+                            .addAll(latlngList)
+                            .color(Color.parseColor(f.features[0].properties.color))
+                    )
 
                 }
             }
