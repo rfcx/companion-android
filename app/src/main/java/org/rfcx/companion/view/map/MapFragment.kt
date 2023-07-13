@@ -33,6 +33,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -60,6 +61,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -272,6 +274,15 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     /* New code TODO: #Tree delete this line */
     override fun onMapReady(p0: GoogleMap) {
         map = p0
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(), R.raw.style_json
+                )
+            )
+        } catch (_: Resources.NotFoundException) { }
         mainViewModel.retrieveLocations()
         mainViewModel.fetchProjects()
         setUpClusterer()
