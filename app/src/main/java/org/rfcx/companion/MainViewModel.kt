@@ -13,14 +13,7 @@ import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.callback.BaseCallback
 import com.auth0.android.result.Credentials
-//import com.mapbox.mapboxsdk.geometry.LatLngBounds
-//import com.mapbox.mapboxsdk.maps.Style
-//import com.mapbox.mapboxsdk.offline.OfflineManager
-//import com.mapbox.mapboxsdk.offline.OfflineRegion
-//import com.mapbox.mapboxsdk.offline.OfflineRegionStatus
-//import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
 import io.realm.RealmResults
-import org.json.JSONObject
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.entity.guardian.GuardianRegistration
@@ -278,7 +271,7 @@ class MainViewModel(
                                         mainRepository.saveTrackingToLocal(
                                             item,
                                             filePath,
-                                            site.id
+                                            site
                                         )
                                         if (fileCount == fileCreated) {
                                             tracks.postValue(Resource.success(response.body()))
