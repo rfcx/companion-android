@@ -1,32 +1,5 @@
 package org.rfcx.companion.view.map
 
-//import com.mapbox.android.core.location.*
-//import com.mapbox.geojson.Feature
-//import com.mapbox.geojson.FeatureCollection
-//import com.mapbox.geojson.LineString
-//import com.mapbox.geojson.Point
-//import com.mapbox.mapboxsdk.Mapbox
-//import com.mapbox.mapboxsdk.annotations.BubbleLayout
-//import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-//import com.mapbox.mapboxsdk.geometry.LatLng
-//import com.mapbox.mapboxsdk.geometry.LatLngBounds
-//import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-//import com.mapbox.mapboxsdk.location.LocationComponentOptions
-//import com.mapbox.mapboxsdk.location.modes.CameraMode
-//import com.mapbox.mapboxsdk.location.modes.RenderMode
-//import com.mapbox.mapboxsdk.maps.MapView
-//import com.mapbox.mapboxsdk.maps.MapboxMap
-//import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-//import com.mapbox.mapboxsdk.maps.Style
-//import com.mapbox.mapboxsdk.style.expressions.Expression.*
-//import com.mapbox.mapboxsdk.style.layers.CircleLayer
-//import com.mapbox.mapboxsdk.style.layers.LineLayer
-//import com.mapbox.mapboxsdk.style.layers.Property.*
-//import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
-//import com.mapbox.mapboxsdk.style.layers.SymbolLayer
-//import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
-//import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-//import com.mapbox.mapboxsdk.utils.BitmapUtils
 import android.Manifest
 import android.animation.Animator
 import android.annotation.SuppressLint
@@ -52,7 +25,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
-import com.google.android.gms.common.Feature
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -79,7 +51,6 @@ import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.entity.socket.response.AdminPing
 import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.localdb.TrackingFileDb
@@ -869,20 +840,21 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         val tracks = mainViewModel.getTrackingFileBySiteId(id)
         try {
             tracks.forEach { track ->
-                val json = File(track.localPath).readText()
-                val f = Gson().fromJson(json, FeatureCollection::class.java)
-                val latlngList = mutableListOf<LatLng>()
-                f.features.forEach {
-                    it.geometry.coordinates.forEach { c ->
-                        latlngList.add(LatLng(c[1], c[0]))
+                if (track.deploymentServerId != null) {
+                    val json = File(track.localPath).readText()
+                    val f = Gson().fromJson(json, FeatureCollection::class.java)
+                    val latlngList = mutableListOf<LatLng>()
+                    f.features.forEach {
+                        it.geometry.coordinates.forEach { c ->
+                            latlngList.add(LatLng(c[1], c[0]))
+                        }
+                        polyline = map.addPolyline(
+                            PolylineOptions()
+                                .clickable(false)
+                                .addAll(latlngList)
+                                .color(Color.parseColor(f.features[0].properties.color))
+                        )
                     }
-                    polyline = map.addPolyline(
-                        PolylineOptions()
-                            .clickable(false)
-                            .addAll(latlngList)
-                            .color(Color.parseColor(f.features[0].properties.color))
-                    )
-
                 }
             }
         } catch (_: JsonSyntaxException) { }
