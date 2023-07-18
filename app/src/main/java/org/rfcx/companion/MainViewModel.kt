@@ -257,7 +257,8 @@ class MainViewModel(
                     var fileCount = 0
                     var fileCreated = 0
                     val siteAssets = response.body()
-                    siteAssets?.forEach { item ->
+                    val assets = siteAssets?.filter { it.mimeType.endsWith("geo+json") }
+                    assets?.last()?.let { item ->
                         if (item.mimeType.endsWith("geo+json")) {
                             fileCount += 1
                             GeoJsonUtils.downloadGeoJsonFile(
@@ -316,95 +317,6 @@ class MainViewModel(
         val unsyncedDeployments = deployments.filter { it.isUnsynced() }
         unsyncedWorksCount.postValue(unsyncedDeployments.size + this.registrationCount)
     }
-
-//    fun updateStatusOfflineMap() {
-//        getProjectsFromLocal().map { project ->
-//            if (context.isNetworkAvailable()) {
-//                val offlineManager: OfflineManager? =
-//                    context?.let { OfflineManager.getInstance(it) }
-//                val definition: OfflineTilePyramidRegionDefinition
-//                offlineManager?.setOfflineMapboxTileCountLimit(10000)
-//
-//                val minLat = project.minLatitude
-//                val maxLat = project.maxLatitude
-//                val minLng = project.minLongitude
-//                val maxLng = project.maxLongitude
-//
-//                if (minLat !== null && maxLat !== null && minLng !== null && maxLng !== null) {
-//                    val regionName = "{\"regionName\":\"regionName.${project.name}\"}"
-//                    val latLngBounds: LatLngBounds = LatLngBounds.from(
-//                        maxLat.toDouble(),
-//                        maxLng.toDouble(),
-//                        minLat.toDouble(),
-//                        minLng.toDouble()
-//                    )
-//                    definition = OfflineTilePyramidRegionDefinition(
-//                        Style.OUTDOORS,
-//                        latLngBounds,
-//                        10.0,
-//                        15.0,
-//                        context?.resources?.displayMetrics?.density ?: 0.0F
-//                    )
-//
-//                    offlineManager?.createOfflineRegion(
-//                        definition, regionName.toByteArray(),
-//                        object : OfflineManager.CreateOfflineRegionCallback {
-//                            override fun onCreate(offlineRegion: OfflineRegion) {
-//                                offlineRegion.getStatus(object :
-//                                        OfflineRegion.OfflineRegionStatusCallback {
-//                                        override fun onStatus(status: OfflineRegionStatus?) {
-//                                            if (status == null) return
-//                                            if (status.requiredResourceCount > 10000) {
-//                                                mainRepository.updateOfflineState(
-//                                                    OfflineMapState.UNAVAILABLE.key,
-//                                                    project.serverId ?: ""
-//                                                )
-//                                            } else {
-//                                                mainRepository.updateOfflineState(
-//                                                    OfflineMapState.DOWNLOAD_STATE.key,
-//                                                    project.serverId ?: ""
-//                                                )
-//                                            }
-//                                            deleteOfflineRegion(project, offlineManager)
-//                                        }
-//
-//                                        override fun onError(error: String?) {}
-//                                    })
-//                            }
-//
-//                            override fun onError(error: String) {}
-//                        }
-//                    )
-//                }
-//            }
-//        }
-//    }
-
-//    private fun deleteOfflineRegion(project: Project, offlineManager: OfflineManager) {
-//        offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-//            override fun onList(offlineRegions: Array<out OfflineRegion>?) {
-//                if (!offlineRegions.isNullOrEmpty()) {
-//                    offlineRegions.map {
-//                        if (getRegionName(it) == "regionName.${project.name}") {
-//                            it.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
-//                                override fun onDelete() {}
-//                                override fun onError(error: String) {}
-//                            })
-//                        }
-//                    }
-//                }
-//            }
-//
-//            override fun onError(error: String?) {}
-//        })
-//    }
-
-//    private fun getRegionName(offlineRegion: OfflineRegion): String {
-//        val metadata = offlineRegion.metadata
-//        val json = String(metadata)
-//        val jsonObject = JSONObject(json)
-//        return jsonObject.getString("regionName")
-//    }
 
     private fun getSelectedProjectId(): Int {
         val preferences = Preferences.getInstance(context)

@@ -115,9 +115,11 @@ object GeoJsonUtils {
                             createFile(context, generateFileName(deployedAt, deploymentId), it)
                         try {
                             val json = File(path).readText()
-                            val f = Gson().fromJson(json, FeatureCollection::class.java)
-                        } catch (_: JsonSyntaxException) { }
-                        callback.onSuccess(path)
+                            Gson().fromJson(json, FeatureCollection::class.java)
+                            callback.onSuccess(path)
+                        } catch (e: JsonSyntaxException) {
+                            callback.onFailed(e.message ?: "error occur")
+                        }
                     }
                 }
 

@@ -192,8 +192,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         updateUnsyncedCount(unsyncedDeploymentCount)
     }
 
-
-    /* New code TODO: #Tree delete this line */
     override fun onMapReady(p0: GoogleMap) {
         map = p0
         try {
@@ -840,21 +838,21 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         val tracks = mainViewModel.getTrackingFileBySiteId(id)
         try {
             tracks.forEach { track ->
-                if (track.deploymentServerId != null) {
+                if (track.siteServerId != null) {
                     val json = File(track.localPath).readText()
                     val f = Gson().fromJson(json, FeatureCollection::class.java)
-                    val latlngList = mutableListOf<LatLng>()
+                    val latLngList = mutableListOf<LatLng>()
                     f.features.forEach {
                         it.geometry.coordinates.forEach { c ->
-                            latlngList.add(LatLng(c[1], c[0]))
+                            latLngList.add(LatLng(c[1], c[0]))
                         }
-                        polyline = map.addPolyline(
-                            PolylineOptions()
-                                .clickable(false)
-                                .addAll(latlngList)
-                                .color(Color.parseColor(f.features[0].properties.color))
-                        )
                     }
+                    polyline = map.addPolyline(
+                        PolylineOptions()
+                            .clickable(false)
+                            .addAll(latLngList)
+                            .color(Color.parseColor(f.features[0].properties.color))
+                    )
                 }
             }
         } catch (_: JsonSyntaxException) { }
