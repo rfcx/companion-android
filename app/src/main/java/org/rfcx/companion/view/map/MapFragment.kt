@@ -96,6 +96,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
     private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
     private var unsyncedDeploymentCount = 0
+    private var lastSelectedId = -1
     private var streamMarkers = listOf<MapMarker>()
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
@@ -202,7 +203,8 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                     requireContext(), R.raw.style_json
                 )
             )
-        } catch (_: Resources.NotFoundException) { }
+        } catch (_: Resources.NotFoundException) {
+        }
         mainViewModel.retrieveLocations()
         mainViewModel.fetchProjects()
         setUpClusterer()
@@ -257,6 +259,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         mClusterManager.setOnClusterItemInfoWindowClickListener(this);
 
         map.setOnMapClickListener {
+            lastSelectedId = -1
             polyline?.remove()
         }
 
@@ -683,7 +686,8 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     fun gettingTracksAndMoveToPin(site: Stream?, markerId: String) {
         currentMarkId = markerId
         site?.let { obj ->
-//            showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
+            lastSelectedId = site.id
+            showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
             if (site.serverId != null) {
                 mainViewModel.getStreamAssets(site)
                 setTrackObserver(obj, markerId)
@@ -765,12 +769,14 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                     }
 
                     Status.SUCCESS -> {
-                        showTrackOnMap(
-                            site.id,
-                            site.latitude,
-                            site.longitude,
-                            markerId
-                        )
+                        if (lastSelectedId == site.id) {
+                            showTrackOnMap(
+                                site.id,
+                                site.latitude,
+                                site.longitude,
+                                markerId
+                            )
+                        }
                     }
 
                     Status.ERROR -> {
@@ -845,15 +851,19 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                             latLngList.add(LatLng(c[1], c[0]))
                         }
                     }
-                    polyline = map.addPolyline(
-                        PolylineOptions()
-                            .clickable(false)
-                            .addAll(latLngList)
-                            .color(Color.parseColor(f.features[0].properties.color))
-                    )
+                    if (lastSelectedId == id) {
+                        polyline?.remove()
+                        polyline = map.addPolyline(
+                            PolylineOptions()
+                                .clickable(false)
+                                .addAll(latLngList)
+                                .color(Color.parseColor(f.features[0].properties.color))
+                        )
+                    }
                 }
             }
-        } catch (_: JsonSyntaxException) { }
+        } catch (_: JsonSyntaxException) {
+        }
     }
 
     private fun showToast(message: String) {
