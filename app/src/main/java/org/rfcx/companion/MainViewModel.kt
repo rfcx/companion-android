@@ -256,9 +256,12 @@ class MainViewModel(
                 ) {
                     var fileCount = 0
                     var fileCreated = 0
-                    val siteAssets = response.body()
+                    var siteAssets = response.body()
                     val assets = siteAssets?.filter { it.mimeType.endsWith("geo+json") }
-                    assets?.last()?.let { item ->
+                    if (!assets.isNullOrEmpty()) {
+                        siteAssets = listOf(assets.last())
+                    }
+                    siteAssets?.forEach { item ->
                         if (item.mimeType.endsWith("geo+json")) {
                             fileCount += 1
                             GeoJsonUtils.downloadGeoJsonFile(

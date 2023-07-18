@@ -117,9 +117,7 @@ object GeoJsonUtils {
                             val json = File(path).readText()
                             Gson().fromJson(json, FeatureCollection::class.java)
                             callback.onSuccess(path)
-                        } catch (e: JsonSyntaxException) {
-                            callback.onFailed(e.message ?: "error occur")
-                        }
+                        } catch (e: JsonSyntaxException) { }
                     }
                 }
 

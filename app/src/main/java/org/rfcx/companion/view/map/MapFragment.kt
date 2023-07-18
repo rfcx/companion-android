@@ -284,6 +284,8 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     }
 
     override fun onClusterItemClick(item: MarkerItem?): Boolean {
+        polyline?.remove()
+
         val isDeployment = item?.let { isDeployment(it.snippet) } ?: false
         if (isDeployment) {
             val data = Gson().fromJson(item!!.snippet, MapMarker.DeploymentMarker::class.java)
@@ -402,11 +404,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-
-
         setViewModel()
-
         fetchJobSyncing()
         showSearchBar(false)
         hideLabel()
