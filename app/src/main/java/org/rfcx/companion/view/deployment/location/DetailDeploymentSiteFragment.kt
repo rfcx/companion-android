@@ -27,7 +27,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.SphericalUtil
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeValue
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.changeProjectTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.coordinatesValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.currentLocate
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.locationGroupValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.nextButton
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.viewMapBox
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.withinTextView
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.Project
@@ -38,7 +46,15 @@ import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
-import org.rfcx.companion.util.*
+import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.DefaultSetupMap
+import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.getLastLocation
+import org.rfcx.companion.util.latitudeCoordinates
+import org.rfcx.companion.util.longitudeCoordinates
+import org.rfcx.companion.util.saveLastLocation
+import org.rfcx.companion.util.setFormatLabel
+import org.rfcx.companion.util.toLatLng
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
 import org.rfcx.companion.view.map.MapboxCameraUtils
@@ -504,16 +520,6 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                     putInt(ARG_SITE_ID, id)
                     putString(ARG_SITE_NAME, name)
                     putBoolean(ARG_IS_CREATE_NEW, isCreateNew)
-                }
-            }
-
-        fun newInstance(lat: Double, lng: Double, siteId: Int) =
-            DetailDeploymentSiteFragment().apply {
-                arguments = Bundle().apply {
-                    putDouble(ARG_LATITUDE, lat)
-                    putDouble(ARG_LONGITUDE, lng)
-                    putInt(ARG_SITE_ID, siteId)
-                    putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
                 }
             }
 

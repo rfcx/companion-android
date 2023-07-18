@@ -111,12 +111,6 @@ fun Location.saveLastLocation(context: Context) {
     preferences.putFloat(Preferences.LAST_ALTITUDE, this.altitude.toFloat())
 }
 
-fun LatLng.saveLastLocation(context: Context) {
-    val preferences = Preferences.getInstance(context)
-    preferences.putFloat(Preferences.LAST_LATITUDE, this.latitude.toFloat())
-    preferences.putFloat(Preferences.LAST_LONGITUDE, this.longitude.toFloat())
-}
-
 fun Context.getLastLocation(): Location? {
     val preferences = Preferences.getInstance(this)
     val latitude = preferences.getFloat(Preferences.LAST_LATITUDE)

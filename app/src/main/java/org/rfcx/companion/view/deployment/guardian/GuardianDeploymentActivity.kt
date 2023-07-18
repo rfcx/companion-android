@@ -231,7 +231,8 @@ class GuardianDeploymentActivity :
                     DetailDeploymentSiteFragment.newInstance(
                         latitude,
                         longitude,
-                        siteId
+                        siteId,
+                        streamName
                     )
                 )
             }

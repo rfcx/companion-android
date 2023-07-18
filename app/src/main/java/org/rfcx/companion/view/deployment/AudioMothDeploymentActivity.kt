@@ -142,7 +142,8 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
                     longitude,
-                    siteId
+                    siteId,
+                    streamName
                 )
             )
             is AudioMothCheckListFragment -> {

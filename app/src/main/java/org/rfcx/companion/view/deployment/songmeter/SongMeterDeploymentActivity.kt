@@ -171,7 +171,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
                     longitude,
-                    siteId
+                    siteId,
+                    streamName
                 )
             )
             is SongMeterCheckListFragment -> {
