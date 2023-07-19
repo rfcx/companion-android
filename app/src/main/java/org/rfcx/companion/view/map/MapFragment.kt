@@ -116,6 +116,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     private var polyline: Polyline? = null
     private var currentMarkId = ""
     private var screen = ""
+    private var lastZoom = DefaultSetupMap.DEFAULT_ZOOM
 
     private val siteAdapter by lazy { SiteAdapter(this) }
     private var adapterOfSearchSite: List<SiteWithLastDeploymentItem>? = null
@@ -210,6 +211,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         setUpClusterer()
         setupSearch()
         setObserver()
+        showSearchBar(false)
 
         if (locationPermissions?.allowed() == false) {
             locationPermissions?.check { /* do nothing */ }
@@ -265,7 +267,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
         combinedData()
     }
-
 
     override fun onClusterClick(cluster: Cluster<MarkerItem>?): Boolean {
         val builder = LatLngBounds.builder()
@@ -409,7 +410,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         mapFragment.getMapAsync(this)
         setViewModel()
         fetchJobSyncing()
-        showSearchBar(false)
         hideLabel()
 
         context?.let { setTextTrackingButton(LocationTrackingManager.isTrackingOn(it)) }
@@ -490,7 +490,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     private fun setOnClickProjectName() {
         val state = listener?.getBottomSheetState() ?: 0
         if (state == BottomSheetBehavior.STATE_EXPANDED && searchLayout.visibility != View.VISIBLE) {
-            clearFeatureSelected()
             listener?.hideBottomSheet()
         }
 
@@ -604,16 +603,18 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
 
         if (show) {
+            lastZoom = map.cameraPosition.zoom
+            map.moveCamera(CameraUpdateFactory.zoomTo(21.0F))
             setSearchView()
             searchLayout.setBackgroundResource(R.color.backgroundColorSite)
         } else {
+            map.moveCamera(CameraUpdateFactory.zoomTo(lastZoom))
             searchLayoutSearchEditText.text = null
             searchLayout.setBackgroundResource(R.color.transparent)
 
             hideLabel()
             siteRecyclerView.visibility = View.GONE
             listener?.showBottomAppBar()
-            listener?.clearFeatureSelectedOnMap()
         }
     }
 
@@ -674,13 +675,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
             }
             handler.postDelayed(this, 20 * 1000L)
         }
-    }
-
-    fun clearFeatureSelected() {
-//        if (this.mapFeatures?.features() != null) {
-//            val features = this.mapFeatures!!.features()
-//            features?.forEach { setFeatureSelectState(it, false) }
-//        }
     }
 
     fun gettingTracksAndMoveToPin(site: Stream?, markerId: String) {

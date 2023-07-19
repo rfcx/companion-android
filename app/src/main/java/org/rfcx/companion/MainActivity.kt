@@ -478,7 +478,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
             }
             bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {
                 hideBottomSheet()
-                clearFeatureSelectedOnMap()
             }
             else -> {
                 return super.onBackPressed()
@@ -487,17 +486,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     }
 
     private fun setSearchBar() {
-        clearFeatureSelectedOnMap()
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
             mapFragment.showSearchBar(false)
-        }
-    }
-
-    override fun clearFeatureSelectedOnMap() {
-        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
-        if (mapFragment is MapFragment) {
-            mapFragment.clearFeatureSelected()
         }
     }
 
@@ -537,5 +528,4 @@ interface MainActivityListener {
     fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
     fun showTrackOnMap(site: Stream?, markerLocationId: String)
     fun getProjectName(): String
-    fun clearFeatureSelectedOnMap()
 }
