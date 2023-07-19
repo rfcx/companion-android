@@ -920,9 +920,19 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         map.moveCamera(CameraUpdateFactory.zoomTo(DefaultSetupMap.DEFAULT_ZOOM))
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
 
+        val clusters = mClusterManager.algorithm.getClusters(21.0F)
+        val markerItems = arrayListOf<MarkerItem>()
+
+        clusters.forEach { cluster ->
+            cluster.items.forEach { item ->
+                markerItems.add(item)
+            }
+        }
+
         mClusterManager.markerCollection.markers.forEach {
             if (it.snippet!!.contains(stream.name)) {
                 it.showInfoWindow()
+                onClusterItemClick(markerItems.first { i -> i.snippet.contains(stream.name)})
             }
         }
     }
