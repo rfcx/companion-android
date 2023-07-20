@@ -66,14 +66,13 @@ class StreamDb(private val realm: Realm) {
                 .findFirst()?.apply {
                     this.siteServerId = siteServerId
                     this.deploymentServerId = deploymentServerId
-//                    this.syncState = SyncState.Sent.key
                 }
 
             // update server id in site
             it.where(Stream::class.java)
                 .equalTo(Stream.FIELD_LAST_DEPLOYMENT_ID, deploymentId)
                 .findFirst()?.apply {
-                    this.serverId = serverId
+                    this.serverId = siteServerId
                     this.syncState = SyncState.Sent.key
                 }
         }

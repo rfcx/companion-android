@@ -51,9 +51,7 @@ import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.*
-import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.localdb.TrackingDb
-import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -86,8 +84,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
     private val trackingDb by lazy { TrackingDb(realm) }
-    private val streamDb by lazy { StreamDb(realm) }
-    private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
     // data
     private var streams = listOf<Stream>()
