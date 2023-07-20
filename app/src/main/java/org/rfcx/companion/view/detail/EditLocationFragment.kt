@@ -187,67 +187,6 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.zoomTo(zoom))
     }
 
-//    override fun onMapReady(mapboxMap: MapboxMap) {
-//        this.mapboxMap = mapboxMap
-//
-//        mapboxMap.uiSettings.setAllGesturesEnabled(false)
-//        mapboxMap.uiSettings.isAttributionEnabled = false
-//        mapboxMap.uiSettings.isLogoEnabled = false
-//
-//        mapboxMap.setStyle(Style.OUTDOORS) {
-//            setupScale()
-//            enableLocationComponent()
-//            val latLng = LatLng(latitude, longitude)
-//            moveCamera(latLng, DefaultSetupMap.DEFAULT_ZOOM)
-//        }
-//    }
-
-//    @SuppressLint("MissingPermission")
-//    private fun enableLocationComponent() {
-//        if (hasPermissions()) {
-//            val loadedMapStyle = mapboxMap?.style
-//            // Activate the LocationComponent
-//            val customLocationComponentOptions = context?.let {
-//                LocationComponentOptions.builder(it)
-//                    .trackingGesturesManagement(true)
-//                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
-//                    .build()
-//            }
-//
-//            val locationComponentActivationOptions =
-//                context?.let {
-//                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
-//                        .locationComponentOptions(customLocationComponentOptions)
-//                        .build()
-//                }
-//
-//            mapboxMap?.let { it ->
-//                it.locationComponent.apply {
-//                    if (locationComponentActivationOptions != null) {
-//                        activateLocationComponent(locationComponentActivationOptions)
-//                    }
-//
-//                    isLocationComponentEnabled = true
-//                    renderMode = RenderMode.COMPASS
-//                }
-//            }
-//        } else {
-//            requestPermissions()
-//        }
-//    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-//                enableLocationComponent()
-            }
-        }
-    }
-
     private fun View.hideKeyboard() = this.let {
         val inputManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

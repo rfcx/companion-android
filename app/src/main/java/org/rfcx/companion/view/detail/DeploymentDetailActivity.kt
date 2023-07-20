@@ -19,15 +19,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-//import com.mapbox.mapboxsdk.Mapbox
-//import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-//import com.mapbox.mapboxsdk.geometry.LatLng
-//import com.mapbox.mapboxsdk.maps.MapView
-//import com.mapbox.mapboxsdk.maps.MapboxMap
-//import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-//import com.mapbox.mapboxsdk.maps.Style
-//import com.mapbox.pluginscalebar.ScaleBarOptions
-//import com.mapbox.pluginscalebar.ScaleBarPlugin
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig

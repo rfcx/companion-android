@@ -2,7 +2,6 @@ package org.rfcx.companion.entity
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.Expose
-//import com.mapbox.mapboxsdk.geometry.LatLng
 import io.realm.RealmModel
 import io.realm.RealmResults
 import io.realm.annotations.LinkingObjects

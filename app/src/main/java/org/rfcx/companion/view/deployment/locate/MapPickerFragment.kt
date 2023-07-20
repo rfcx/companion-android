@@ -38,8 +38,7 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 class MapPickerFragment :
-    Fragment(),
-    SearchResultFragment.OnSearchResultListener, OnMapReadyCallback {
+    Fragment(), OnMapReadyCallback {
 
     private var mapPickerProtocol: MapPickerProtocol? = null
     private var editLocationActivityListener: EditLocationActivityListener? = null

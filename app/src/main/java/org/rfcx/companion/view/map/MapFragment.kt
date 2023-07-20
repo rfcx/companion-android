@@ -292,7 +292,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
         val isDeployment = item?.let { isDeployment(it.snippet) } ?: false
         if (isDeployment) {
-            val data = Gson().fromJson(item!!.snippet, MapMarker.DeploymentMarker::class.java)
+            val data = Gson().fromJson(item!!.snippet, InfoWindowMarker::class.java)
             val deployment = mainViewModel.getDeploymentById(data.id)
             val site = mainViewModel.getStreamById(deployment?.stream?.id ?: -1)
             gettingTracksAndMoveToPin(site, "${data.locationName}.${data.id}")
@@ -305,8 +305,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         val isDeployment = isDeployment(item.snippet)
 
         if (isDeployment) {
-            val data = Gson().fromJson(item.snippet, MapMarker.DeploymentMarker::class.java)
-
+            val data = Gson().fromJson(item.snippet, InfoWindowMarker::class.java)
             context?.let {
                 firebaseCrashlytics.setCustomKey(
                     CrashlyticsKey.OnClickSeeDetail.key,

@@ -57,7 +57,7 @@ import org.rfcx.companion.util.setFormatLabel
 import org.rfcx.companion.util.toLatLng
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
-import org.rfcx.companion.view.map.MapboxCameraUtils
+import org.rfcx.companion.view.map.MapCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 
 class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
@@ -419,7 +419,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Float) {
         map.moveCamera(
-            MapboxCameraUtils.calculateLatLngForZoom(
+            MapCameraUtils.calculateLatLngForZoom(
                 userPosition,
                 nearestSite,
                 zoom
@@ -428,7 +428,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng, zoom: Float) {
-        map.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
+        map.moveCamera(MapCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
     }
 
     private fun setCheckboxForResumeDeployment(curLoc: LatLng, target: LatLng) {

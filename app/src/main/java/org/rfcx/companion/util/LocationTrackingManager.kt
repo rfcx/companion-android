@@ -7,7 +7,6 @@ import android.os.Build
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.maps.android.SphericalUtil
 import com.google.android.gms.maps.model.LatLng
-//import com.mapbox.mapboxsdk.geometry.LatLng
 import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.service.LocationTrackerService
 

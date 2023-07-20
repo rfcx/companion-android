@@ -6,7 +6,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.SphericalUtil
 
-object MapboxCameraUtils {
+object MapCameraUtils {
     fun calculateLatLngForZoom(userPosition: LatLng, nearestSite: LatLng? = null, zoom: Float): CameraUpdate {
         if (nearestSite == null) {
             return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
