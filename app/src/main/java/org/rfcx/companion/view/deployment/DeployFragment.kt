@@ -18,7 +18,6 @@ import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.prefs.GuardianPlan
-import org.rfcx.companion.view.deployment.guardian.GuardianDeploymentProtocol
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.detail.DisplayImageActivity
 import org.rfcx.companion.view.dialog.GuidelineButtonClickListener
@@ -44,7 +43,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private var audioMothDeploymentProtocol: BaseDeploymentProtocol? = null
     private var songMeterDeploymentProtocol: BaseDeploymentProtocol? = null
-    private var guardianDeploymentProtocol: GuardianDeploymentProtocol? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -76,37 +74,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     context.resources.getStringArray(R.array.songmeter_guideline_texts).toList()
                 imageExamples =
                     context.resources.getStringArray(R.array.audiomoth_photos).toList()
-            }
-            is GuardianDeploymentProtocol -> {
-                guardianDeploymentProtocol = context
-                guardianDeploymentProtocol?.let {
-                    it.showToolbar()
-                    it.setCurrentPage(requireContext().resources.getStringArray(R.array.guardian_optional_checks)[0])
-                    it.setToolbarTitle()
-                }
-
-                when (guardianDeploymentProtocol?.getGuardianPlan()) {
-                    GuardianPlan.SAT_ONLY -> {
-                        imagePlaceHolders =
-                            context.resources.getStringArray(R.array.sat_guardian_placeholders)
-                                .toList()
-                        imageGuidelineTexts =
-                            context.resources.getStringArray(R.array.sat_guardian_guideline_texts)
-                                .toList()
-                        imageExamples =
-                            context.resources.getStringArray(R.array.sat_guardian_photos).toList()
-                    }
-                    else -> {
-                        imagePlaceHolders =
-                            context.resources.getStringArray(R.array.cell_guardian_placeholders)
-                                .toList()
-                        imageGuidelineTexts =
-                            context.resources.getStringArray(R.array.cell_guardian_guideline_texts)
-                                .toList()
-                        imageExamples =
-                            context.resources.getStringArray(R.array.cell_guardian_photos).toList()
-                    }
-                }
             }
         }
     }
@@ -147,7 +114,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     private fun setupImages() {
         val savedImages =
             audioMothDeploymentProtocol?.getImages() ?: songMeterDeploymentProtocol?.getImages()
-                ?: guardianDeploymentProtocol?.getImages()
         getImageAdapter().setPlaceHolders(imagePlaceHolders)
         if (savedImages != null && savedImages.isNotEmpty()) {
             getImageAdapter().updateImagesFromSavedImages(savedImages)
@@ -224,7 +190,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         val images = getImageAdapter().getCurrentImagePaths()
         audioMothDeploymentProtocol?.setImages(images)
         songMeterDeploymentProtocol?.setImages(images)
-        guardianDeploymentProtocol?.setImages(images)
     }
 
     private fun updatePhotoTakenNumber() {
@@ -344,12 +309,6 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
                     analytics?.trackAddDeploymentImageEvent(Device.SONGMETER.value)
                 }
                 songMeterDeploymentProtocol?.nextStep()
-            }
-            Screen.GUARDIAN_CHECK_LIST.id -> {
-                if (images.isNotEmpty()) {
-                    analytics?.trackAddDeploymentImageEvent(Device.GUARDIAN.value)
-                }
-                guardianDeploymentProtocol?.nextStep()
             }
         }
     }

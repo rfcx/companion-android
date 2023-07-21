@@ -46,11 +46,6 @@ class Analytics(context: Context) {
         trackEvent(Event.SEE_DETAIL.id, bundle)
     }
 
-    fun trackConnectCreateDeploymentEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.CONNECT_CREATE_DEPLOYMENT.id, bundle)
-    }
-
     fun trackDeleteDeploymentEvent(status: String) {
         val bundle = Bundle()
         bundle.putString(STATUS, status)
@@ -62,23 +57,6 @@ class Analytics(context: Context) {
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, format)
         trackEvent(Event.CHANGE_COORDINATES.id, bundle)
     }
-
-    fun trackCreateNewGroupEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.CREATE_NEW_GROUP.id, bundle)
-    }
-
-    fun trackSaveNewGroupEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.SAVE_NEW_GROUP.id, bundle)
-    }
-
-    fun trackDeleteLocationGroupEvent(status: String) {
-        val bundle = Bundle()
-        bundle.putString(STATUS, status)
-        trackEvent(Event.DELETE_LOCATION_GROUP.id, bundle)
-    }
-
     fun trackChangeThemeEvent(theme: String) {
         val bundle = Bundle()
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, theme)
@@ -94,11 +72,6 @@ class Analytics(context: Context) {
     fun trackAddFeedbackImagesEvent() {
         val bundle = Bundle()
         trackEvent(Event.ADD_FEEDBACK_IMAGES.id, bundle)
-    }
-
-    fun trackSearchLocationEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.SEARCH_LOCATION.id, bundle)
     }
 
     fun trackSelectLocationEvent() {
@@ -168,47 +141,6 @@ class Analytics(context: Context) {
     fun trackCreateSongMeterDeploymentEvent() {
         val bundle = Bundle()
         trackEvent(Event.CREATE_SONGMETER_DEPLOYMENT.id, bundle)
-    }
-
-    fun trackSelectGuardianHotspotEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.SELECT_GUARDIAN_HOTSPOT.id, bundle)
-    }
-
-    fun trackConnectGuardianHotspotEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.CONNECT_GUARDIAN_HOTSPOT.id, bundle)
-    }
-
-    fun trackRetryGuardianHotspotEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.RETRY_GUARDIAN_HOTSPOT.id, bundle)
-    }
-
-    fun trackClickNextEvent(page: String) {
-        val bundle = Bundle()
-        bundle.putString(FROM_PAGE, page)
-        trackEvent(Event.CLICK_NEXT.id, bundle)
-    }
-
-    fun trackRegisterGuardianEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.REGISTER_GUARDIAN.id, bundle)
-    }
-
-    fun trackSelectGuardianProfileEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.SELECT_GUARDIAN_PROFILE.id, bundle)
-    }
-
-    fun trackCreateNewGuardianProfileEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.CREATE_NEW_GUARDIAN_PROFILE.id, bundle)
-    }
-
-    fun trackCreateGuardianDeploymentEvent() {
-        val bundle = Bundle()
-        trackEvent(Event.CREATE_GUARDIAN_DEPLOYMENT.id, bundle)
     }
 
     companion object {

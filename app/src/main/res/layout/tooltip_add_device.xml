@@ -42,51 +42,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/guardianLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:padding="@dimen/margin_padding_small"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/audioMothLayout">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:orientation="horizontal">
-
-            <View
-                android:id="@+id/tooltipGuardianIcon"
-                android:layout_width="@dimen/tooltip_icon_size"
-                android:layout_height="@dimen/tooltip_icon_size"
-                android:layout_marginTop="@dimen/margin_padding_small"
-                android:background="@drawable/tooltip_guardian"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/addGuardian"
-                style="@style/AudioMothText.Body"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/margin_padding_small"
-                android:text="@string/rfcx_guardian"
-                android:gravity="center"
-                android:textColor="@color/tooltipTextColor"
-                app:layout_constraintBottom_toBottomOf="@id/tooltipGuardianIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/tooltipGuardianIcon"
-                app:layout_constraintTop_toTopOf="@id/tooltipGuardianIcon"
-                tools:ignore="RtlHardcoded" />
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/songMeterLayout"
         android:layout_width="wrap_content"
@@ -95,7 +50,7 @@
         android:padding="@dimen/margin_padding_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guardianLayout">
+        app:layout_constraintTop_toBottomOf="@id/audioMothLayout">
 
         <View
             android:id="@+id/songMeterIcon"
