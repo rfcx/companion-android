@@ -234,55 +234,6 @@
                 app:layout_constraintTop_toBottomOf="@id/offlineMapTextView" />
 
             <TextView
-                android:id="@+id/guardianSectionTextView"
-                style="@style/AudioMothText.Title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/margin_padding_normal"
-                android:paddingTop="@dimen/margin_padding_small"
-                android:paddingEnd="@dimen/margin_padding_normal"
-                android:paddingBottom="@dimen/margin_padding_small"
-                android:text="@string/guardian"
-                android:textAllCaps="false"
-                android:textColor="@color/text_secondary"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/viewGuardian" />
-
-            <TextView
-                android:id="@+id/softwareTextView"
-                style="@style/AudioMothText.SubTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:padding="@dimen/margin_padding_normal"
-                android:text="@string/guardian_softwares"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/guardianSectionTextView" />
-
-            <TextView
-                android:id="@+id/classifierTextView"
-                style="@style/AudioMothText.SubTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:padding="@dimen/margin_padding_normal"
-                android:text="@string/classifier"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/softwareTextView" />
-
-            <View
-                android:id="@+id/viewProject"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/separate_line_size"
-                android:background="@color/separateLine"
-                app:layout_constraintTop_toBottomOf="@id/classifierTextView" />
-
-            <TextView
 
                 android:id="@+id/additionalTextView"
                 style="@style/AudioMothText.Title"
@@ -296,7 +247,7 @@
                 android:textColor="@color/text_secondary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/classifierTextView" />
+                app:layout_constraintTop_toBottomOf="@id/viewGuardian" />
 
             <TextView
                 android:id="@+id/feedbackTextView"

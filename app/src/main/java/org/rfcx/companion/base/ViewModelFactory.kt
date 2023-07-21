@@ -21,10 +21,6 @@ import org.rfcx.companion.view.detail.EditLocationRepository
 import org.rfcx.companion.view.detail.EditLocationViewModel
 import org.rfcx.companion.view.detail.image.AddImageRepository
 import org.rfcx.companion.view.detail.image.AddImageViewModel
-import org.rfcx.companion.view.profile.classifier.repository.GuardianClassifierRepository
-import org.rfcx.companion.view.profile.classifier.viewmodel.GuardianClassifierViewModel
-import org.rfcx.companion.view.profile.guardiansoftware.repository.GuardianSoftwareRepository
-import org.rfcx.companion.view.profile.guardiansoftware.viewmodel.GuardianSoftwareViewModel
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapRepository
 import org.rfcx.companion.view.profile.offlinemap.ProjectOfflineMapViewModel
 import org.rfcx.companion.view.project.repository.ProjectSelectRepository
@@ -59,12 +55,6 @@ class ViewModelFactory(
                     ProjectOfflineMapRepository(deviceApiHelper, localDataHelper)
                 ) as T
             }
-            modelClass.isAssignableFrom(GuardianSoftwareViewModel::class.java) -> {
-                return GuardianSoftwareViewModel(
-                    application,
-                    GuardianSoftwareRepository(coreApiHelper)
-                ) as T
-            }
             modelClass.isAssignableFrom(LoginViewModel::class.java) -> {
                 return LoginViewModel(
                     application,
@@ -93,12 +83,6 @@ class ViewModelFactory(
                 return EditLocationViewModel(
                     application,
                     EditLocationRepository(deviceApiHelper, localDataHelper)
-                ) as T
-            }
-            modelClass.isAssignableFrom(GuardianClassifierViewModel::class.java) -> {
-                return GuardianClassifierViewModel(
-                    application,
-                    GuardianClassifierRepository(deviceApiHelper, localDataHelper)
                 ) as T
             }
             modelClass.isAssignableFrom(SongMeterViewModel::class.java) -> {
