@@ -912,7 +912,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
         showSearchBar(false)
 
         val latLng = LatLng(stream.latitude, stream.longitude)
-        map.moveCamera(CameraUpdateFactory.zoomTo(17.0F))
+        map.moveCamera(CameraUpdateFactory.zoomTo(20.0F))
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
 
         val clusters = mClusterManager.algorithm.getClusters(21.0F)
