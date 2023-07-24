@@ -256,6 +256,7 @@
     <string name="format_deployed">deployed</string>
 
     <string name="not_have_permission">You don’t have permission to deploy to this project. You can ask the project owner to change your user permissions.</string>
+    <string name="select_cycle_s_to_skip_between_recordings">Select cycle(s) to skip between recordings</string>
 
     <!-- ConnectGuardianFragment -->
     <string name="nearby_guardians">Nearby Guardian(s)</string>
@@ -264,105 +265,6 @@
     <string name="connect">Connect</string>
     <string name="retry">Retry</string>
     <string name="not_found">No Guardians were Detected Nearby.</string>
-
-    <!-- GuardianSelectProfileFragment -->
-    <string name="configuration_details">%s, %d kHz, %d kbs, %d secs</string>
-
-    <!-- GuardianConfigureFragment -->
-    <string name="bitrate">Bitrate</string>
-    <string name="duration">Recording cycle duration (per file)</string>
-    <string name="choose_bitrate">Choose Bitrate (kbs)</string>
-    <string name="choose_file_format">Choose Audio Format</string>
-    <string name="choose_duration_cycle">Choose recording cycle duration (secs)</string>
-    <string name="choose_sampling">Choose Recording Strategy</string>
-    <string name="sampling_ratio">Cycle(s) skipped between recordings</string>
-    <string name="select_cycle_s_to_skip_between_recordings">Select cycle(s) to skip between recordings</string>
-    <string name="advanced_config">Guardian Preferences</string>
-    <string name="schedule_start_time">Select start time</string>
-    <string name="schedule_stop_time">Select stop time</string>
-    <string name="recording_schedule">Recording schedule</string>
-
-    <!-- GuardianPreferences -->
-    <bool name="prefs_value_default_show_ui">true</bool>
-    <bool name="prefs_value_default_enable_audio_capture">true</bool>
-    <bool name="prefs_value_default_enable_checkin_publish">true</bool>
-    <bool name="prefs_value_default_enable_cutoffs_battery">true</bool>
-    <bool name="prefs_value_default_enable_cutoffs_schedule_off_hours">true</bool>
-    <bool name="prefs_value_default_admin_enable_ssh_server">false</bool>
-
-    <string name="prefs_value_default_api_rest_host">api.rfcx.org</string>
-    <string name="prefs_value_default_api_rest_protocol">https</string>
-
-    <string name="prefs_value_default_api_checkin_host">api-mqtt.rfcx.org</string>
-    <string name="prefs_value_default_api_checkin_protocol">ssl</string>
-    <string name="prefs_value_default_api_checkin_port">8883</string>
-
-    <string name="prefs_value_default_api_ntp_host">time.apple.com</string>
-    <string name="prefs_value_default_api_sms_address">+14154803657</string>
-
-    <string name="prefs_value_default_reboot_forced_daily_at">23:54:00</string>
-
-    <string name="prefs_value_default_audio_cycle_duration">90</string>
-    <string name="prefs_value_default_audio_schedule_off_hours">23:56-23:58,23:58-00:00</string>
-    <string name="prefs_value_default_audio_encode_codec">opus</string>
-    <string name="prefs_value_default_audio_encode_bitrate">28672</string>
-    <string name="prefs_value_default_audio_sample_rate">24000</string>
-
-    <string name="prefs_value_default_checkin_battery_cutoff">90</string>
-    <string name="prefs_value_default_audio_battery_cutoff">80</string>
-
-    <string name="prefs_value_default_checkin_failure_thresholds">12,25,40,60,80</string>
-    <string name="prefs_value_default_checkin_skip_threshold">5</string>
-    <string name="prefs_value_default_checkin_stash_threshold">240</string>
-    <string name="prefs_value_default_checkin_archive_threshold">160</string>
-
-    <bool name="prefs_value_default_admin_enable_log_capture">false</bool>
-    <string name="prefs_value_default_admin_log_capture_level">Warn</string>
-    <string name="prefs_value_default_admin_log_capture_cycle">30</string>
-
-    <bool name="prefs_value_default_admin_enable_screenshot_capture">true</bool>
-    <string name="prefs_value_default_admin_screenshot_capture_cycle">180</string>
-
-    <bool name="prefs_value_default_admin_enable_tcp_adb">true</bool>
-    <bool name="prefs_value_default_admin_enable_wifi">false</bool>
-    <bool name="prefs_value_default_admin_enable_bluetooth">false</bool>
-
-    <string name="prefs_value_default_admin_system_timezone">[ Not Set ]</string>
-    <bool name="prefs_value_default_admin_enable_sentinel_capture">true</bool>
-
-    <!-- GuardianDiagnostic -->
-    <string name="diagnostic">Diagnostic</string>
-    <string name="record">Record</string>
-    <string name="checkin">CheckIn</string>
-    <string name="total_size">Total Size</string>
-    <string name="total_time">Total Time</string>
-    <string name="configuration">Configuration</string>
-    <string name="file_format">File Format</string>
-    <string name="advanced">Advanced</string>
-    <string name="detail_file">%d files</string>
-    <string name="detail_size">%d MBs</string>
-    <string name="detail_secs">%d seconds</string>
-    <string name="detail_percentage">%d %%</string>
-    <string name="detail_khz">%d kHz</string>
-    <string name="detail_kbs">%d kbs</string>
-
-    <!-- GuardianVerifyFragment -->
-    <string name="position_the_device">Adjust the Antenna to Attain the Best Signal</string>
-
-    <string name="network_strength_signal">Network Signal Strength</string>
-    <string name="signal_text_0">Signal Strength is Very Low or Imperceptible</string>
-    <string name="signal_text_1">Signal Strength is Poor</string>
-    <string name="signal_text_2">Signal Strength is Normal</string>
-    <string name="signal_text_3">Signal Strength is Good</string>
-    <string name="signal_text_4">Signal Strength is Excellent</string>
-    <string name="signal_value">%d dBm</string>
-    <string name="signal_sim_card">The Guardian does not have a SIM card inserted.\nPlease insert a SIM card.</string>
-    <string name="signal_lost">WiFi hotspot connection lost.\nPlease try again.</string>
-    <string name="speed_test_failed">failed to retrieve</string>
-    <string name="speed_test_wait">waiting for testing</string>
-    <string name="speed_test_run">run a test</string>
-    <string name="speed_test_kbps">%.2f kb/s download</string>
-    <string name="speed_test_kbps_upload">%.2f kb/s upload</string>
 
     <!-- LocationTrackerService -->
     <string name="track">Track</string>
@@ -383,64 +285,9 @@
     <string name="search_error_message">Please try again later</string>
     <string name="desc_deployment_image">Deployment Photos</string>
 
-    <!-- GuardianMicrophoneTestingFragment -->
-    <string name="positioning_the_microphone">Microphone Test</string>
-    <string name="listen">Begin Mic Test</string>
     <string name="cancel">cancel</string>
-    <string name="stop_listen">Halt Mic Test</string>
-    <string name="listen_again">Restart Mic Test</string>
-    <string name="don_t_forget_to_turn_speaker_on">*Please Turn the Speaker On</string>
-    <string name="rainbow">Rainbow</string>
-    <string name="fire">Fire</string>
-    <string name="ice">Ice</string>
-    <string name="grey">Grey</string>
-    <string name="color">Color</string>
-    <string name="frequency_scale">Frequency Scale</string>
-    <string name="speed">Speed</string>
-    <string name="choose_speed">Choose spectrogram speed</string>
-    <string name="choose_freq">Choose spectrogram frequency scale</string>
-    <string name="choose_color">Choose spectrogram color</string>
-    <string name="choose_play_back">Choose audio playback</string>
-    <string name="play_back">Playback</string>
-    <string name="mic_recorder_warn">Recorder service is not started yet.\nPlease try again later.</string>
-    <string name="unknown_error">unknown error</string>
-
-
-    <!-- GuardianCheckinTestFragment -->
-    <string name="testing_guardian_checkin">Guardian CheckIn Check</string>
-    <string name="checkin_url">CheckIn URL</string>
-    <string name="status">Status</string>
-    <string name="delivery_time">Delivery Time</string>
-    <string name="dash">-</string>
     <string name="correct_mark">\u2713</string>
-    <string name="last_checkin">Last checkin</string>
-
-    <!-- GuardianSolarPanelFragment -->
-    <string name="solar_panel_feedback">Solar Panel Input Values</string>
-    <string name="voltage_v">Voltage</string>
-    <string name="current_a">Current</string>
-    <string name="power_w">Power</string>
-    <string name="please_assemble_solar_panel_to_get_feedback">Please Begin Attaching the Solar Panels\nto Observe Feedback</string>
-
-    <!-- GuardianRegisterFragment -->
-    <string name="let_s_register_your_guardian">Let\'s Register your Guardian</string>
-    <string name="production">Production</string>
-    <string name="staging">Staging</string>
-    <string name="register">Register</string>
-    <string name="already_registered">Your guardian is already registered</string>
-    <string name="register_failed">Registration Failed. Please Try Again.</string>
-    <string name="register_success">Your Registration is Complete!</string>
-    <string name="registering">Registration Request Sent. Awaiting Response.</string>
-    <string name="check_registered">Verifying Guardian Registration Status</string>
-    <string name="not_registered">Your Guardian is Not Registered</string>
-    <string name="register_guardian">Register Guardian with RFCx</string>
-
-    <!-- GuardianCheckListFragment -->
-    <string name="setting_up_checklist">Guardian Setup Checklist</string>
     <string name="deploy">Deploy</string>
-    <string name="wifi_notification_title">Do you want to disable Guardian\'s WiFi after deployed?</string>
-    <string name="notification_yes">Yes</string>
-    <string name="notification_no">No</string>
 
     <!-- SongMeterCheckListFragment -->
     <string name="song_meter_checklist">Song Meter Setup Checklist:</string>
