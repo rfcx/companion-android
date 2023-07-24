@@ -1,5 +1,6 @@
 package org.rfcx.companion.localdb
 
+import android.util.Log
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
@@ -79,6 +80,9 @@ class DeploymentDb(private val realm: Realm) {
     fun insertOrUpdate(deploymentResponses: List<DeploymentResponse>) {
         realm.executeTransaction {
             deploymentResponses.forEach { deploymentResponse ->
+                if (deploymentResponse.deploymentType == Device.GUARDIAN.value) {
+                    return@forEach
+                }
                 val deployment =
                     it.where(Deployment::class.java)
                         .equalTo(Deployment.FIELD_SERVER_ID, deploymentResponse.id)
