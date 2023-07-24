@@ -269,6 +269,17 @@ class DeploymentDb(private val realm: Realm) {
         }
     }
 
+    fun deleteDeploymentWithType(type: String) {
+        realm.executeTransaction {
+            val deployments =
+                it.where(Deployment::class.java).equalTo(Deployment.FIELD_DEVICE, type)
+                    .findAll()
+            deployments?.forEach { deployment ->
+                deployment?.deleteFromRealm()
+            }
+        }
+    }
+
     fun deleteDeploymentLocation(id: Int, callback: DatabaseCallback) {
         realm.executeTransactionAsync({ bgRealm ->
             // do update and set delete deployment

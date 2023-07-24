@@ -163,7 +163,6 @@ class MainViewModel(
                                         ?: Project()
                                 if (project.minLatitude != res.minLatitude || project.maxLatitude != res.maxLatitude || project.minLongitude != res.minLongitude || project.maxLongitude != res.maxLongitude) {
                                     updateProjectBounds(res)
-//                                    updateStatusOfflineMap()
                                 }
                             }
                         }
@@ -305,6 +304,8 @@ class MainViewModel(
     }
 
     fun combinedData() {
+        mainRepository.deleteDeploymentWithType(Device.GUARDIAN.value)
+
         val projectId = getSelectedProjectId()
         val filteredStreams = this.streams.filter { it.project?.id == projectId }
         streamList.postValue(filteredStreams)
