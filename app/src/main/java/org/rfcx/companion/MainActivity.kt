@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
+    private val notificationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
     private var snackbar: Snackbar? = null
 
@@ -134,6 +135,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermissions.handleRequestResult(requestCode, grantResults)
+        notificationPermissions.handleRequestResult(requestCode, grantResults)
 
         currentFragment?.let {
             if (it is MapFragment) {
