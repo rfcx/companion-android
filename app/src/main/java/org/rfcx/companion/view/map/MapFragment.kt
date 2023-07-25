@@ -69,7 +69,6 @@ import org.rfcx.companion.view.unsynced.UnsyncedWorksActivity
 import java.io.File
 import java.util.*
 
-
 class MapFragment :
     Fragment(),
     ProjectListener,
