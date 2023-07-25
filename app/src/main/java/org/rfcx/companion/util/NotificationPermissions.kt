@@ -27,7 +27,8 @@ class NotificationPermissions(private val activity: Activity) {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun request() {
-        activity.requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+        activity.requestPermissions(
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
             REQUEST_POST_NOTIFICATIONS
         )
     }
