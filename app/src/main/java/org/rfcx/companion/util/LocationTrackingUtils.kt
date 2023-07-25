@@ -50,7 +50,8 @@ class LocationTrackingUtils(private val context: Context) {
                             getNotificationManager().notify(
                                 NOTIFICATION_LOCATION_ID,
                                 createLocationTrackerNotification(true)
-                            )                        }
+                            )
+                        }
                     } else {
                         getNotificationManager().notify(
                             NOTIFICATION_LOCATION_ID,
@@ -64,7 +65,8 @@ class LocationTrackingUtils(private val context: Context) {
                         getNotificationManager().notify(
                             NOTIFICATION_LOCATION_ID,
                             createLocationTrackerNotification(false)
-                        )                    }
+                        )
+                    }
                 } else {
                     getNotificationManager().notify(
                         NOTIFICATION_LOCATION_ID,
@@ -80,7 +82,8 @@ class LocationTrackingUtils(private val context: Context) {
                     getNotificationManager().notify(
                         NOTIFICATION_LOCATION_ID,
                         createLocationTrackerNotification(true)
-                    )                }
+                    )
+                }
             } else {
                 getNotificationManager().notify(
                     NOTIFICATION_LOCATION_ID,
@@ -95,7 +98,8 @@ class LocationTrackingUtils(private val context: Context) {
                     getNotificationManager().notify(
                         NOTIFICATION_LOCATION_ID,
                         createLocationTrackerNotification(false)
-                    )                }
+                    )
+                }
             } else {
                 getNotificationManager().notify(
                     NOTIFICATION_LOCATION_ID,
