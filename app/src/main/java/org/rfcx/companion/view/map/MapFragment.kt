@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -102,6 +103,7 @@ class MapFragment :
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
+    private val notificationPermissions by lazy { activity?.let { NotificationPermissions(it) } }
     private var listener: MainActivityListener? = null
 
     private var currentUserLocation: Location? = null
@@ -386,6 +388,7 @@ class MapFragment :
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermissions?.handleRequestResult(requestCode, grantResults)
+        notificationPermissions?.handleRequestResult(requestCode, grantResults)
     }
 
     override fun onCreateView(
@@ -408,6 +411,12 @@ class MapFragment :
         setViewModel()
         fetchJobSyncing()
         hideLabel()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (notificationPermissions?.notificationAllowed() == false) {
+                notificationPermissions?.check { /* do nothing */ }
+            }
+        }
 
         context?.let { setTextTrackingButton(LocationTrackingManager.isTrackingOn(it)) }
         projectNameTextView.text =
