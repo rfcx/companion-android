@@ -66,7 +66,9 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_map_picker, container, false)
     }
@@ -133,13 +135,13 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
 
         if (hasPermissions()) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                    map.uiSettings.isZoomControlsEnabled = false
-                    map.uiSettings.isMyLocationButtonEnabled = false
-                    map.isMyLocationEnabled = true
-                    context?.let { location?.saveLastLocation(it) }
-                    currentUserLocation = location
-                    showLoading(false)
-                }
+                map.uiSettings.isZoomControlsEnabled = false
+                map.uiSettings.isMyLocationButtonEnabled = false
+                map.isMyLocationEnabled = true
+                context?.let { location?.saveLastLocation(it) }
+                currentUserLocation = location
+                showLoading(false)
+            }
         } else {
             requestPermissions()
         }
@@ -183,11 +185,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
 
     private fun setLatLogLabel(location: LatLng) {
         context?.let {
-            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${
-                location.longitude.longitudeCoordinates(
-                    it
-                )
-            }"
+            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(it)}"
             locationTextView.text = latLng
         }
     }
@@ -273,10 +271,10 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
         childFragmentManager.beginTransaction().apply {
             setCustomAnimations(R.anim.fragment_slide_in_up, 0, 0, R.anim.fragment_slide_out_up)
         }.addToBackStack(SearchResultFragment.tag).replace(
-                searchResultListContainer.id,
-                SearchResultFragment.newInstance(searchLayoutSearchEditText.text?.toString()),
-                SearchResultFragment.tag
-            ).commitAllowingStateLoss()
+            searchResultListContainer.id,
+            SearchResultFragment.newInstance(searchLayoutSearchEditText.text?.toString()),
+            SearchResultFragment.tag
+        ).commitAllowingStateLoss()
     }
 
     private fun hideSearchFragment() {
@@ -312,23 +310,23 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
         @JvmStatic
         fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int, name: String) =
             MapPickerFragment().apply {
-                    arguments = Bundle().apply {
-                        putDouble(ARG_LATITUDE, lat)
-                        putDouble(ARG_LONGITUDE, lng)
-                        putDouble(ARG_ALTITUDE, altitude)
-                        putInt(ARG_STREAM_ID, id)
-                        putString(ARG_STREAM_NAME, name)
-                    }
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                    putDouble(ARG_ALTITUDE, altitude)
+                    putInt(ARG_STREAM_ID, id)
+                    putString(ARG_STREAM_NAME, name)
                 }
+            }
 
         fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int) =
             MapPickerFragment().apply {
-                    arguments = Bundle().apply {
-                        putDouble(ARG_LATITUDE, lat)
-                        putDouble(ARG_LONGITUDE, lng)
-                        putDouble(ARG_ALTITUDE, altitude)
-                        putInt(ARG_STREAM_ID, id)
-                    }
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                    putDouble(ARG_ALTITUDE, altitude)
+                    putInt(ARG_STREAM_ID, id)
                 }
+            }
     }
 }

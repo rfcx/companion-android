@@ -303,7 +303,7 @@ class DeploymentDetailActivity :
 
     private fun moveCamera() {
         if (map == null) return
-        val latlng = LatLng(deployment?.stream?.latitude ?: 0.0, deployment?.stream?.longitude  ?: 0.0)
+        val latlng = LatLng(deployment?.stream?.latitude ?: 0.0, deployment?.stream?.longitude ?: 0.0)
         map?.moveCamera(CameraUpdateFactory.newLatLng(latlng))
         map?.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM))
     }

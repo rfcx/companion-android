@@ -94,7 +94,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun setViewModel() {
         audioMothDeploymentViewModel = ViewModelProvider(
-            this, ViewModelFactory(
+            this,
+            ViewModelFactory(
                 requireActivity().application,
                 DeviceApiHelper(DeviceApiServiceImpl(requireContext())),
                 CoreApiHelper(CoreApiServiceImpl(requireContext())),
@@ -115,7 +116,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_detail_deployment_site, container, false)
@@ -211,7 +214,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateLocationOfExistingSite(
-        latitude: Double, longitude: Double, altitude: Double
+        latitude: Double,
+        longitude: Double,
+        altitude: Double
     ) {
         setLatLngToDefault()
         var locate = Stream()
@@ -325,9 +330,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun setLatLngLabel(location: LatLng, altitude: Double) {
         context?.let {
-            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${
-                location.longitude.longitudeCoordinates(it)
-            }"
+            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(it)}"
             coordinatesValueTextView.text = latLng
             altitudeValue.text = altitude.setFormatLabel()
         }
@@ -340,12 +343,12 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
         if (hasPermissions()) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                    map.uiSettings.isZoomControlsEnabled = false
-                    map.uiSettings.isMyLocationButtonEnabled = false
-                    map.isMyLocationEnabled = true
-                    context?.let { location?.saveLastLocation(it) }
-                    currentUserLocation = location
-                }
+                map.uiSettings.isZoomControlsEnabled = false
+                map.uiSettings.isMyLocationButtonEnabled = false
+                map.isMyLocationEnabled = true
+                context?.let { location?.saveLastLocation(it) }
+                currentUserLocation = location
+            }
         } else {
             requestPermissions()
         }
@@ -492,7 +495,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             }
 
         fun newInstance(
-            lat: Double, lng: Double, siteId: Int, siteName: String, fromMapPicker: Boolean
+            lat: Double, lng: Double,
+            siteId: Int,
+            siteName: String,
+            fromMapPicker: Boolean
         ) = DetailDeploymentSiteFragment().apply {
             arguments = Bundle().apply {
                 putDouble(ARG_LATITUDE, lat)

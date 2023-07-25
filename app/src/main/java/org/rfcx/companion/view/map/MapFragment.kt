@@ -71,7 +71,10 @@ import java.util.*
 
 
 class MapFragment :
-    Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Boolean) -> Unit,
+    Fragment(),
+    ProjectListener,
+    OnMapReadyCallback,
+    (Stream, Boolean) -> Unit,
     ClusterManager.OnClusterClickListener<MarkerItem>,
     ClusterManager.OnClusterItemClickListener<MarkerItem>,
     ClusterManager.OnClusterItemInfoWindowClickListener<MarkerItem> {
@@ -925,7 +928,7 @@ class MapFragment :
         mClusterManager.markerCollection.markers.forEach {
             if (it.snippet!!.contains(stream.name)) {
                 it.showInfoWindow()
-                onClusterItemClick(markerItems.first { i -> i.snippet.contains(stream.name)})
+                onClusterItemClick(markerItems.first { i -> i.snippet.contains(stream.name) })
             }
         }
     }
@@ -957,8 +960,11 @@ class MapFragment :
     private fun enableMyLocation() {
 
         // Check if permissions are granted, if so, enable the my location layer
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-            || ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED)
+        {
             map.isMyLocationEnabled = true
             return
         }
