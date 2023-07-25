@@ -33,7 +33,7 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
 
         deploymentImage.forEach {
             val file = File(it.localPath)
-            val mimeType = file.getMimeType()
+            val mimeType = file.getMimeType("image/jpeg")
             val requestFile = RequestBody.create(MediaType.parse(mimeType), storage.compressFile(context, file))
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
