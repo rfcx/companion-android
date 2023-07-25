@@ -495,7 +495,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             }
 
         fun newInstance(
-            lat: Double, lng: Double,
+            lat: Double,
+            lng: Double,
             siteId: Int,
             siteName: String,
             fromMapPicker: Boolean
