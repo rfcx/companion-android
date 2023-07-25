@@ -15,7 +15,7 @@ object MapCameraUtils {
         val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
         if (oppositeLat >= -90 && oppositeLat <= 90 && oppositeLng >= -180 && oppositeLng <= 180) {
             val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
-            val distance = SphericalUtil.computeDistanceBetween(oppositeNearestSite, userPosition);
+            val distance = SphericalUtil.computeDistanceBetween(oppositeNearestSite, userPosition)
             if (distance < 30) {
                 return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
             }

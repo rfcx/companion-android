@@ -388,14 +388,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
         finish()
     }
 
-    override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
-        hideBottomAppBar()
-        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
-        if (mapFragment is MapFragment) {
-//            mapFragment.moveToDeploymentMarker(lat, lng)
-        }
-    }
-
     override fun showTrackOnMap(site: Stream?, markerLocationId: String) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
@@ -519,7 +511,6 @@ interface MainActivityListener {
     fun showSnackbarForCompleteUpdate()
     fun hideSnackbar()
     fun onLogout()
-    fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
     fun showTrackOnMap(site: Stream?, markerLocationId: String)
     fun getProjectName(): String
 }

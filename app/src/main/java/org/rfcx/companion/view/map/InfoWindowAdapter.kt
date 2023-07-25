@@ -43,9 +43,7 @@ class InfoWindowAdapter(var mContext: Context) : GoogleMap.InfoWindowAdapter {
         } else {
             dateAt.text = "${mContext.getString(R.string.created_at)} ${data.createdAt.toTimeAgo(mContext)}"
         }
-        val latLngText = "${data.latitude.latitudeCoordinates(mContext)}, ${
-            data.longitude.longitudeCoordinates(mContext)
-        }"
+        val latLngText = "${data.latitude.latitudeCoordinates(mContext)}, ${data.longitude.longitudeCoordinates(mContext)}"
         latLngTextView.text = latLngText
     }
 

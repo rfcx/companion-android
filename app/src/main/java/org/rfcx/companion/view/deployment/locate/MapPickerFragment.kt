@@ -37,8 +37,7 @@ import org.rfcx.companion.view.detail.MapPickerProtocol
 import java.util.*
 import kotlin.concurrent.schedule
 
-class MapPickerFragment :
-    Fragment(), OnMapReadyCallback {
+class MapPickerFragment : Fragment(), OnMapReadyCallback {
 
     private var mapPickerProtocol: MapPickerProtocol? = null
     private var editLocationActivityListener: EditLocationActivityListener? = null
@@ -83,8 +82,7 @@ class MapPickerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val mapFragment =
-            childFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+        val mapFragment = childFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         showLoading(true)
@@ -136,15 +134,14 @@ class MapPickerFragment :
         moveCamera(LatLng(latitude, longitude), DefaultSetupMap.DEFAULT_ZOOM)
 
         if (hasPermissions()) {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    map.uiSettings.isZoomControlsEnabled = false
-                    map.uiSettings.isMyLocationButtonEnabled = false
-                    map.isMyLocationEnabled = true
-                    context?.let { location?.saveLastLocation(it) }
-                    currentUserLocation = location
-                    showLoading(false)
-                }
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                map.uiSettings.isZoomControlsEnabled = false
+                map.uiSettings.isMyLocationButtonEnabled = false
+                map.isMyLocationEnabled = true
+                context?.let { location?.saveLastLocation(it) }
+                currentUserLocation = location
+                showLoading(false)
+            }
         } else {
             requestPermissions()
         }
@@ -157,8 +154,7 @@ class MapPickerFragment :
             selectedLocation = loc
             setLatLogLabel(
                 LatLng(
-                    currentCameraPosition.latitude,
-                    currentCameraPosition.longitude
+                    currentCameraPosition.latitude, currentCameraPosition.longitude
                 )
             )
         }
@@ -171,8 +167,7 @@ class MapPickerFragment :
     private fun hasPermissions(): Boolean {
         val permissionState = context?.let {
             ActivityCompat.checkSelfPermission(
-                it,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                it, Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
         return permissionState == PackageManager.PERMISSION_GRANTED
@@ -181,8 +176,7 @@ class MapPickerFragment :
     private fun requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_PERMISSIONS_REQUEST_CODE
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSIONS_REQUEST_CODE
             )
         } else {
             throw Exception("Request permissions not required before API 23 (should never happen)")
@@ -191,12 +185,7 @@ class MapPickerFragment :
 
     private fun setLatLogLabel(location: LatLng) {
         context?.let {
-            val latLng =
-                "${location.latitude.latitudeCoordinates(it)}, ${
-                    location.longitude.longitudeCoordinates(
-                        it
-                    )
-                }"
+            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(it)}"
             locationTextView.text = latLng
         }
     }
@@ -281,12 +270,11 @@ class MapPickerFragment :
     private fun showSearchFragment() {
         childFragmentManager.beginTransaction().apply {
             setCustomAnimations(R.anim.fragment_slide_in_up, 0, 0, R.anim.fragment_slide_out_up)
-        }.addToBackStack(SearchResultFragment.tag)
-            .replace(
-                searchResultListContainer.id,
-                SearchResultFragment.newInstance(searchLayoutSearchEditText.text?.toString()),
-                SearchResultFragment.tag
-            ).commitAllowingStateLoss()
+        }.addToBackStack(SearchResultFragment.tag).replace(
+            searchResultListContainer.id,
+            SearchResultFragment.newInstance(searchLayoutSearchEditText.text?.toString()),
+            SearchResultFragment.tag
+        ).commitAllowingStateLoss()
     }
 
     private fun hideSearchFragment() {
@@ -321,26 +309,24 @@ class MapPickerFragment :
 
         @JvmStatic
         fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int, name: String) =
-            MapPickerFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putDouble(ARG_LATITUDE, lat)
-                        putDouble(ARG_LONGITUDE, lng)
-                        putDouble(ARG_ALTITUDE, altitude)
-                        putInt(ARG_STREAM_ID, id)
-                        putString(ARG_STREAM_NAME, name)
-                    }
+            MapPickerFragment().apply {
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                    putDouble(ARG_ALTITUDE, altitude)
+                    putInt(ARG_STREAM_ID, id)
+                    putString(ARG_STREAM_NAME, name)
                 }
+            }
 
         fun newInstance(lat: Double, lng: Double, altitude: Double, id: Int) =
-            MapPickerFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putDouble(ARG_LATITUDE, lat)
-                        putDouble(ARG_LONGITUDE, lng)
-                        putDouble(ARG_ALTITUDE, altitude)
-                        putInt(ARG_STREAM_ID, id)
-                    }
+            MapPickerFragment().apply {
+                arguments = Bundle().apply {
+                    putDouble(ARG_LATITUDE, lat)
+                    putDouble(ARG_LONGITUDE, lng)
+                    putDouble(ARG_ALTITUDE, altitude)
+                    putInt(ARG_STREAM_ID, id)
                 }
+            }
     }
 }
