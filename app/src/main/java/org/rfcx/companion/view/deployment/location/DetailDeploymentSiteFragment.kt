@@ -94,8 +94,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun setViewModel() {
         audioMothDeploymentViewModel = ViewModelProvider(
-            this,
-            ViewModelFactory(
+            this, ViewModelFactory(
                 requireActivity().application,
                 DeviceApiHelper(DeviceApiServiceImpl(requireContext())),
                 CoreApiHelper(CoreApiServiceImpl(requireContext())),
@@ -116,9 +115,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_detail_deployment_site, container, false)
@@ -134,17 +131,14 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         setupTopBar()
         setViewModel()
 
-        val mapFragment =
-            childFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+        val mapFragment = childFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
         mapFragment.getMapAsync(this)
         updateView()
 
         changeProjectTextView.setOnClickListener {
             context?.let { it1 ->
                 ProjectActivity.startActivity(
-                    it1,
-                    this.project?.id ?: -1,
-                    Screen.DETAIL_DEPLOYMENT_SITE.id
+                    it1, this.project?.id ?: -1, Screen.DETAIL_DEPLOYMENT_SITE.id
                 )
                 analytics?.trackChangeLocationGroupEvent(Screen.DETAIL_DEPLOYMENT_SITE.id)
             }
@@ -217,9 +211,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateLocationOfExistingSite(
-        latitude: Double,
-        longitude: Double,
-        altitude: Double
+        latitude: Double, longitude: Double, altitude: Double
     ) {
         setLatLngToDefault()
         var locate = Stream()
@@ -307,7 +299,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateView() {
         if (!isCreateNew) site = site ?: audioMothDeploymentViewModel.getStreamById(siteId)
-        if (currentUserLocation == null ) {
+        if (currentUserLocation == null) {
             currentUserLocation = context?.getLastLocation()
         }
         if (latitude != 0.0 && longitude != 0.0) {
@@ -347,8 +339,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         setPinOnMap()
 
         if (hasPermissions()) {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                     map.uiSettings.isZoomControlsEnabled = false
                     map.uiSettings.isMyLocationButtonEnabled = false
                     map.isMyLocationEnabled = true
@@ -374,8 +365,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 val latLng = locate.getLatLng()
                 moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
                 setCheckboxForResumeDeployment(
-                    curLoc,
-                    latLng
+                    curLoc, latLng
                 )
                 createSiteSymbol(latLng)
                 pinLocation = latLng
@@ -399,8 +389,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun hasPermissions(): Boolean {
         val permissionState = context?.let {
             ActivityCompat.checkSelfPermission(
-                it,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                it, Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
         return permissionState == PackageManager.PERMISSION_GRANTED
@@ -409,8 +398,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_PERMISSIONS_REQUEST_CODE
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSIONS_REQUEST_CODE
             )
         } else {
             throw Exception("Request permissions not required before API 23 (should never happen)")
@@ -420,9 +408,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Float) {
         map.moveCamera(
             MapCameraUtils.calculateLatLngForZoom(
-                userPosition,
-                nearestSite,
-                zoom
+                userPosition, nearestSite, zoom
             )
         )
     }
@@ -443,19 +429,13 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun setWithinText() {
         withinTextView.text = getString(R.string.within)
         withinTextView.setCompoundDrawablesWithIntrinsicBounds(
-            R.drawable.ic_checklist_passed,
-            0,
-            0,
-            0
+            R.drawable.ic_checklist_passed, 0, 0, 0
         )
     }
 
     private fun setNotWithinText(distance: String) {
         withinTextView.setCompoundDrawablesWithIntrinsicBounds(
-            R.drawable.ic_checklist_cross,
-            0,
-            0,
-            0
+            R.drawable.ic_checklist_cross, 0, 0, 0
         )
         withinTextView.text = getString(R.string.more_than, distance)
     }
@@ -473,27 +453,15 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun bitmapFromVector(context: Context, vectorResId: Int): BitmapDescriptor {
-        //drawable generator
         val vectorDrawable: Drawable = ContextCompat.getDrawable(context, vectorResId)!!
         vectorDrawable.setBounds(
-            0,
-            0,
-            vectorDrawable.intrinsicWidth,
-            vectorDrawable.intrinsicHeight
+            0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight
         )
-        //bitmap genarator
-        val bitmap: Bitmap =
-            Bitmap.createBitmap(
-                vectorDrawable.intrinsicWidth,
-                vectorDrawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
-            )
-        //canvas genaret
-        //pass bitmap in canvas constructor
+        val bitmap: Bitmap = Bitmap.createBitmap(
+            vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+        )
         val canvas: Canvas = Canvas(bitmap)
-        //pass canvas in drawable
         vectorDrawable.draw(canvas)
-        //return BitmapDescriptorFactory
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
@@ -524,22 +492,17 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             }
 
         fun newInstance(
-            lat: Double,
-            lng: Double,
-            siteId: Int,
-            siteName: String,
-            fromMapPicker: Boolean
-        ) =
-            DetailDeploymentSiteFragment().apply {
-                arguments = Bundle().apply {
-                    putDouble(ARG_LATITUDE, lat)
-                    putDouble(ARG_LONGITUDE, lng)
-                    putInt(ARG_SITE_ID, siteId)
-                    putString(ARG_SITE_NAME, siteName)
-                    putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
-                    putBoolean(ARG_FROM_MAP_PICKER, fromMapPicker)
-                }
+            lat: Double, lng: Double, siteId: Int, siteName: String, fromMapPicker: Boolean
+        ) = DetailDeploymentSiteFragment().apply {
+            arguments = Bundle().apply {
+                putDouble(ARG_LATITUDE, lat)
+                putDouble(ARG_LONGITUDE, lng)
+                putInt(ARG_SITE_ID, siteId)
+                putString(ARG_SITE_NAME, siteName)
+                putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
+                putBoolean(ARG_FROM_MAP_PICKER, fromMapPicker)
             }
+        }
 
         fun newInstance(lat: Double, lng: Double, siteId: Int, siteName: String) =
             DetailDeploymentSiteFragment().apply {

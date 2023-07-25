@@ -163,7 +163,6 @@ class MainViewModel(
                                         ?: Project()
                                 if (project.minLatitude != res.minLatitude || project.maxLatitude != res.maxLatitude || project.minLongitude != res.minLongitude || project.maxLongitude != res.maxLongitude) {
                                     updateProjectBounds(res)
-//                                    updateStatusOfflineMap()
                                 }
                             }
                         }

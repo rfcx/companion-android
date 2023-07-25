@@ -221,7 +221,6 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-
     companion object {
         private const val ARG_LATITUDE = "ARG_LATITUDE"
         private const val ARG_LONGITUDE = "ARG_LONGITUDE"

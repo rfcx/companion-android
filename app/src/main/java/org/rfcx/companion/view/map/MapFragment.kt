@@ -70,7 +70,8 @@ import java.io.File
 import java.util.*
 
 
-class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Boolean) -> Unit,
+class MapFragment :
+    Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Boolean) -> Unit,
     ClusterManager.OnClusterClickListener<MarkerItem>,
     ClusterManager.OnClusterItemClickListener<MarkerItem>,
     ClusterManager.OnClusterItemInfoWindowClickListener<MarkerItem> {
@@ -230,7 +231,6 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
                 context?.let { location?.saveLastLocation(it) }
                 currentUserLocation = location
             }
-
     }
 
     private fun setUpClusterer() {
@@ -249,12 +249,12 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
             mClusterManager.onCameraIdle()
         }
 
-        map.setOnMarkerClickListener(mClusterManager);
-        map.setInfoWindowAdapter(mClusterManager.markerManager);
-        map.setOnInfoWindowClickListener(mClusterManager);
-        mClusterManager.setOnClusterClickListener(this);
-        mClusterManager.setOnClusterItemClickListener(this);
-        mClusterManager.setOnClusterItemInfoWindowClickListener(this);
+        map.setOnMarkerClickListener(mClusterManager)
+        map.setInfoWindowAdapter(mClusterManager.markerManager)
+        map.setOnInfoWindowClickListener(mClusterManager)
+        mClusterManager.setOnClusterClickListener(this)
+        mClusterManager.setOnClusterItemClickListener(this)
+        mClusterManager.setOnClusterItemInfoWindowClickListener(this)
 
         map.setOnMapClickListener {
             lastSelectedId = -1
@@ -347,7 +347,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
 
         // Move Camera
         map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-        map.animateCamera(CameraUpdateFactory.zoomTo(13.0f));
+        map.animateCamera(CameraUpdateFactory.zoomTo(13.0f))
     }
 
     private fun setMarker(data: MapMarker.DeploymentMarker) {
@@ -664,9 +664,7 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     private val run: Runnable = object : Runnable {
         override fun run() {
             context?.let {
-                trackingTextView.text = "${
-                    LocationTrackingManager.getDistance(trackingDb).setFormatLabel()
-                }  ${LocationTrackingManager.getOnDutyTimeMinute(it)} min"
+                trackingTextView.text = "${LocationTrackingManager.getDistance(trackingDb).setFormatLabel()}  ${LocationTrackingManager.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
         }
@@ -959,14 +957,8 @@ class MapFragment : Fragment(), ProjectListener, OnMapReadyCallback, (Stream, Bo
     private fun enableMyLocation() {
 
         // Check if permissions are granted, if so, enable the my location layer
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             map.isMyLocationEnabled = true
             return
         }

@@ -3,7 +3,6 @@ package org.rfcx.companion.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -306,7 +305,7 @@ class DeploymentDetailActivity :
         if (map == null) return
         val latlng = LatLng(deployment?.stream?.latitude ?: 0.0, deployment?.stream?.longitude  ?: 0.0)
         map?.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-        map?.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+        map?.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM))
     }
     private fun setupToolbar() {
         setSupportActionBar(toolbar)

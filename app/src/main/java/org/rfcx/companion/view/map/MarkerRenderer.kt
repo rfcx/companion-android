@@ -51,7 +51,6 @@ class MarkerRenderer(
     }
 
     private fun bitmapFromVector(context: Context, vectorResId: Int): BitmapDescriptor {
-        //drawable generator
         val vectorDrawable: Drawable = ContextCompat.getDrawable(context, vectorResId)!!
         vectorDrawable.setBounds(
             0,
@@ -59,19 +58,15 @@ class MarkerRenderer(
             vectorDrawable.intrinsicWidth,
             vectorDrawable.intrinsicHeight
         )
-        //bitmap genarator
         val bitmap: Bitmap =
             Bitmap.createBitmap(
                 vectorDrawable.intrinsicWidth,
                 vectorDrawable.intrinsicHeight,
                 Bitmap.Config.ARGB_8888
             )
-        //canvas genaret
-        //pass bitmap in canvas constructor
+
         val canvas: Canvas = Canvas(bitmap)
-        //pass canvas in drawable
         vectorDrawable.draw(canvas)
-        //return BitmapDescriptorFactory
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
