@@ -428,8 +428,8 @@ class CompanionRealmMigration : RealmMigration {
         }
     }
     private fun migrateToV22(realm: DynamicRealm) {
-        realm.schema.remove("GuardianRegistrationDb")
-        realm.schema.remove("ClassifierDb")
+        realm.schema.remove("GuardianRegistration")
+        realm.schema.remove("Classifier")
     }
 
     override fun hashCode(): Int {
