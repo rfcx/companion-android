@@ -292,7 +292,7 @@ class MainViewModel(
     }
 
     fun combinedData() {
-        mainRepository.deleteDeploymentWithType(Device.GUARDIAN.value)
+        mainRepository.deleteDeploymentWithType("guardian")
 
         val projectId = getSelectedProjectId()
         val filteredStreams = this.streams.filter { it.project?.id == projectId }

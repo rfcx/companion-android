@@ -99,30 +99,6 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                 maxImages =
                     if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
-            Device.GUARDIAN.value + "-cell" -> {
-                imagePlaceHolders =
-                    resources.getStringArray(R.array.cell_guardian_placeholders)
-                        .toList()
-                imageGuidelineTexts =
-                    resources.getStringArray(R.array.cell_guardian_guideline_texts)
-                        .toList()
-                imageExamples =
-                    resources.getStringArray(R.array.cell_guardian_photos).toList()
-                maxImages =
-                    if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
-            }
-            Device.GUARDIAN.value + "-sat" -> {
-                imagePlaceHolders =
-                    resources.getStringArray(R.array.sat_guardian_placeholders)
-                        .toList()
-                imageGuidelineTexts =
-                    resources.getStringArray(R.array.sat_guardian_guideline_texts)
-                        .toList()
-                imageExamples =
-                    resources.getStringArray(R.array.sat_guardian_photos).toList()
-                maxImages =
-                    if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
-            }
         }
         getImageAdapter().setMaxImages(maxImages)
     }

@@ -26,7 +26,7 @@ open class Deployment(
     var deploymentKey: String = randomDeploymentId(),
     @Expose(serialize = false)
     var state: Int = 0, // 1 = Locate, 2 = Config, 3 = Sync, 4 = Verify, 5 = Deploy, 6 = Ready To Upload
-    var device: String? = Device.GUARDIAN.value,
+    var device: String? = Device.AUDIOMOTH.value,
     var stream: Stream? = null,
     var createdAt: Date = Date(),
     var updatedAt: Date? = null,
@@ -65,9 +65,6 @@ open class Deployment(
 fun Deployment.toMark(context: Context): MapMarker.DeploymentMarker {
     val pinImage = when (state) {
         DeploymentState.AudioMoth.ReadyToUpload.key -> {
-            Pin.PIN_GREEN
-        }
-        DeploymentState.Guardian.ReadyToUpload.key -> {
             Pin.PIN_GREEN
         }
         DeploymentState.SongMeter.ReadyToUpload.key -> {

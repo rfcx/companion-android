@@ -226,7 +226,6 @@
     <string name="create_deployment">Create deployment</string>
     <string name="no_deployment">No deployment</string>
     <string name="deploy_at">Deployed at %s</string>
-    <string name="guardian">Guardian</string>
     <string name="days_remaining">%d days remaining</string>
     <string name="day_remaining">%s day remaining</string>
     <string name="battery_depleted">battery depleted</string>
@@ -244,7 +243,6 @@
     <string name="choose_your_device">Choose your device</string>
     <string name="rfcx_edge_audiomoth">AudioMoth</string>
     <string name="rfcx_song_meter">Song Meter Micro</string>
-    <string name="rfcx_guardian">RFCx Guardian</string>
     <string name="warning_text">Sites is downloading \nBeware missing sites</string>
 
     <string name="location_permission_msg">Companion App would like to use your location</string>
@@ -258,13 +256,8 @@
     <string name="not_have_permission">You don’t have permission to deploy to this project. You can ask the project owner to change your user permissions.</string>
     <string name="select_cycle_s_to_skip_between_recordings">Select cycle(s) to skip between recordings</string>
 
-    <!-- ConnectGuardianFragment -->
-    <string name="nearby_guardians">Nearby Guardian(s)</string>
-    <string name="connecting_up">Searching for Nearby\n Guardians</string>
-    <string name="instruction">Why can\'t I see a Guardian</string>
     <string name="connect">Connect</string>
     <string name="retry">Retry</string>
-    <string name="not_found">No Guardians were Detected Nearby.</string>
 
     <!-- LocationTrackerService -->
     <string name="track">Track</string>
@@ -296,9 +289,6 @@
     <!-- ConnectInstructionDiaglogFragment -->
     <string name="got_it">Got It</string>
 
-    <!-- WifiLostDialog -->
-    <string name="wifi_lost_dialog">Guardian Hotspot connection was lost. \n Please reconnect to continue the deployment.</string>
-
     <!-- SelectExistedSites -->
     <string name="sites_loading_dialog">Your full site list is still downloading.\nSome sites may not be visible until the download is complete.</string>
     <string name="sites_loading_finish_dialog">Your full site list is downloaded.</string>
@@ -327,8 +317,6 @@
     <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
     <string name="logout">logout</string>
     <string name="admin_role">admin</string>
-    <string name="classify_role">classify</string>
-    <string name="guardian_role">guardian</string>
     <string name="updater_role">updater</string>
     <string name="up_to_date">up to date</string>
     <string name="update">Update</string>
@@ -359,8 +347,6 @@
     <string name="cell_data_transfer">Cell data transfer</string>
     <string name="cell_no_internet_connection">No internet connection</string>
     <string name="retest">Retest</string>
-    <string name="satellite_module_detected">Satellite module detected</string>
-    <string name="satellite_module_not_detected">Satellite module not detected</string>
     <string name="background_noise">Background noise</string>
     <string name="perfect">Perfect</string>
     <string name="good">Good</string>
@@ -371,26 +357,11 @@
     <string name="lt_100_ok"><![CDATA[< -100 Good]]></string>
     <string name="lt_104_perfect"><![CDATA[< -104 Perfect]]></string>
     <string name="lt_110_error"><![CDATA[< -110 Error]]></string>
-    <string name="signal_error">Satellite Background Noise in this range usually indicates a disconnected antenna\n\nPlease refer to your installation instructions for additional information</string>
     <string name="phone_number">phone number:</string>
     <string name="swarm_id">swarm id:</string>
-    <string name="cell_data_only">Cell data only</string>
-    <string name="cell_data_sms_fallback_experimental">Cell data + SMS fallback (experimental)</string>
-    <string name="satellite_only">Satellite only</string>
     <string name="offline_mode">Offline mode</string>
     <string name="pass_times_local_time">Off times (local time)</string>
     <string name="plus">+</string>
-
-    <string name="sat_start_time">Select Satellite start time off</string>
-    <string name="sat_end_time">Select Satellite end time off</string>
-    <string name="guardian_local_time">Guardian local time:</string>
-    <string name="guardian_local_time_null">cannot retrieve local time</string>
-    <string name="guardian_local_timezone_null">cannot retrieve timezone</string>
-    <string name="guardian_timezone">Guardian timezone:</string>
-    <string name="guardian_lost_wifi">Guardian WiFi lost connection</string>
-    <string name="guardian_go_back_wifi">Go Back</string>
-    <string name="satellite_gps_detected">Satellite GPS detected</string>
-    <string name="satellite_gps_not_detected">Satellite GPS not detected</string>
     <string name="manual">manual</string>
     <string name="auto">auto</string>
     <string name="there_is_no_off_time_in_this_project">There is no off time in this project</string>
@@ -398,6 +369,7 @@
     <string name="delete_from_local">delete from local</string>
     <string name="sync_now">Sync Now</string>
 
+    <string name="all_works_synced">All works synced</string>
     <string name="unsynced_works">Unsynced Works</string>
     <string name="syncing">Syncing</string>
     <string name="synced">Synced</string>
@@ -416,24 +388,10 @@
     <string name="dialog_start_service_mic">Look like you have a trouble with microphone.\nTry restarting service?</string>
     <string name="restart">Restart</string>
 
-    <!-- Unsynced Activity -->
-    <string name="all_works_synced">All works synced</string>
-    <string name="unsynced_registration_text">You have %d registrations</string>
-    <string name="unsynced_deployment_text">You have %d unsynced deployments</string>
-    <string name="unsynced_all_text">You have %d unsynced deployments and %d registrations</string>
-    <string name="deployment">Deployment</string>
-    <string name="registration">Registration</string>
-
-    <!-- Guardian Storage Fragment -->
-    <string name="internal_storage">Internal Storage</string>
-    <string name="storage_format">%s/%s</string>
-    <string name="external_storage">External Storage</string>
-    <string name="see_audio_coverage">See audio coverage</string>
-    <string name="select_month_year">Select year and month</string>
-    <string name="hour_less_than_10">0%d</string>
-    <string name="audio_coverage">Audio Coverage</string>
-    <string name="coverage_on">Audio coverage on %s %d</string>
-
     <string name="type_title">type:</string>
     <string name="id_title">id:</string>
+    <string name="select_month_year">Select year and month</string>
+    <string name="unsynced_deployment_text">You have %d unsynced deployments</string>
+    <string name="deployment">Deployment</string>
+
 </resources>

@@ -17,7 +17,6 @@ import org.rfcx.companion.R
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
-import org.rfcx.companion.util.prefs.GuardianPlan
 import org.rfcx.companion.view.deployment.songmeter.SongMeterDeploymentProtocol
 import org.rfcx.companion.view.detail.DisplayImageActivity
 import org.rfcx.companion.view.dialog.GuidelineButtonClickListener
