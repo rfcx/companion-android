@@ -326,23 +326,13 @@
     <string name="network_not_available">network not available</string>
     <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
     <string name="logout">logout</string>
-    <string name="guardian_softwares">Guardian software</string>
     <string name="admin_role">admin</string>
-    <string name="not_found_software">not found in local</string>
     <string name="classify_role">classify</string>
     <string name="guardian_role">guardian</string>
     <string name="updater_role">updater</string>
     <string name="up_to_date">up to date</string>
-
-    <!-- ClassifierLoadFragment -->
-    <string name="guardian_version">Guardian version</string>
-    <string name="admin_version">Admin version</string>
-    <string name="classify_version">Classify version</string>
-    <string name="updater_version">Updater version</string>
     <string name="update">Update</string>
-    <string name="update_to">Update to</string>
     <string name="protocol">Protocol</string>
-    <string name="cell">cell</string>
     <string name="swarm">swarm</string>
 
     <!-- SongMeterConnectFragment -->
@@ -358,7 +348,6 @@
     <string name="alert_songmeter">Bluetooth needs to be enabled before advancing to the next step</string>
     <string name="alert_bluetooth_songmeter">Bluetooth permission is needed before advancing to the next step</string>
 
-    <string name="download_softwares_from_guardian_softwares_page_first">Download softwares from Guardian softwares page first\nProfile -> Guardian software -> Download APKs you needed</string>
     <string name="download_classifiers_from_guardian_classifier_page_first">Download classifiers from Guardian classifier page first\nProfile -> Classifier -> Download Classifiers you needed</string>
     <string name="ibattery_p">Internal Battery</string>
     <string name="mbattery_p">Main Battery</string>
@@ -407,7 +396,6 @@
     <string name="auto">auto</string>
     <string name="there_is_no_off_time_in_this_project">There is no off time in this project</string>
 
-    <string name="installed_software">(current %s installed)</string>
     <string name="delete_from_local">delete from local</string>
     <string name="sync_now">Sync Now</string>
 
@@ -423,7 +411,6 @@
     <string name="classifier">Classifier</string>
     <string name="not_found_classifier_local">not found</string>
 
-    <string name="guardian_software_not_allowed">Your guardian software version is not compatible with this feature.</string>
     <string name="guardian_type_not_allowed">Your device is configured for Cell/GSM. Please switch to SMS, Satellite or Offline mode to activate a classifier.</string>
     <string name="go_back">go back</string>
     <string name="battery_voltage">Battery Voltage</string>
