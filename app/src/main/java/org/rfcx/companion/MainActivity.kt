@@ -166,35 +166,31 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
         }
 
         createLocationButton.setOnClickListener {
-            if (BuildConfig.ENABLE_SONG_METER) {
-                addTooltip = SimpleTooltip.Builder(this)
-                    .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
-                    .anchorView(createLocationButton)
-                    .gravity(Gravity.TOP)
-                    .modal(true)
-                    .dismissOnInsideTouch(false)
-                    .animationPadding(10F)
-                    .contentView(R.layout.tooltip_add_device)
-                    .animated(false)
-                    .transparentOverlay(true)
-                    .build()
+            addTooltip = SimpleTooltip.Builder(this)
+                .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
+                .anchorView(createLocationButton)
+                .gravity(Gravity.TOP)
+                .modal(true)
+                .dismissOnInsideTouch(false)
+                .animationPadding(10F)
+                .contentView(R.layout.tooltip_add_device)
+                .animated(false)
+                .transparentOverlay(true)
+                .build()
 
-                addTooltip?.let { tip ->
-                    val addEdgeOrAudioMoth =
-                        tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
-                    val addSongMeter = tip.findViewById<ConstraintLayout>(R.id.songMeterLayout)
-                    addEdgeOrAudioMoth?.setOnClickListener {
-                        AudioMothDeploymentActivity.startActivity(this)
-                        tip.dismiss()
-                    }
-                    addSongMeter?.setOnClickListener {
-                        SongMeterDeploymentActivity.startActivity(this)
-                        tip.dismiss()
-                    }
-                    tip.show()
+            addTooltip?.let { tip ->
+                val addEdgeOrAudioMoth =
+                    tip.findViewById<ConstraintLayout>(R.id.audioMothLayout)
+                val addSongMeter = tip.findViewById<ConstraintLayout>(R.id.songMeterLayout)
+                addEdgeOrAudioMoth?.setOnClickListener {
+                    AudioMothDeploymentActivity.startActivity(this)
+                    tip.dismiss()
                 }
-            } else {
-                AudioMothDeploymentActivity.startActivity(this)
+                addSongMeter?.setOnClickListener {
+                    SongMeterDeploymentActivity.startActivity(this)
+                    tip.dismiss()
+                }
+                tip.show()
             }
         }
 

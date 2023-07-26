@@ -35,11 +35,9 @@ android {
     }
     productFlavors {
         common {
-            buildConfigField 'boolean', 'ENABLE_SONG_METER', 'false'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
         }
         internal {
-            buildConfigField 'boolean', 'ENABLE_SONG_METER', 'true'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://device-api.rfcx.org/"'
             buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://api.rfcx.org/"'
@@ -47,7 +45,6 @@ android {
             manifestPlaceholders = [usesCleartextTraffic: false]
         }
         internalDevelop {
-            buildConfigField 'boolean', 'ENABLE_SONG_METER', 'true'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment-dev.cloudfunctions.net/auth/"'
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"https://staging-device-api.rfcx.org/"'
             buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://staging-api.rfcx.org/"'
@@ -56,7 +53,6 @@ android {
             manifestPlaceholders = [usesCleartextTraffic: false]
         }
         internalLocal {
-            buildConfigField 'boolean', 'ENABLE_SONG_METER', 'true'
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment-dev.cloudfunctions.net/auth/"'
             buildConfigField 'String', 'DEVICE_API_DOMAIN', '"http://10.0.2.2:3000/"'
             buildConfigField 'String', 'DEPLOY_DOMAIN', '"https://staging-api.rfcx.org/"'
