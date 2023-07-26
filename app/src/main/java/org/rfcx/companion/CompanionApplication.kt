@@ -24,8 +24,6 @@ class CompanionApplication : Application() {
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             defaultHandler?.uncaughtException(thread, throwable)
-
-            SocketUtils.stopAllConnections()
         }
     }
 
@@ -48,10 +46,5 @@ class CompanionApplication : Application() {
                 logout()
             }
         }
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-        SocketUtils.stopAllConnections()
     }
 }

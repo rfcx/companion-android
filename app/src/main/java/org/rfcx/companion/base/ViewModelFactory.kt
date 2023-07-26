@@ -76,7 +76,7 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(UnsyncedWorksViewModel::class.java) -> {
                 return UnsyncedWorksViewModel(
                     application,
-                    UnsyncedWorksRepository(deviceApiHelper, localDataHelper)
+                    UnsyncedWorksRepository(localDataHelper)
                 ) as T
             }
             modelClass.isAssignableFrom(EditLocationViewModel::class.java) -> {

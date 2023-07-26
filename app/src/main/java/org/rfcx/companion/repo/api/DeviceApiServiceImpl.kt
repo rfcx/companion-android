@@ -48,16 +48,6 @@ class DeviceApiServiceImpl(private val context: Context) : DeviceApiService {
         return ApiManager.getInstance().getDeviceApi2(context).getProjectsById(id)
     }
 
-    override fun registerGuardian(
-        guid: GuardianRegisterRequest
-    ): Call<GuardianRegisterResponse> {
-        return ApiManager.getInstance().getDeviceApi2(context).registerGuardian(guid)
-    }
-
-    override fun checkAvailableClassifiers(): Call<List<GuardianClassifierResponse>> {
-        return ApiManager.getInstance().getDeviceApi2(context).checkAvailableClassifiers()
-    }
-
     override fun downloadFile(url: String): Call<ResponseBody> {
         return ApiManager.getInstance().getDeviceApi2(context).downloadFile(url)
     }

@@ -6,7 +6,6 @@ import androidx.work.*
 import io.realm.Realm
 import org.rfcx.companion.localdb.DeploymentDb
 import org.rfcx.companion.localdb.DeploymentImageDb
-import org.rfcx.companion.localdb.GuardianRegistrationDb
 import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.service.images.ImageSyncWorker
 import org.rfcx.companion.util.RealmHelper
@@ -43,12 +42,6 @@ class DeploymentCleanupWorker(val context: Context, params: WorkerParameters) :
         trackingFileDb.unlockSending()
         if (trackingFileUnsent > 0) {
             TrackingSyncWorker.enqueue(context)
-        }
-
-        val registrationDb = GuardianRegistrationDb(realm)
-        val registrationUnsent = registrationDb.count()
-        if (registrationUnsent > 0) {
-            RegisterGuardianWorker.enqueue(context)
         }
     }
 

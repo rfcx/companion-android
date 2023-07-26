@@ -106,11 +106,6 @@
             android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" />
 
-        <activity
-            android:name="org.rfcx.companion.view.deployment.guardian.GuardianDeploymentActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" />
-
         <activity android:name=".view.deployment.songmeter.SongMeterDeploymentActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden"
@@ -121,20 +116,8 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".view.profile.guardiansoftware.GuardianSoftwareActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity
             android:name=".view.unsynced.UnsyncedWorksActivity"
             android:screenOrientation="portrait"/>
-
-        <activity
-            android:name=".view.profile.classifier.GuardianClassifierActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity
-            android:name=".view.deployment.guardian.storage.HeatmapAudioCoverageActivity"
-            android:screenOrientation="landscape"/>
 
         <activity
             android:name=".view.detail.image.AddImageActivity"

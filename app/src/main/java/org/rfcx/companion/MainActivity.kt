@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
         }
 
         createLocationButton.setOnClickListener {
-            if (BuildConfig.ENABLE_GUARDIAN) {
+            if (BuildConfig.ENABLE_SONG_METER) {
                 addTooltip = SimpleTooltip.Builder(this)
                     .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
                     .anchorView(createLocationButton)

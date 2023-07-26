@@ -225,14 +225,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/projectTextView" />
 
-            <View
-                android:id="@+id/viewGuardian"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/separate_line_size"
-                android:background="@color/separateLine"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/offlineMapTextView" />
-
             <TextView
 
                 android:id="@+id/additionalTextView"
@@ -247,7 +239,7 @@
                 android:textColor="@color/text_secondary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/viewGuardian" />
+                app:layout_constraintTop_toBottomOf="@id/offlineMapTextView" />
 
             <TextView
                 android:id="@+id/feedbackTextView"

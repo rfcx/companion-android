@@ -23,7 +23,6 @@ import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.service.DeploymentSyncWorker
-import org.rfcx.companion.service.RegisterGuardianWorker
 import org.rfcx.companion.util.isNetworkAvailable
 import org.rfcx.companion.view.map.SyncInfo
 
@@ -92,7 +91,6 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
 
         confirmButton.setOnClickListener {
             viewModel.syncDeployment()
-            viewModel.syncRegistration()
             it.isEnabled = false
         }
     }
@@ -123,13 +121,10 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
         deploymentWorkInfoLiveData = DeploymentSyncWorker.workInfos(this)
         deploymentWorkInfoLiveData.observe(this, deploymentWorkInfoObserve)
 
-        registrationWorkInfoLiveData = RegisterGuardianWorker.workInfos(this)
-        registrationWorkInfoLiveData.observe(this, registrationWorkInfoObserve)
-
         viewModel.getUnsyncedWorkLiveData().observe(
             this
         ) {
-            setUnsyncedText(it.count { item -> item is UnsyncedWorksViewItem.Deployment }, it.count { item -> item is UnsyncedWorksViewItem.Registration })
+            setUnsyncedText(it.count { item -> item is UnsyncedWorksViewItem.Deployment })
             unsyncedWork = it
             unsyncedWorksAdapter.setUnsynceds(it)
         }
@@ -158,9 +153,9 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
         setStatus(this.lastDeploymentSyncingInfo, this.lastRegistrationSyncingInfo)
     }
 
-    private fun setUnsyncedText(deploymentCount: Int, registrationCount: Int) {
-        when {
-            deploymentCount == 0 && registrationCount == 0 -> {
+    private fun setUnsyncedText(deploymentCount: Int) {
+        when (deploymentCount) {
+            0 -> {
                 bannerText.text = getString(R.string.all_works_synced)
                 unsyncedWorksAdapter.setUnsynceds(listOf())
                 noContentTextView.visibility = View.VISIBLE
@@ -168,17 +163,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
                 hideBanner()
             }
             else -> {
-                when {
-                    deploymentCount == 0 -> {
-                        bannerText.text = getString(R.string.unsynced_registration_text, registrationCount)
-                    }
-                    registrationCount == 0 -> {
-                        bannerText.text = getString(R.string.unsynced_deployment_text, deploymentCount)
-                    }
-                    else -> {
-                        bannerText.text = getString(R.string.unsynced_all_text, deploymentCount, registrationCount)
-                    }
-                }
+                bannerText.text = getString(R.string.unsynced_deployment_text, deploymentCount)
                 noContentTextView.visibility = View.GONE
                 showBanner()
             }
@@ -238,11 +223,6 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
     override fun onDeploymentClick(id: Int) {
         viewModel.deleteDeployment(id)
     }
-
-    override fun onRegistrationClick(id: String) {
-        viewModel.deleteRegistration(id)
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true

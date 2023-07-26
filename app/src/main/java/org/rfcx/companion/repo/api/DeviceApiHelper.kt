@@ -26,6 +26,5 @@ class DeviceApiHelper(private val deviceApiService: DeviceApiService) {
 
     fun userTouch() = deviceApiService.userTouch()
 
-    fun checkAvailableClassifier() = deviceApiService.checkAvailableClassifiers()
     fun downloadAPK(url: String) = deviceApiService.downloadFile(url)
 }

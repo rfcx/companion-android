@@ -43,14 +43,6 @@ interface DeviceApiService {
         @Path("id") id: String
     ): Call<ProjectByIdResponse>
 
-    @POST("guardians")
-    fun registerGuardian(
-        @Body guid: GuardianRegisterRequest
-    ): Call<GuardianRegisterResponse>
-
-    @GET("classifiers")
-    fun checkAvailableClassifiers(): Call<List<GuardianClassifierResponse>>
-
     @Streaming
     @GET
     @Headers("No-Authentication: true")
