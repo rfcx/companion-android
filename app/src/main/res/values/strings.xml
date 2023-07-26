@@ -343,11 +343,7 @@
     <string name="sentinel_module_not_detect">Sentinel module not detected</string>
     <string name="sim_detected">SIM Card detected</string>
     <string name="sim_not_detected">SIM Card not detected</string>
-    <string name="cell_signal_strength">Cell signal strength</string>
-    <string name="cell_data_transfer">Cell data transfer</string>
-    <string name="cell_no_internet_connection">No internet connection</string>
     <string name="retest">Retest</string>
-    <string name="background_noise">Background noise</string>
     <string name="perfect">Perfect</string>
     <string name="good">Good</string>
     <string name="bad">Bad</string>

@@ -126,32 +126,11 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
         setContentView(R.layout.fragment_deploy)
         setViewModel()
         initIntent()
+        getPlaceHolder()
+        setupImages()
+        setupImageRecycler()
+        updatePhotoTakenNumber()
 
-        if (device == "guardian") {
-            val types = arrayOf("cell", "sat")
-            var index = 0
-            MaterialAlertDialogBuilder(this)
-                .setTitle("Type of guardian")
-                .setSingleChoiceItems(types, index) { _, which ->
-                    index = which
-                }
-                .setPositiveButton("Ok") { _, _ ->
-                    device += "-${types[index]}"
-                    getPlaceHolder()
-                    setupImages()
-                    setupImageRecycler()
-                    updatePhotoTakenNumber()
-                }
-                .setNegativeButton("Cancel") { _, _ ->
-                    finish()
-                }
-                .show()
-        } else {
-            getPlaceHolder()
-            setupImages()
-            setupImageRecycler()
-            updatePhotoTakenNumber()
-        }
 
         finishButton.setOnClickListener {
             val missing = getImageAdapter().getMissingImages()
