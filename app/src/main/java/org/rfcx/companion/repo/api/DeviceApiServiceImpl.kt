@@ -3,7 +3,6 @@ package org.rfcx.companion.repo.api
 import android.content.Context
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.UserTouchResponse
-import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.*
 import org.rfcx.companion.repo.ApiManager
 import retrofit2.Call

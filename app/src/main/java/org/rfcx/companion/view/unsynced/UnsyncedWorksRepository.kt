@@ -2,7 +2,6 @@ package org.rfcx.companion.view.unsynced
 
 import io.realm.RealmResults
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.local.LocalDataHelper
 
 class UnsyncedWorksRepository(

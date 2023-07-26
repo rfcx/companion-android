@@ -131,7 +131,6 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
         setupImageRecycler()
         updatePhotoTakenNumber()
 
-
         finishButton.setOnClickListener {
             val missing = getImageAdapter().getMissingImages()
             if (missing.isEmpty()) {
