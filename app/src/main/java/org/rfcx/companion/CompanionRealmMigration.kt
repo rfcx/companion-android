@@ -82,6 +82,10 @@ class CompanionRealmMigration : RealmMigration {
         if (oldVersion < 21L && newVersion >= 21L) {
             migrateToV21(realm)
         }
+
+        if (oldVersion < 22L && newVersion >= 22L) {
+            migrateToV22(realm)
+        }
     }
 
     private fun migrateToV2(realm: DynamicRealm) {
@@ -422,6 +426,10 @@ class CompanionRealmMigration : RealmMigration {
                     .setNullable(DeploymentImage.FIELD_IMAGE_LABEL, false)
             }
         }
+    }
+    private fun migrateToV22(realm: DynamicRealm) {
+        realm.schema.remove("GuardianRegistration")
+        realm.schema.remove("Classifier")
     }
 
     override fun hashCode(): Int {

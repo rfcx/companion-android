@@ -3,7 +3,6 @@ package org.rfcx.companion.repo.api
 import android.content.Context
 import okhttp3.ResponseBody
 import org.rfcx.companion.entity.UserTouchResponse
-import org.rfcx.companion.entity.request.GuardianRegisterRequest
 import org.rfcx.companion.entity.response.*
 import org.rfcx.companion.repo.ApiManager
 import retrofit2.Call
@@ -46,16 +45,6 @@ class DeviceApiServiceImpl(private val context: Context) : DeviceApiService {
 
     override fun getProjectsById(id: String): Call<ProjectByIdResponse> {
         return ApiManager.getInstance().getDeviceApi2(context).getProjectsById(id)
-    }
-
-    override fun registerGuardian(
-        guid: GuardianRegisterRequest
-    ): Call<GuardianRegisterResponse> {
-        return ApiManager.getInstance().getDeviceApi2(context).registerGuardian(guid)
-    }
-
-    override fun checkAvailableClassifiers(): Call<List<GuardianClassifierResponse>> {
-        return ApiManager.getInstance().getDeviceApi2(context).checkAvailableClassifiers()
     }
 
     override fun downloadFile(url: String): Call<ResponseBody> {

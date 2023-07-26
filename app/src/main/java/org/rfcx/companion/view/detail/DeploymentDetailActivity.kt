@@ -254,7 +254,7 @@ class DeploymentDetailActivity :
 
     private fun updateDeploymentDetailView(deployment: Deployment) {
         // setup deployment images view
-        observeDeploymentImage(deployment.id, deployment.device ?: Device.GUARDIAN.value)
+        observeDeploymentImage(deployment.id, deployment.device ?: Device.AUDIOMOTH.value)
         val location = deployment.stream
         location?.let { locate ->
             latitudeValue.text = locate.latitude.latitudeCoordinates(this)

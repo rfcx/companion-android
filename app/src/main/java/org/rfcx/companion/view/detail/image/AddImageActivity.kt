@@ -99,30 +99,6 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
                 maxImages =
                     if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
             }
-            Device.GUARDIAN.value + "-cell" -> {
-                imagePlaceHolders =
-                    resources.getStringArray(R.array.cell_guardian_placeholders)
-                        .toList()
-                imageGuidelineTexts =
-                    resources.getStringArray(R.array.cell_guardian_guideline_texts)
-                        .toList()
-                imageExamples =
-                    resources.getStringArray(R.array.cell_guardian_photos).toList()
-                maxImages =
-                    if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
-            }
-            Device.GUARDIAN.value + "-sat" -> {
-                imagePlaceHolders =
-                    resources.getStringArray(R.array.sat_guardian_placeholders)
-                        .toList()
-                imageGuidelineTexts =
-                    resources.getStringArray(R.array.sat_guardian_guideline_texts)
-                        .toList()
-                imageExamples =
-                    resources.getStringArray(R.array.sat_guardian_photos).toList()
-                maxImages =
-                    if (imagePlaceHolders.size <= 10) maxImages + (10 - maxImages) else imagePlaceHolders.size
-            }
         }
         getImageAdapter().setMaxImages(maxImages)
     }
@@ -150,32 +126,10 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
         setContentView(R.layout.fragment_deploy)
         setViewModel()
         initIntent()
-
-        if (device == "guardian") {
-            val types = arrayOf("cell", "sat")
-            var index = 0
-            MaterialAlertDialogBuilder(this)
-                .setTitle("Type of guardian")
-                .setSingleChoiceItems(types, index) { _, which ->
-                    index = which
-                }
-                .setPositiveButton("Ok") { _, _ ->
-                    device += "-${types[index]}"
-                    getPlaceHolder()
-                    setupImages()
-                    setupImageRecycler()
-                    updatePhotoTakenNumber()
-                }
-                .setNegativeButton("Cancel") { _, _ ->
-                    finish()
-                }
-                .show()
-        } else {
-            getPlaceHolder()
-            setupImages()
-            setupImageRecycler()
-            updatePhotoTakenNumber()
-        }
+        getPlaceHolder()
+        setupImages()
+        setupImageRecycler()
+        updatePhotoTakenNumber()
 
         finishButton.setOnClickListener {
             val missing = getImageAdapter().getMissingImages()

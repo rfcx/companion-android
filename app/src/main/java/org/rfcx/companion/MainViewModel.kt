@@ -16,7 +16,6 @@ import com.auth0.android.result.Credentials
 import io.realm.RealmResults
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
-import org.rfcx.companion.entity.guardian.GuardianRegistration
 import org.rfcx.companion.entity.guardian.toMark
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.entity.response.ProjectByIdResponse
@@ -48,7 +47,6 @@ class MainViewModel(
     private val streamList = MutableLiveData<List<Stream>>()
 
     private var streams = listOf<Stream>()
-    private var registrationCount = 0
 
     private lateinit var streamLiveData: LiveData<List<Stream>>
     private val streamObserve = Observer<List<Stream>> {
@@ -58,11 +56,6 @@ class MainViewModel(
 
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
     private val deploymentObserve = Observer<List<Deployment>> {
-        combinedData()
-    }
-    private lateinit var registrationLiveData: LiveData<List<GuardianRegistration>>
-    private val registrationObserve = Observer<List<GuardianRegistration>> {
-        registrationCount = it.size
         combinedData()
     }
 
@@ -94,11 +87,6 @@ class MainViewModel(
             mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
         ) { it }
         deploymentLiveData.observeForever(deploymentObserve)
-
-        registrationLiveData = Transformations.map(
-            mainRepository.getAllRegistrationResultsAsync().asLiveData()
-        ) { it }
-        registrationLiveData.observeForever(registrationObserve)
     }
 
     fun fetchProjects() {
@@ -304,6 +292,8 @@ class MainViewModel(
     }
 
     fun combinedData() {
+        mainRepository.deleteDeploymentWithType("guardian")
+
         val projectId = getSelectedProjectId()
         val filteredStreams = this.streams.filter { it.project?.id == projectId }
         streamList.postValue(filteredStreams)
@@ -317,7 +307,7 @@ class MainViewModel(
         deploymentMarkers.postValue(deploymentMarkersList)
 
         val unsyncedDeployments = deployments.filter { it.isUnsynced() }
-        unsyncedWorksCount.postValue(unsyncedDeployments.size + this.registrationCount)
+        unsyncedWorksCount.postValue(unsyncedDeployments.size)
     }
 
     private fun getSelectedProjectId(): Int {
