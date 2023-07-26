@@ -3,7 +3,6 @@ package org.rfcx.companion.view.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -13,16 +12,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.pluginscalebar.ScaleBarOptions
-import com.mapbox.pluginscalebar.ScaleBarPlugin
 import kotlinx.android.synthetic.main.activity_deployment_detail.*
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
@@ -47,12 +42,11 @@ import java.io.File
 
 class DeploymentDetailActivity :
     AppCompatActivity(), OnMapReadyCallback {
-
     private val deploymentImageAdapter by lazy { DeploymentImageAdapter() }
     private lateinit var viewModel: DeploymentDetailViewModel
 
-    private lateinit var mapView: MapView
-    private lateinit var mapBoxMap: MapboxMap
+    private var map: GoogleMap? = null
+
     private val analytics by lazy { Analytics(this) }
     private val firebaseCrashlytics by lazy { Crashlytics() }
 
@@ -73,11 +67,28 @@ class DeploymentDetailActivity :
 
     private var toAddImage = false
 
+    private lateinit var deploymentLiveData: LiveData<List<Deployment>>
+    private val deploymentObserve = Observer<List<Deployment>> {
+        deployment?.let {
+            val data = viewModel.getDeploymentById(it.id)
+            if (data != null) {
+                deployment = data
+                updateDeploymentDetailView(data)
+                setupToolbar()
+            }
+        }
+        moveCamera()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, getString(R.string.mapbox_token))
         setContentView(R.layout.activity_deployment_detail)
         setViewModel()
+
+        deploymentLiveData = Transformations.map(
+            viewModel.getAllDeploymentLocateResultsAsync().asLiveData()
+        ) { it }
+        deploymentLiveData.observeForever(deploymentObserve)
 
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
@@ -86,10 +97,8 @@ class DeploymentDetailActivity :
         deleteButton.visibility =
             if (project?.permissions == Permissions.ADMIN.value) View.VISIBLE else View.GONE
 
-        // Setup Mapbox
-        mapView = findViewById(R.id.mapBoxView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
         deployment =
             intent.extras?.getInt(EXTRA_DEPLOYMENT_ID)
@@ -286,37 +295,18 @@ class DeploymentDetailActivity :
         deploymentImageAdapter.setImages(arrayListOf())
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        mapBoxMap = mapboxMap
-        mapboxMap.uiSettings.apply {
-            setAllGesturesEnabled(false)
-            isAttributionEnabled = false
-            isLogoEnabled = false
-        }
-
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            setupScale()
-            deployment?.let { it1 -> setLocationOnMap(it1) }
-        }
+    override fun onMapReady(p0: GoogleMap) {
+        map = p0
+        map?.uiSettings?.setAllGesturesEnabled(false)
+        moveCamera()
     }
 
-    private fun setupScale() {
-        val scaleBarPlugin = ScaleBarPlugin(mapView, mapBoxMap)
-        scaleBarPlugin.create(ScaleBarOptions(this))
+    private fun moveCamera() {
+        if (map == null) return
+        val latlng = LatLng(deployment?.stream?.latitude ?: 0.0, deployment?.stream?.longitude ?: 0.0)
+        map?.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+        map?.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM))
     }
-
-    private fun setLocationOnMap(deployment: Deployment) {
-        val location = deployment.stream
-        location?.let { locate ->
-            val latLng = LatLng(locate.latitude, locate.longitude)
-            moveCamera(latLng, DEFAULT_ZOOM)
-        }
-    }
-
-    private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapBoxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
-    }
-
     private fun setupToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
@@ -335,6 +325,8 @@ class DeploymentDetailActivity :
         super.onDestroy()
         // remove observer
         deployImageLiveData.removeObserver(deploymentImageObserve)
+        deploymentLiveData.removeObserver(deploymentObserve)
+
         val newImages = deploymentImageAdapter.getNewAttachImageTyped()
         if (newImages.isNotEmpty() && !toAddImage) {
             viewModel.insertImage(deployment, newImages)
@@ -342,39 +334,9 @@ class DeploymentDetailActivity :
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapView.onStart()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        mapView.onSaveInstanceState(outState)
-    }
-
     companion object {
         const val DEPLOYMENT_REQUEST_CODE = 1001
-        const val DEFAULT_ZOOM = 15.0
+        const val DEFAULT_ZOOM = 15.0f
         const val NEW_IMAGES_EXTRA = "NEW_IMAGES_EXTRA"
         fun startActivity(context: Context, deploymentId: Int) {
             val intent = Intent(context, DeploymentDetailActivity::class.java)

@@ -5,7 +5,9 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonSyntaxException
 import okhttp3.ResponseBody
+import org.rfcx.companion.entity.FeatureCollection
 import org.rfcx.companion.entity.response.DeploymentAssetResponse
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.toISO8601Format
@@ -111,7 +113,11 @@ object GeoJsonUtils {
                     response.body()?.byteStream()?.let {
                         val path =
                             createFile(context, generateFileName(deployedAt, deploymentId), it)
-                        callback.onSuccess(path)
+                        try {
+                            val json = File(path).readText()
+                            Gson().fromJson(json, FeatureCollection::class.java)
+                            callback.onSuccess(path)
+                        } catch (e: JsonSyntaxException) { }
                     }
                 }
 

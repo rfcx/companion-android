@@ -3,7 +3,7 @@ package org.rfcx.companion.util
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
-import com.mapbox.mapboxsdk.geometry.LatLng
+import com.google.android.gms.maps.model.LatLng
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DDM_FORMAT
 import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion.DD_FORMAT
@@ -11,7 +11,7 @@ import org.rfcx.companion.view.profile.coordinates.CoordinatesActivity.Companion
 import kotlin.math.absoluteValue
 
 object DefaultSetupMap {
-    const val DEFAULT_ZOOM = 15.0
+    const val DEFAULT_ZOOM = 15.0f
 }
 
 fun Double?.latitudeCoordinates(context: Context): String {
@@ -108,24 +108,21 @@ fun Location.saveLastLocation(context: Context) {
     val preferences = Preferences.getInstance(context)
     preferences.putFloat(Preferences.LAST_LATITUDE, this.latitude.toFloat())
     preferences.putFloat(Preferences.LAST_LONGITUDE, this.longitude.toFloat())
-}
-
-fun LatLng.saveLastLocation(context: Context) {
-    val preferences = Preferences.getInstance(context)
-    preferences.putFloat(Preferences.LAST_LATITUDE, this.latitude.toFloat())
-    preferences.putFloat(Preferences.LAST_LONGITUDE, this.longitude.toFloat())
+    preferences.putFloat(Preferences.LAST_ALTITUDE, this.altitude.toFloat())
 }
 
 fun Context.getLastLocation(): Location? {
     val preferences = Preferences.getInstance(this)
     val latitude = preferences.getFloat(Preferences.LAST_LATITUDE)
     val longitude = preferences.getFloat(Preferences.LAST_LONGITUDE)
+    val altitude = preferences.getFloat(Preferences.LAST_ALTITUDE)
     val lastLocate = Location(LocationManager.GPS_PROVIDER)
 
     if (latitude == 0.0F && longitude == 0.0F) return null
 
     lastLocate.latitude = latitude.toDouble()
     lastLocate.longitude = longitude.toDouble()
+    lastLocate.altitude = altitude.toDouble()
 
     return lastLocate
 }

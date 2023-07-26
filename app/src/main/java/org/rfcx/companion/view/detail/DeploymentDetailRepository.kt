@@ -26,6 +26,10 @@ class DeploymentDetailRepository(
         return localDataHelper.getDeploymentImageLocalDb().getAllResultsAsync(deploymentId, device)
     }
 
+    fun getAllDeploymentLocateResultsAsync(): RealmResults<Deployment> {
+        return localDataHelper.getDeploymentLocalDb().getAllResultsAsync()
+    }
+
     fun insertImage(
         deployment: Deployment? = null,
         attachImages: List<DeploymentImageView>

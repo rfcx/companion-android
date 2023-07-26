@@ -115,7 +115,7 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         val updatedDp = ApiManager.getInstance().getDeviceApi(context)
             .getDeployment(id).execute().body()
         updatedDp?.let { dp ->
-            streamDb.updateSiteServerId(deploymentId, dp.stream!!.id!!)
+            streamDb.updateSiteServerId(deploymentId, dp.stream!!.id!!, id)
         }
 
         // send tracking if there is

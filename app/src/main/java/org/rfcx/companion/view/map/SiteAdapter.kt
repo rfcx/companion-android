@@ -19,8 +19,6 @@ class SiteAdapter(private val itemClickListener: (Stream, Boolean) -> Unit) :
             notifyDataSetChanged()
         }
 
-    var isNewSite = false
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

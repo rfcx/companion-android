@@ -6,6 +6,8 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
@@ -34,6 +36,7 @@ import java.util.*
 class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymentProtocol {
     private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
     private var useExistedLocation: Boolean = false
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private var currentCheck = 0
     private var passedChecks = RealmList<Int>()
@@ -49,12 +52,18 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_deployment)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         setupToolbar()
         startCheckList()
         setViewModel()
         setObserver()
         preferences.clearSelectedProject()
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                location?.let { setCurrentLocation(it) }
+            }
     }
 
     private fun setViewModel() {
@@ -133,7 +142,8 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
                 DetailDeploymentSiteFragment.newInstance(
                     latitude,
                     longitude,
-                    siteId
+                    siteId,
+                    streamName
                 )
             )
             is AudioMothCheckListFragment -> {

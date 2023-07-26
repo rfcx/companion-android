@@ -41,9 +41,9 @@ class MainRepository(
     fun saveTrackingToLocal(
         deploymentAssetResponse: DeploymentAssetResponse,
         filePath: String,
-        deploymentId: Int?
+        site: Stream?
     ) = localDataHelper.getTrackingFileLocalDb()
-        .insertOrUpdate(deploymentAssetResponse, filePath, deploymentId)
+        .insertOrUpdate(deploymentAssetResponse, filePath, site)
 
     fun getAllLocateResultsAsync(): RealmResults<Stream> {
         return localDataHelper.getStreamLocalDb().getAllResultsAsync()

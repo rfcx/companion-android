@@ -133,7 +133,6 @@ class SetDeploymentSiteFragment :
             override fun afterTextChanged(s: Editable?) {
                 searchItem?.isVisible = s?.length == 0
                 if (s?.length == 0) {
-                    existedSiteAdapter.isNewSite = false
                     existedSiteAdapter.items = sitesAdapter
                 } else {
                     val text = s.toString().toLowerCase()
@@ -161,7 +160,6 @@ class SetDeploymentSiteFragment :
                         existedSiteAdapter.setFilter(ArrayList(newList))
                     } else {
                         existedSiteAdapter.setFilter(ArrayList(createNew + newList))
-                        existedSiteAdapter.isNewSite = true
                     }
                 }
             }
@@ -180,7 +178,6 @@ class SetDeploymentSiteFragment :
     }
 
     private fun handleItemsAdapter(sites: List<SiteWithLastDeploymentItem>) {
-        existedSiteAdapter.isNewSite = false
         existedSiteAdapter.items = sites
         deploymentProtocol?.setSiteItem(sites)
     }

@@ -17,6 +17,10 @@ class DeploymentDetailViewModel(
         return deploymentDetailRepository.getDeploymentById(id)
     }
 
+    fun getAllDeploymentLocateResultsAsync(): RealmResults<Deployment> {
+        return deploymentDetailRepository.getAllDeploymentLocateResultsAsync()
+    }
+
     fun deleteDeploymentLocation(id: Int, callback: DatabaseCallback) {
         return deploymentDetailRepository.deleteDeploymentLocation(id, callback)
     }

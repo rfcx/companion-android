@@ -67,13 +67,17 @@ class TrackingFileDb(private val realm: Realm) {
             .equalTo(TrackingFile.FIELD_SITE_ID, id)
             .findAll()
     }
+    fun getTrackingFile(): RealmResults<TrackingFile> {
+        return realm.where(TrackingFile::class.java)
+            .findAll()
+    }
 
     fun insertOrUpdate(file: TrackingFile) {
         realm.executeTransaction {
             if (file.id == 0) {
                 val id =
                     (
-                        realm.where(Tracking::class.java).max(Tracking.TRACKING_ID)
+                        realm.where(TrackingFile::class.java).max(TrackingFile.FIELD_ID)
                             ?.toInt() ?: 0
                         ) + 1
                 file.id = id
@@ -85,22 +89,23 @@ class TrackingFileDb(private val realm: Realm) {
     fun insertOrUpdate(
         deploymentAssetResponse: DeploymentAssetResponse,
         filePath: String,
-        deploymentId: Int?
+        site: Stream?
     ) {
         realm.executeTransaction {
             val file =
                 it.where(TrackingFile::class.java)
                     .equalTo(TrackingFile.FIELD_REMOTE_PATH, "assets/${deploymentAssetResponse.id}")
                     .findFirst()
-
-            if (file == null && deploymentId != null) {
+            if (file == null && site != null) {
                 val deploymentTracking = deploymentAssetResponse.toDeploymentTrack()
                 val id = (
                     it.where(TrackingFile::class.java).max(TrackingFile.FIELD_ID)?.toInt()
                         ?: 0
                     ) + 1
                 deploymentTracking.id = id
-                deploymentTracking.siteId = deploymentId
+                deploymentTracking.siteId = site.id
+                deploymentTracking.siteServerId = site.serverId
+                deploymentTracking.deploymentId = site.lastDeploymentId
                 deploymentTracking.syncState = SyncState.Sent.key
                 deploymentTracking.localPath = filePath
                 it.insert(deploymentTracking)

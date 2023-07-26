@@ -1,12 +1,13 @@
 package org.rfcx.companion.view.map
 
-import com.mapbox.mapboxsdk.camera.CameraUpdate
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.SphericalUtil
 
-object MapboxCameraUtils {
-    fun calculateLatLngForZoom(userPosition: LatLng, nearestSite: LatLng? = null, zoom: Double): CameraUpdate {
+object MapCameraUtils {
+    fun calculateLatLngForZoom(userPosition: LatLng, nearestSite: LatLng? = null, zoom: Float): CameraUpdate {
         if (nearestSite == null) {
             return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
         }
@@ -14,7 +15,8 @@ object MapboxCameraUtils {
         val oppositeLng = userPosition.longitude - (nearestSite.longitude - userPosition.longitude)
         if (oppositeLat >= -90 && oppositeLat <= 90 && oppositeLng >= -180 && oppositeLng <= 180) {
             val oppositeNearestSite = LatLng(oppositeLat, oppositeLng)
-            if (oppositeNearestSite.distanceTo(userPosition) < 30) {
+            val distance = SphericalUtil.computeDistanceBetween(oppositeNearestSite, userPosition)
+            if (distance < 30) {
                 return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
             }
             val latLngBounds = LatLngBounds.Builder()
@@ -23,6 +25,6 @@ object MapboxCameraUtils {
                 .build()
             return CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
         }
-        return CameraUpdateFactory.newLatLngZoom(userPosition, zoom)
+        return CameraUpdateFactory.newLatLngZoom(nearestSite, zoom)
     }
 }

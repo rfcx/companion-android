@@ -5,8 +5,9 @@
     android:layout_height="match_parent"
     tools:context="org.rfcx.companion.view.deployment.locate.MapPickerFragment">
 
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapBoxPickerView"
+    <androidx.fragment.app.FragmentContainerView
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -15,10 +16,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_pin_map"
-        app:layout_constraintBottom_toBottomOf="@id/mapBoxPickerView"
-        app:layout_constraintEnd_toEndOf="@id/mapBoxPickerView"
-        app:layout_constraintStart_toStartOf="@id/mapBoxPickerView"
-        app:layout_constraintTop_toTopOf="@id/mapBoxPickerView" />
+        app:layout_constraintBottom_toBottomOf="@id/mapView"
+        app:layout_constraintEnd_toEndOf="@id/mapView"
+        app:layout_constraintStart_toStartOf="@id/mapView"
+        app:layout_constraintTop_toTopOf="@id/mapView" />
 
     <RelativeLayout
         android:layout_width="wrap_content"

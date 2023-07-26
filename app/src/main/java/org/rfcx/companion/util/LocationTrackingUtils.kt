@@ -1,17 +1,21 @@
 package org.rfcx.companion.util
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.location.LocationProvider
 import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.realm.Realm
@@ -41,31 +45,67 @@ class LocationTrackingUtils(private val context: Context) {
         override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
             if (status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
                 if ((System.currentTimeMillis() - Preferences.getInstance(context).getLong(Preferences.LASTEST_GET_LOCATION_TIME, 0L)) > 10 * 1000L) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (notificationAllowed()) {
+                            getNotificationManager().notify(
+                                NOTIFICATION_LOCATION_ID,
+                                createLocationTrackerNotification(true)
+                            )
+                        }
+                    } else {
+                        getNotificationManager().notify(
+                            NOTIFICATION_LOCATION_ID,
+                            createLocationTrackerNotification(true)
+                        )
+                    }
+                }
+            } else if (status == LocationProvider.OUT_OF_SERVICE) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (notificationAllowed()) {
+                        getNotificationManager().notify(
+                            NOTIFICATION_LOCATION_ID,
+                            createLocationTrackerNotification(false)
+                        )
+                    }
+                } else {
+                    getNotificationManager().notify(
+                        NOTIFICATION_LOCATION_ID,
+                        createLocationTrackerNotification(false)
+                    )
+                }
+            }
+        }
+
+        override fun onProviderEnabled(provider: String) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (notificationAllowed()) {
                     getNotificationManager().notify(
                         NOTIFICATION_LOCATION_ID,
                         createLocationTrackerNotification(true)
                     )
                 }
-            } else if (status == LocationProvider.OUT_OF_SERVICE) {
+            } else {
+                getNotificationManager().notify(
+                    NOTIFICATION_LOCATION_ID,
+                    createLocationTrackerNotification(true)
+                )
+            }
+        }
+
+        override fun onProviderDisabled(provider: String) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (notificationAllowed()) {
+                    getNotificationManager().notify(
+                        NOTIFICATION_LOCATION_ID,
+                        createLocationTrackerNotification(false)
+                    )
+                }
+            } else {
                 getNotificationManager().notify(
                     NOTIFICATION_LOCATION_ID,
                     createLocationTrackerNotification(false)
                 )
             }
-        }
-
-        override fun onProviderEnabled(provider: String) {
-            getNotificationManager().notify(
-                NOTIFICATION_LOCATION_ID,
-                createLocationTrackerNotification(true)
-            )
-        }
-
-        override fun onProviderDisabled(provider: String) {
-            getNotificationManager().notify(
-                NOTIFICATION_LOCATION_ID,
-                createLocationTrackerNotification(false)
-            )
         }
     }
 
@@ -91,10 +131,19 @@ class LocationTrackingUtils(private val context: Context) {
 
             trackingStatTimer?.cancel()
             trackingStatTimer = fixedRateTimer("timer", false, 60 * 1000L, 60 * 1000L) {
-                getNotificationManager().notify(
-                    NOTIFICATION_LOCATION_ID,
-                    createLocationTrackerNotification(isLocationAvailability)
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (notificationAllowed()) {
+                        getNotificationManager().notify(
+                            NOTIFICATION_LOCATION_ID,
+                            createLocationTrackerNotification(isLocationAvailability)
+                        )
+                    }
+                } else {
+                    getNotificationManager().notify(
+                        NOTIFICATION_LOCATION_ID,
+                        createLocationTrackerNotification(isLocationAvailability)
+                    )
+                }
             }
         } catch (ex: SecurityException) {
             ex.printStackTrace()
@@ -136,7 +185,13 @@ class LocationTrackingUtils(private val context: Context) {
                     setSound(null, null)
                     setShowBadge(false)
                 }
-            getNotificationManager().createNotificationChannel(channel)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (notificationAllowed()) {
+                    getNotificationManager().createNotificationChannel(channel)
+                }
+            } else {
+                getNotificationManager().createNotificationChannel(channel)
+            }
         }
     }
 
@@ -175,5 +230,12 @@ class LocationTrackingUtils(private val context: Context) {
 
     fun stopTracking() {
         trackingStatTimer?.cancel()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    fun notificationAllowed(): Boolean {
+        val permissionState =
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+        return permissionState == PackageManager.PERMISSION_GRANTED
     }
 }

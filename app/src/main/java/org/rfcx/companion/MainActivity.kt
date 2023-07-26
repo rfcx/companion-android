@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
+    private val notificationPermissions by lazy { LocationPermissions(this) }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
     private var snackbar: Snackbar? = null
 
@@ -134,6 +135,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermissions.handleRequestResult(requestCode, grantResults)
+        notificationPermissions.handleRequestResult(requestCode, grantResults)
 
         currentFragment?.let {
             if (it is MapFragment) {
@@ -394,14 +396,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
         finish()
     }
 
-    override fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String) {
-        hideBottomAppBar()
-        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
-        if (mapFragment is MapFragment) {
-            mapFragment.moveToDeploymentMarker(lat, lng)
-        }
-    }
-
     override fun showTrackOnMap(site: Stream?, markerLocationId: String) {
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
@@ -478,7 +472,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
             }
             bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {
                 hideBottomSheet()
-                clearFeatureSelectedOnMap()
             }
             else -> {
                 return super.onBackPressed()
@@ -487,17 +480,9 @@ class MainActivity : AppCompatActivity(), MainActivityListener, InstallStateUpda
     }
 
     private fun setSearchBar() {
-        clearFeatureSelectedOnMap()
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
             mapFragment.showSearchBar(false)
-        }
-    }
-
-    override fun clearFeatureSelectedOnMap() {
-        val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
-        if (mapFragment is MapFragment) {
-            mapFragment.clearFeatureSelected()
         }
     }
 
@@ -534,8 +519,6 @@ interface MainActivityListener {
     fun showSnackbarForCompleteUpdate()
     fun hideSnackbar()
     fun onLogout()
-    fun moveMapIntoDeploymentMarker(lat: Double, lng: Double, markerLocationId: String)
     fun showTrackOnMap(site: Stream?, markerLocationId: String)
     fun getProjectName(): String
-    fun clearFeatureSelectedOnMap()
 }

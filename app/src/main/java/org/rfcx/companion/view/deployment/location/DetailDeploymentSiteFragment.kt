@@ -1,35 +1,41 @@
 package org.rfcx.companion.view.deployment.location
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.mapbox.android.core.location.*
-import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
-import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.SphericalUtil
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeValue
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.changeProjectTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.coordinatesValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.currentLocate
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.locationGroupValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.nextButton
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.viewMapBox
+import kotlinx.android.synthetic.main.fragment_detail_deployment_site.withinTextView
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
 import org.rfcx.companion.entity.Project
@@ -40,10 +46,18 @@ import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
 import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
-import org.rfcx.companion.util.*
+import org.rfcx.companion.util.Analytics
+import org.rfcx.companion.util.DefaultSetupMap
+import org.rfcx.companion.util.Preferences
+import org.rfcx.companion.util.getLastLocation
+import org.rfcx.companion.util.latitudeCoordinates
+import org.rfcx.companion.util.longitudeCoordinates
+import org.rfcx.companion.util.saveLastLocation
+import org.rfcx.companion.util.setFormatLabel
+import org.rfcx.companion.util.toLatLng
 import org.rfcx.companion.view.deployment.AudioMothDeploymentViewModel
 import org.rfcx.companion.view.deployment.BaseDeploymentProtocol
-import org.rfcx.companion.view.map.MapboxCameraUtils
+import org.rfcx.companion.view.map.MapCameraUtils
 import org.rfcx.companion.view.profile.locationgroup.ProjectActivity
 
 class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
@@ -52,10 +66,8 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private var deploymentProtocol: BaseDeploymentProtocol? = null
     private lateinit var audioMothDeploymentViewModel: AudioMothDeploymentViewModel
 
-    // Mapbox
-    private var mapboxMap: MapboxMap? = null
-    private lateinit var mapView: MapView
-    private var symbolManager: SymbolManager? = null
+    private lateinit var map: GoogleMap
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     // Arguments
     var siteId: Int = -1
@@ -73,33 +85,10 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private var currentUserLocation: Location? = null
     private var userLocation: Location? = null
     private var pinLocation: LatLng? = null
-    private var locationEngine: LocationEngine? = null
-    private val mapboxLocationChangeCallback =
-        object : LocationEngineCallback<LocationEngineResult> {
-            override fun onSuccess(result: LocationEngineResult?) {
-                if (activity != null) {
-                    val location = result?.lastLocation
-                    location ?: return
-                    currentUserLocation = location
-                    updateView()
-
-                    if (isCreateNew && !fromMapPicker) {
-                        currentUserLocation?.let { currentUserLocation ->
-                            val latLng =
-                                LatLng(currentUserLocation.latitude, currentUserLocation.longitude)
-                            moveCamera(latLng, null, DefaultSetupMap.DEFAULT_ZOOM)
-                        }
-                    }
-                    pinLocation?.let { setCheckboxForResumeDeployment(location.toLatLng(), it) }
-                }
-            }
-
-            override fun onFailure(exception: Exception) {}
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         initIntent()
     }
 
@@ -145,17 +134,14 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         setupTopBar()
         setViewModel()
 
-        mapView = view.findViewById(R.id.mapBoxView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+        mapFragment.getMapAsync(this)
         updateView()
 
         changeProjectTextView.setOnClickListener {
             context?.let { it1 ->
                 ProjectActivity.startActivity(
-                    it1,
-                    this.project?.id ?: -1,
-                    Screen.DETAIL_DEPLOYMENT_SITE.id
+                    it1, this.project?.id ?: -1, Screen.DETAIL_DEPLOYMENT_SITE.id
                 )
                 analytics?.trackChangeLocationGroupEvent(Screen.DETAIL_DEPLOYMENT_SITE.id)
             }
@@ -219,7 +205,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         val currentLatLng =
             LatLng(currentUserLocation?.latitude ?: 0.0, currentUserLocation?.longitude ?: 0.0)
         createSiteSymbol(currentLatLng)
-        moveCamera(LatLng(currentLatLng), DefaultSetupMap.DEFAULT_ZOOM)
+        moveCamera(currentLatLng, DefaultSetupMap.DEFAULT_ZOOM)
     }
 
     private fun setLatLngToDefault() {
@@ -250,7 +236,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 deployments = it.deployments
             )
             createSiteSymbol(locate.getLatLng())
-            moveCamera(LatLng(locate.getLatLng()), DefaultSetupMap.DEFAULT_ZOOM)
+            moveCamera(locate.getLatLng(), DefaultSetupMap.DEFAULT_ZOOM)
         }
         site = locate
     }
@@ -316,8 +302,11 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun updateView() {
+    private fun updateView() {
         if (!isCreateNew) site = site ?: audioMothDeploymentViewModel.getStreamById(siteId)
+        if (currentUserLocation == null) {
+            currentUserLocation = context?.getLastLocation()
+        }
         if (latitude != 0.0 && longitude != 0.0) {
             val alt = currentUserLocation?.altitude
             setLatLngLabel(LatLng(latitude, longitude), alt ?: 0.0)
@@ -341,28 +330,32 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
 
     private fun setLatLngLabel(location: LatLng, altitude: Double) {
         context?.let {
-            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${
-            location.longitude.longitudeCoordinates(it)
-            }"
+            val latLng = "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(it)}"
             coordinatesValueTextView.text = latLng
             altitudeValue.text = altitude.setFormatLabel()
         }
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        this.mapboxMap = mapboxMap
-        mapboxMap.uiSettings.setAllGesturesEnabled(false)
-        mapboxMap.uiSettings.isAttributionEnabled = false
-        mapboxMap.uiSettings.isLogoEnabled = false
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            setupSymbolManager(it)
-            setPinOnMap()
-            enableLocationComponent()
+    override fun onMapReady(p0: GoogleMap) {
+        map = p0
+        map.uiSettings.setAllGesturesEnabled(false)
+        setPinOnMap()
+
+        if (hasPermissions()) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                map.uiSettings.isZoomControlsEnabled = false
+                map.uiSettings.isMyLocationButtonEnabled = false
+                map.isMyLocationEnabled = true
+                context?.let { location?.saveLastLocation(it) }
+                currentUserLocation = location
+            }
+        } else {
+            requestPermissions()
         }
     }
 
     private fun setPinOnMap() {
-        val curLoc = context?.getLastLocation()?.toLatLng() ?: LatLng()
+        val curLoc = context?.getLastLocation()?.toLatLng() ?: LatLng(0.0, 0.0)
         if (latitude != 0.0 && longitude != 0.0) {
             val latLng = LatLng(latitude, longitude)
             moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
@@ -375,133 +368,60 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 val latLng = locate.getLatLng()
                 moveCamera(curLoc, latLng, DefaultSetupMap.DEFAULT_ZOOM)
                 setCheckboxForResumeDeployment(
-                    curLoc,
-                    latLng
+                    curLoc, latLng
                 )
                 createSiteSymbol(latLng)
                 pinLocation = latLng
             }
         } else {
+            moveCamera(curLoc, DefaultSetupMap.DEFAULT_ZOOM)
             createSiteSymbol(curLoc)
+            setWithinText()
             pinLocation = curLoc
         }
     }
 
-    private fun setupSymbolManager(style: Style) {
-        this.mapboxMap?.let { mapboxMap ->
-            symbolManager = SymbolManager(this.mapView, mapboxMap, style)
-            symbolManager?.iconAllowOverlap = true
-
-            style.addImage(
-                PROPERTY_MARKER_IMAGE,
-                ResourcesCompat.getDrawable(this.resources, R.drawable.ic_pin_map, null)!!
-            )
-        }
-    }
-
     private fun createSiteSymbol(latLng: LatLng) {
-        symbolManager?.deleteAll()
-        symbolManager?.create(
-            SymbolOptions()
-                .withLatLng(latLng)
-                .withIconImage(PROPERTY_MARKER_IMAGE)
-                .withIconSize(0.75f)
+        map.clear()
+        map.addMarker(
+            MarkerOptions().title("").position(latLng)
+                .icon(bitmapFromVector(requireContext(), R.drawable.ic_pin_map))
         )
     }
 
     private fun hasPermissions(): Boolean {
         val permissionState = context?.let {
             ActivityCompat.checkSelfPermission(
-                it,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                it, Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
         return permissionState == PackageManager.PERMISSION_GRANTED
     }
 
-    @SuppressLint("MissingPermission")
-    private fun enableLocationComponent() {
-        if (hasPermissions()) {
-            val loadedMapStyle = mapboxMap?.style
-            val locationComponent = mapboxMap?.locationComponent
-            // Activate the LocationComponent
-            val customLocationComponentOptions = context?.let {
-                LocationComponentOptions.builder(it)
-                    .trackingGesturesManagement(true)
-                    .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
-                    .build()
-            }
-
-            val locationComponentActivationOptions =
-                context?.let {
-                    LocationComponentActivationOptions.builder(it, loadedMapStyle!!)
-                        .locationComponentOptions(customLocationComponentOptions)
-                        .build()
-                }
-
-            mapboxMap?.let { it ->
-                it.locationComponent.apply {
-                    if (locationComponentActivationOptions != null) {
-                        activateLocationComponent(locationComponentActivationOptions)
-                    }
-
-                    isLocationComponentEnabled = true
-                    renderMode = RenderMode.COMPASS
-                }
-            }
-
-            this.currentUserLocation = locationComponent?.lastKnownLocation
-            initLocationEngine()
-        } else {
-            requestPermissions()
-        }
-    }
-
     private fun requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity?.requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_PERMISSIONS_REQUEST_CODE
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSIONS_REQUEST_CODE
             )
         } else {
             throw Exception("Request permissions not required before API 23 (should never happen)")
         }
     }
 
-    /**
-     * Set up the LocationEngine and the parameters for querying the device's location
-     */
-    @SuppressLint("MissingPermission")
-    private fun initLocationEngine() {
-        locationEngine = context?.let { LocationEngineProvider.getBestLocationEngine(it) }
-        val request =
-            LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
-                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-                .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build()
-        locationEngine?.requestLocationUpdates(
-            request,
-            mapboxLocationChangeCallback,
-            Looper.getMainLooper()
-        )
-        locationEngine?.getLastLocation(mapboxLocationChangeCallback)
-    }
-
-    private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Double) {
-        mapboxMap?.moveCamera(
-            MapboxCameraUtils.calculateLatLngForZoom(
-                userPosition,
-                nearestSite,
-                zoom
+    private fun moveCamera(userPosition: LatLng, nearestSite: LatLng?, zoom: Float) {
+        map.moveCamera(
+            MapCameraUtils.calculateLatLngForZoom(
+                userPosition, nearestSite, zoom
             )
         )
     }
 
-    private fun moveCamera(latLng: LatLng, zoom: Double) {
-        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
+    private fun moveCamera(latLng: LatLng, zoom: Float) {
+        map.moveCamera(MapCameraUtils.calculateLatLngForZoom(latLng, null, zoom))
     }
 
     private fun setCheckboxForResumeDeployment(curLoc: LatLng, target: LatLng) {
-        val distance = curLoc.distanceTo(target)
+        val distance = SphericalUtil.computeDistanceBetween(curLoc, target)
         if (distance <= 20) {
             setWithinText()
         } else {
@@ -512,31 +432,19 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private fun setWithinText() {
         withinTextView.text = getString(R.string.within)
         withinTextView.setCompoundDrawablesWithIntrinsicBounds(
-            R.drawable.ic_checklist_passed,
-            0,
-            0,
-            0
+            R.drawable.ic_checklist_passed, 0, 0, 0
         )
     }
 
     private fun setNotWithinText(distance: String) {
         withinTextView.setCompoundDrawablesWithIntrinsicBounds(
-            R.drawable.ic_checklist_cross,
-            0,
-            0,
-            0
+            R.drawable.ic_checklist_cross, 0, 0, 0
         )
         withinTextView.text = getString(R.string.more_than, distance)
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapView.onStart()
-    }
-
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
 
         val projectId = preferences?.getInt(Preferences.SELECTED_PROJECT) ?: -1
         val selectedProject = audioMothDeploymentViewModel.getProjectById(projectId)
@@ -547,24 +455,17 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         locationGroupValueTextView.text = this.project?.name
     }
 
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
+    private fun bitmapFromVector(context: Context, vectorResId: Int): BitmapDescriptor {
+        val vectorDrawable: Drawable = ContextCompat.getDrawable(context, vectorResId)!!
+        vectorDrawable.setBounds(
+            0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight
+        )
+        val bitmap: Bitmap = Bitmap.createBitmap(
+            vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+        )
+        val canvas: Canvas = Canvas(bitmap)
+        vectorDrawable.draw(canvas)
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
     companion object {
@@ -593,33 +494,22 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 }
             }
 
-        fun newInstance(lat: Double, lng: Double, siteId: Int) =
-            DetailDeploymentSiteFragment().apply {
-                arguments = Bundle().apply {
-                    putDouble(ARG_LATITUDE, lat)
-                    putDouble(ARG_LONGITUDE, lng)
-                    putInt(ARG_SITE_ID, siteId)
-                    putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
-                }
-            }
-
         fun newInstance(
             lat: Double,
             lng: Double,
             siteId: Int,
             siteName: String,
             fromMapPicker: Boolean
-        ) =
-            DetailDeploymentSiteFragment().apply {
-                arguments = Bundle().apply {
-                    putDouble(ARG_LATITUDE, lat)
-                    putDouble(ARG_LONGITUDE, lng)
-                    putInt(ARG_SITE_ID, siteId)
-                    putString(ARG_SITE_NAME, siteName)
-                    putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
-                    putBoolean(ARG_FROM_MAP_PICKER, fromMapPicker)
-                }
+        ) = DetailDeploymentSiteFragment().apply {
+            arguments = Bundle().apply {
+                putDouble(ARG_LATITUDE, lat)
+                putDouble(ARG_LONGITUDE, lng)
+                putInt(ARG_SITE_ID, siteId)
+                putString(ARG_SITE_NAME, siteName)
+                putBoolean(ARG_IS_CREATE_NEW, siteId == -1)
+                putBoolean(ARG_FROM_MAP_PICKER, fromMapPicker)
             }
+        }
 
         fun newInstance(lat: Double, lng: Double, siteId: Int, siteName: String) =
             DetailDeploymentSiteFragment().apply {

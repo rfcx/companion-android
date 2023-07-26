@@ -1,59 +1,47 @@
 package org.rfcx.companion.view.map
 
+import android.Manifest
 import android.animation.Animator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
+import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.PointF
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import com.mapbox.android.core.location.*
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.LineString
-import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.BubbleLayout
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
-import com.mapbox.mapboxsdk.location.modes.CameraMode
-import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.style.expressions.Expression.*
-import com.mapbox.mapboxsdk.style.layers.CircleLayer
-import com.mapbox.mapboxsdk.style.layers.LineLayer
-import com.mapbox.mapboxsdk.style.layers.Property.*
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
-import com.mapbox.mapboxsdk.style.layers.SymbolLayer
-import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.utils.BitmapUtils
+import com.google.maps.android.clustering.Cluster
+import com.google.maps.android.clustering.ClusterManager
 import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
@@ -81,19 +69,21 @@ import org.rfcx.companion.view.profile.locationgroup.ProjectListener
 import org.rfcx.companion.view.unsynced.UnsyncedWorksActivity
 import java.io.File
 import java.util.*
-import kotlin.collections.set
 
-class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Boolean) -> Unit {
+class MapFragment :
+    Fragment(),
+    ProjectListener,
+    OnMapReadyCallback,
+    (Stream, Boolean) -> Unit,
+    ClusterManager.OnClusterClickListener<MarkerItem>,
+    ClusterManager.OnClusterItemClickListener<MarkerItem>,
+    ClusterManager.OnClusterItemInfoWindowClickListener<MarkerItem> {
 
+    // Google map
+    private lateinit var map: GoogleMap
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var mClusterManager: ClusterManager<MarkerItem>
     private lateinit var mainViewModel: MainViewModel
-
-    // map
-    private lateinit var mapView: MapView
-    private var mapboxMap: MapboxMap? = null
-    private var locationEngine: LocationEngine? = null
-    private var mapSource: GeoJsonSource? = null
-    private var lineSource: GeoJsonSource? = null
-    private var mapFeatures: FeatureCollection? = null
 
     // database manager
     private val realm by lazy { Realm.getInstance(RealmHelper.migrationConfig()) }
@@ -106,15 +96,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     private var deploymentMarkers = listOf<MapMarker.DeploymentMarker>()
     private var unsyncedDeploymentCount = 0
+    private var lastSelectedId = -1
     private var streamMarkers = listOf<MapMarker>()
 
     private lateinit var deploymentWorkInfoLiveData: LiveData<List<WorkInfo>>
     private lateinit var downloadStreamsWorkInfoLiveData: LiveData<List<WorkInfo>>
 
     private val locationPermissions by lazy { activity?.let { LocationPermissions(it) } }
+    private val notificationPermissions by lazy { activity?.let { NotificationPermissions(it) } }
     private var listener: MainActivityListener? = null
 
-    private var isFirstTime = true
     private var currentUserLocation: Location? = null
 
     private val analytics by lazy { context?.let { Analytics(it) } }
@@ -122,46 +113,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     private val handler: Handler = Handler()
 
-    // for animate line string
-    private var routeCoordinateList = listOf<Point>()
-    private var routeIndex = 0
-    private var markerLinePointList = arrayListOf<ArrayList<Point>>()
     private var currentAnimator: Animator? = null
-    private var queue = arrayListOf<List<Point>>()
-    private var queueColor = arrayListOf<String>()
-    private var queuePivot = 0
-
+    private var polyline: Polyline? = null
     private var currentMarkId = ""
-
     private var screen = ""
+    private var lastZoom = DefaultSetupMap.DEFAULT_ZOOM
 
     private val siteAdapter by lazy { SiteAdapter(this) }
     private var adapterOfSearchSite: List<SiteWithLastDeploymentItem>? = null
-
     private val locationGroupAdapter by lazy { ProjectAdapter(this) }
-
-    private val mapboxLocationChangeCallback =
-        object : LocationEngineCallback<LocationEngineResult> {
-            override fun onSuccess(result: LocationEngineResult?) {
-                if (activity != null) {
-                    val location = result?.lastLocation
-                    location ?: return
-                    context?.let { location.saveLastLocation(it) }
-
-                    mapboxMap?.let {
-                        this@MapFragment.currentUserLocation = location
-                    }
-                    if (isFirstTime && streams.isNotEmpty()) {
-                        moveCameraOnStartWithProject()
-                        isFirstTime = false
-                    }
-                }
-            }
-
-            override fun onFailure(exception: Exception) {
-                Log.e(MapFragment.tag, exception.localizedMessage ?: "empty localizedMessage")
-            }
-        }
 
     // observer
     private val deploymentWorkInfoObserve = Observer<List<WorkInfo>> {
@@ -183,8 +143,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
                 WorkInfo.State.SUCCEEDED -> {
                     updateSyncInfo(SyncInfo.Uploaded, true)
                     mainViewModel.updateProjectBounds()
-                    mainViewModel.updateStatusOfflineMap()
                 }
+
                 else -> updateSyncInfo(isSites = true)
             }
         }
@@ -194,6 +154,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         when (it.status) {
             Status.LOADING -> {
             }
+
             Status.SUCCESS -> {
                 mainViewModel.updateProjectBounds()
                 projectSwipeRefreshView.isRefreshing = false
@@ -204,8 +165,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
                 locationGroupAdapter.notifyDataSetChanged()
 
                 combinedData()
-                mainViewModel.updateStatusOfflineMap()
             }
+
             Status.ERROR -> {
                 combinedData()
                 projectSwipeRefreshView.isRefreshing = false
@@ -234,6 +195,181 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         updateUnsyncedCount(unsyncedDeploymentCount)
     }
 
+    override fun onMapReady(p0: GoogleMap) {
+        map = p0
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(), R.raw.style_json
+                )
+            )
+        } catch (_: Resources.NotFoundException) {
+        }
+        mainViewModel.retrieveLocations()
+        mainViewModel.fetchProjects()
+        setUpClusterer()
+        setupSearch()
+        setObserver()
+        showSearchBar(false)
+
+        if (locationPermissions?.allowed() == false) {
+            locationPermissions?.check { /* do nothing */ }
+        } else {
+            enableMyLocation()
+        }
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                map.moveCamera(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(
+                            location?.latitude ?: 0.0,
+                            location?.longitude ?: 0.0
+                        )
+                    )
+                )
+                map.uiSettings.isZoomControlsEnabled = true
+                map.uiSettings.isMyLocationButtonEnabled = false
+                context?.let { location?.saveLastLocation(it) }
+                currentUserLocation = location
+            }
+    }
+
+    private fun setUpClusterer() {
+        // Create the ClusterManager class and set the custom renderer.
+        mClusterManager = ClusterManager<MarkerItem>(requireContext(), map)
+        mClusterManager.renderer =
+            MarkerRenderer(
+                requireContext(),
+                map,
+                mClusterManager
+            )
+        // Set custom info window adapter
+        mClusterManager.markerCollection.setInfoWindowAdapter(InfoWindowAdapter(requireContext()))
+        // can re-cluster when zooming in and out.
+        map.setOnCameraIdleListener {
+            mClusterManager.onCameraIdle()
+        }
+
+        map.setOnMarkerClickListener(mClusterManager)
+        map.setInfoWindowAdapter(mClusterManager.markerManager)
+        map.setOnInfoWindowClickListener(mClusterManager)
+        mClusterManager.setOnClusterClickListener(this)
+        mClusterManager.setOnClusterItemClickListener(this)
+        mClusterManager.setOnClusterItemInfoWindowClickListener(this)
+
+        map.setOnMapClickListener {
+            lastSelectedId = -1
+            polyline?.remove()
+        }
+
+        combinedData()
+    }
+
+    override fun onClusterClick(cluster: Cluster<MarkerItem>?): Boolean {
+        val builder = LatLngBounds.builder()
+        val markers: Collection<MarkerItem> = cluster!!.items
+
+        for (item in markers) {
+            val position = item.position
+            builder.include(position)
+        }
+
+        val bounds = builder.build()
+
+        try {
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        } catch (error: Exception) {
+            return true
+        }
+        return true
+    }
+
+    override fun onClusterItemClick(item: MarkerItem?): Boolean {
+        polyline?.remove()
+
+        val isDeployment = item?.let { isDeployment(it.snippet) } ?: false
+        if (isDeployment) {
+            val data = Gson().fromJson(item!!.snippet, InfoWindowMarker::class.java)
+            val deployment = mainViewModel.getDeploymentById(data.id)
+            val site = mainViewModel.getStreamById(deployment?.stream?.id ?: -1)
+            gettingTracksAndMoveToPin(site, "${data.locationName}.${data.id}")
+        }
+        return false
+    }
+
+    override fun onClusterItemInfoWindowClick(item: MarkerItem?) {
+        if (item?.snippet == null) return
+        val isDeployment = isDeployment(item.snippet)
+
+        if (isDeployment) {
+            val data = Gson().fromJson(item.snippet, InfoWindowMarker::class.java)
+            context?.let {
+                firebaseCrashlytics.setCustomKey(
+                    CrashlyticsKey.OnClickSeeDetail.key,
+                    "Site: ${data.locationName}, Project: ${data.projectName}"
+                )
+                DeploymentDetailActivity.startActivity(it, data.id)
+                analytics?.trackSeeDetailEvent()
+            }
+        } else {
+            return
+        }
+    }
+
+    private fun isDeployment(data: String): Boolean {
+        return data.contains("deploymentKey")
+    }
+
+    private fun setMarker(mapMarker: List<MapMarker>) {
+        mapMarker.map {
+            when (it) {
+                is MapMarker.DeploymentMarker -> {
+                    setMarker(it)
+                }
+
+                is MapMarker.SiteMarker -> {
+                    setMarker(it)
+                }
+            }
+        }
+    }
+
+    private fun setMarker(data: MapMarker.SiteMarker) {
+        // Add Marker
+        val latlng = LatLng(data.latitude, data.longitude)
+        val item = MarkerItem(
+            data.latitude,
+            data.longitude,
+            data.name,
+            Gson().toJson(data.toInfoWindowMarker())
+        )
+        mClusterManager.addItem(item)
+        mClusterManager.cluster()
+
+        // Move Camera
+        map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+        map.animateCamera(CameraUpdateFactory.zoomTo(13.0f))
+    }
+
+    private fun setMarker(data: MapMarker.DeploymentMarker) {
+        // Add Marker
+        val latlng = LatLng(data.latitude, data.longitude)
+        val item = MarkerItem(
+            data.latitude,
+            data.longitude,
+            data.locationName,
+            Gson().toJson(data.toInfoWindowMarker())
+        )
+        mClusterManager.addItem(item)
+        mClusterManager.cluster()
+
+        // Move Camera
+        map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.listener = context as MainActivityListener
@@ -252,6 +388,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         locationPermissions?.handleRequestResult(requestCode, grantResults)
+        notificationPermissions?.handleRequestResult(requestCode, grantResults)
     }
 
     override fun onCreateView(
@@ -264,20 +401,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context?.let { Mapbox.getInstance(it, getString(R.string.mapbox_token)) }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mapView = view.findViewById(R.id.mapView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
         setViewModel()
-        setObserver()
-
         fetchJobSyncing()
-        showSearchBar(false)
         hideLabel()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (notificationPermissions?.notificationAllowed() == false) {
+                notificationPermissions?.check { /* do nothing */ }
+            }
+        }
 
         context?.let { setTextTrackingButton(LocationTrackingManager.isTrackingOn(it)) }
         projectNameTextView.text =
@@ -287,27 +426,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         searchLayoutSearchEditText.hint = getString(R.string.site_name_hint)
 
         currentLocationButton.setOnClickListener {
-            mapboxMap?.locationComponent?.isLocationComponentActivated?.let {
-                if (it) {
-                    moveCameraToCurrentLocation()
-                } else {
-                    mapboxMap?.style?.let { style ->
-                        checkThenAccquireLocation(style)
-                    }
-                }
+            currentUserLocation?.let {
+                map.moveCamera(CameraUpdateFactory.newLatLng(LatLng(it.latitude, it.longitude)))
             }
         }
 
         zoomOutButton.setOnClickListener {
-            mapboxMap?.let {
-                it.animateCamera(CameraUpdateFactory.zoomOut(), DURATION)
-            }
+            map.animateCamera(CameraUpdateFactory.zoomOut())
         }
 
         zoomInButton.setOnClickListener {
-            mapboxMap?.let {
-                it.animateCamera(CameraUpdateFactory.zoomIn(), DURATION)
-            }
+            map.animateCamera(CameraUpdateFactory.zoomIn())
         }
 
         projectNameTextView.setOnClickListener {
@@ -367,7 +496,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     private fun setOnClickProjectName() {
         val state = listener?.getBottomSheetState() ?: 0
         if (state == BottomSheetBehavior.STATE_EXPANDED && searchLayout.visibility != View.VISIBLE) {
-            clearFeatureSelected()
             listener?.hideBottomSheet()
         }
 
@@ -481,16 +609,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
 
         if (show) {
+            lastZoom = map.cameraPosition.zoom
+            map.moveCamera(CameraUpdateFactory.zoomTo(21.0F))
             setSearchView()
             searchLayout.setBackgroundResource(R.color.backgroundColorSite)
         } else {
+            map.moveCamera(CameraUpdateFactory.zoomTo(lastZoom))
             searchLayoutSearchEditText.text = null
             searchLayout.setBackgroundResource(R.color.transparent)
 
             hideLabel()
             siteRecyclerView.visibility = View.GONE
             listener?.showBottomAppBar()
-            listener?.clearFeatureSelectedOnMap()
         }
     }
 
@@ -545,409 +675,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     private val run: Runnable = object : Runnable {
         override fun run() {
             context?.let {
-                trackingTextView.text = "${
-                LocationTrackingManager.getDistance(trackingDb).setFormatLabel()
-                }  ${LocationTrackingManager.getOnDutyTimeMinute(it)} min"
+                trackingTextView.text = "${LocationTrackingManager.getDistance(trackingDb).setFormatLabel()}  ${LocationTrackingManager.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
         }
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
-        this.mapboxMap = mapboxMap
-        mapboxMap.uiSettings.isAttributionEnabled = false
-        mapboxMap.uiSettings.isLogoEnabled = false
-        mapboxMap.uiSettings.setCompassMargins(0, 1350, 900, 0)
-
-        mainViewModel.fetchProjects()
-        mainViewModel.retrieveLocations()
-
-        mapboxMap.setStyle(Style.OUTDOORS) {
-            checkThenAccquireLocation(it)
-            setupSources(it)
-            setupImages(it)
-            setupMarkerLayers(it)
-            setupSearch()
-            setupWindowInfo(it)
-
-            mapboxMap.addOnMapClickListener { latLng ->
-                val screenPoint = mapboxMap.projection.toScreenLocation(latLng)
-                val features = mapboxMap.queryRenderedFeatures(screenPoint, WINDOW_MARKER_ID)
-                val symbolScreenPoint = mapboxMap.projection.toScreenLocation(latLng)
-                if (features.isNotEmpty()) {
-                    handleClickCallout(features[0])
-                } else {
-                    handleClickIcon(symbolScreenPoint)
-                }
-            }
-        }
-    }
-
-    private fun setupSources(style: Style) {
-        mapSource =
-            GeoJsonSource(
-                SOURCE_DEPLOYMENT,
-                FeatureCollection.fromFeatures(listOf()),
-                GeoJsonOptions()
-                    .withCluster(true)
-                    .withClusterMaxZoom(25)
-                    .withClusterRadius(30)
-                    .withClusterProperty(
-                        PROPERTY_CLUSTER_TYPE,
-                        sum(accumulated(), get(PROPERTY_CLUSTER_TYPE)),
-                        switchCase(
-                            any(
-                                eq(
-                                    get(PROPERTY_DEPLOYMENT_MARKER_IMAGE),
-                                    Pin.PIN_GREEN
-                                )
-                            ),
-                            literal(1),
-                            literal(0)
-                        )
-                    )
-            )
-
-        lineSource = GeoJsonSource(SOURCE_LINE)
-
-        style.addSource(mapSource!!)
-        style.addSource(lineSource!!)
-    }
-
-    fun clearFeatureSelected() {
-        if (this.mapFeatures?.features() != null) {
-            val features = this.mapFeatures!!.features()
-            features?.forEach { setFeatureSelectState(it, false) }
-        }
-    }
-
-    private fun setFeatureSelectState(feature: Feature, selectedState: Boolean) {
-        feature.properties()?.let {
-            it.addProperty(PROPERTY_DEPLOYMENT_SELECTED, selectedState)
-            refreshSource()
-        }
-    }
-
-    private fun setDeploymentDetail(feature: Feature) {
-        val markerId = feature.getProperty(
-            PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
-        ).asString
-
-        val windowInfoImages = hashMapOf<String, Bitmap>()
-        val inflater = LayoutInflater.from(context)
-
-        val layout =
-            inflater.inflate(R.layout.layout_deployment_window_info, null) as BubbleLayout
-        val id = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) ?: ""
-        val title = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE)
-
-        var stream: Stream? = null
-        val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
-        deploymentId?.let {
-            val deployment = mainViewModel.getDeploymentById(it.toInt())
-            val type = deployment?.device ?: Device.AUDIOMOTH.value
-            layout.deploymentTypeName.text = "type: ${type.toUpperCase()}"
-
-            stream = deployment?.stream
-            val streamId = stream?.serverId
-            layout.deploymentStreamId.visibility = View.VISIBLE
-            layout.deploymentStreamId.text = "id: $streamId"
-        }
-        layout.deploymentSiteTitle.text = title
-        val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
-        layout.projectName.text = projectName
-        val deployedAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
-        layout.deployedAt.text = deployedAt
-        var latLng = ""
-        context?.let { context ->
-            latLng = "${stream?.latitude.latitudeCoordinates(context)}, ${stream?.longitude.longitudeCoordinates(context)}"
-        }
-        layout.latLngTextView.text = latLng
-        val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        layout.measure(measureSpec, measureSpec)
-        val measuredWidth = layout.measuredWidth
-        layout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
-        val bitmap = SymbolGenerator.generate(layout)
-        windowInfoImages[id] = bitmap
-
-        setWindowInfoImageGenResults(windowInfoImages)
-
-        firebaseCrashlytics.setCustomKey(
-            CrashlyticsKey.WindowInfoDeployment.key,
-            "Site: $title, Project: $projectName"
-        )
-    }
-
-    private fun setSiteDetail(feature: Feature) {
-        val windowInfoImages = hashMapOf<String, Bitmap>()
-        val inflater = LayoutInflater.from(context)
-
-        val bubbleLayout =
-            inflater.inflate(R.layout.layout_map_window_info, null) as BubbleLayout
-        val id = feature.getStringProperty(PROPERTY_SITE_MARKER_ID) ?: ""
-        val title = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME)
-        bubbleLayout.infoWindowTitle.text = title
-        val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
-        bubbleLayout.infoWindowDescription.text = projectName
-        val createdAt = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_CREATED_AT)
-        bubbleLayout.createdAtValue.text = createdAt
-        var latLng = ""
-        val lat = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LATITUDE) ?: "0.0"
-        val lng = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_LONGITUDE) ?: "0.0"
-        context?.let { context ->
-            latLng = "${lat.toDouble().latitudeCoordinates(context)}, ${lng.toDouble().longitudeCoordinates(context)}"
-        }
-        bubbleLayout.latLngValue.text = latLng
-        val measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        bubbleLayout.measure(measureSpec, measureSpec)
-        val measuredWidth = bubbleLayout.measuredWidth
-        bubbleLayout.arrowPosition = (measuredWidth / 2 - 5).toFloat()
-        val bitmap = SymbolGenerator.generate(bubbleLayout)
-        windowInfoImages[id] = bitmap
-
-        setWindowInfoImageGenResults(windowInfoImages)
-        firebaseCrashlytics.setCustomKey(
-            CrashlyticsKey.WindowInfoSite.key,
-            "Site: $title, Project: $projectName"
-        )
-    }
-
-    private fun setupImages(style: Style) {
-        val drawablePinSite =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
-        val mBitmapPinSite = BitmapUtils.getBitmapFromDrawable(drawablePinSite)
-        if (mBitmapPinSite != null) {
-            style.addImage(SITE_MARKER, mBitmapPinSite)
-        }
-
-        val drawablePinMapGreen =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map, null)
-        val mBitmapPinMapGreen = BitmapUtils.getBitmapFromDrawable(drawablePinMapGreen)
-        if (mBitmapPinMapGreen != null) {
-            style.addImage(Pin.PIN_GREEN, mBitmapPinMapGreen)
-        }
-
-        val drawablePinMapGrey =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pin_map_grey, null)
-        val mBitmapPinMapGrey = BitmapUtils.getBitmapFromDrawable(drawablePinMapGrey)
-        if (mBitmapPinMapGrey != null) {
-            style.addImage(Pin.PIN_GREY, mBitmapPinMapGrey)
-        }
-    }
-
-    private fun setupMarkerLayers(style: Style) {
-
-        val line = LineLayer("line-layer", SOURCE_LINE).withProperties(
-            lineCap(LINE_CAP_ROUND),
-            lineJoin(LINE_JOIN_ROUND),
-            lineWidth(5f),
-            lineColor(get("color"))
-        )
-
-        style.addLayer(line)
-
-        val unclusteredSiteLayer =
-            SymbolLayer(MARKER_SITE_ID, SOURCE_DEPLOYMENT).withProperties(
-                iconImage("{$PROPERTY_SITE_MARKER_IMAGE}"),
-                iconSize(0.8f),
-                iconAllowOverlap(true)
-            )
-
-        val unclusteredDeploymentLayer =
-            SymbolLayer(MARKER_DEPLOYMENT_ID, SOURCE_DEPLOYMENT).withProperties(
-                iconImage("{$PROPERTY_DEPLOYMENT_MARKER_IMAGE}"),
-                iconSize(
-                    match(
-                        toString(
-                            get(
-                                PROPERTY_DEPLOYMENT_SELECTED
-                            )
-                        ),
-                        literal(0.8f), stop("true", 1.0f)
-                    )
-                ),
-                iconAllowOverlap(true)
-            )
-
-        style.addLayer(unclusteredSiteLayer)
-        style.addLayer(unclusteredDeploymentLayer)
-
-        val layers = arrayOf(
-            intArrayOf(0, Color.parseColor("#98A0A9")),
-            intArrayOf(1, Color.parseColor("#2AA841"))
-        )
-
-        layers.forEachIndexed { i, ly ->
-            val deploymentSymbolLayer = CircleLayer("$DEPLOYMENT_CLUSTER-$i", SOURCE_DEPLOYMENT)
-            val hasDeploymentAtLeastOne = toNumber(get(PROPERTY_CLUSTER_TYPE))
-            val pointCount = toNumber(get(POINT_COUNT))
-            deploymentSymbolLayer.setProperties(circleColor(ly[1]), circleRadius(16f))
-            deploymentSymbolLayer.setFilter(
-                if (i == 0) {
-                    all(
-                        gte(hasDeploymentAtLeastOne, literal(ly[0])),
-                        gte(pointCount, literal(1))
-                    )
-                } else {
-                    all(
-                        gte(hasDeploymentAtLeastOne, literal(ly[0])),
-                        gt(hasDeploymentAtLeastOne, literal(layers[i - 1][0]))
-                    )
-                }
-            )
-
-            style.addLayer(deploymentSymbolLayer)
-        }
-
-        val deploymentCount = SymbolLayer(DEPLOYMENT_COUNT, SOURCE_DEPLOYMENT)
-        deploymentCount.setProperties(
-            textField(
-                format(
-                    formatEntry(
-                        toString(get(POINT_COUNT)),
-                        FormatOption.formatFontScale(1.5)
-                    )
-                )
-            ),
-            textSize(12f),
-            textColor(Color.WHITE),
-            textIgnorePlacement(true),
-            textOffset(arrayOf(0f, -0.2f)),
-            textAllowOverlap(true)
-        )
-
-        style.addLayer(deploymentCount)
-    }
-
-    private fun handleClickIcon(screenPoint: PointF): Boolean {
-        val deploymentFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_DEPLOYMENT_ID)
-        val siteFeatures = mapboxMap?.queryRenderedFeatures(screenPoint, MARKER_SITE_ID)
-        val deploymentClusterFeatures =
-            mapboxMap?.queryRenderedFeatures(screenPoint, "$DEPLOYMENT_CLUSTER-0")
-        if (deploymentFeatures != null && deploymentFeatures.isNotEmpty()) {
-            val selectedFeature = deploymentFeatures[0]
-            val features = this.mapFeatures!!.features()!!
-            features.forEachIndexed { index, feature ->
-                if (selectedFeature.getProperty(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID) == feature.getProperty(
-                        PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
-                    )
-                ) {
-                    val markerId = selectedFeature.getProperty(
-                        PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID
-                    ).asString
-                    val deploymentId = markerId.split(".").last()
-                    val deployment = mainViewModel.getDeploymentById(deploymentId.toInt())
-                    val site = mainViewModel.getStreamById(deployment?.stream?.id ?: -1)
-                    gettingTracksAndMoveToPin(site, markerId)
-                    analytics?.trackClickPinEvent()
-
-                    features[index]?.let {
-                        setDeploymentDetail(it)
-                        setFeatureSelectState(it, true)
-                    }
-                } else {
-                    features[index]?.let { setFeatureSelectState(it, false) }
-                }
-            }
-            return true
-        } else {
-            (activity as MainActivityListener).hideBottomSheet()
-            hideTrackOnMap()
-        }
-
-        if (siteFeatures != null && siteFeatures.isNotEmpty()) {
-
-            val selectedFeature = siteFeatures[0]
-            val features = this.mapFeatures!!.features()!!
-            features.forEachIndexed { index, feature ->
-                val markerId = selectedFeature.getProperty(PROPERTY_SITE_MARKER_ID)
-                if (markerId == feature.getProperty(PROPERTY_SITE_MARKER_ID)) {
-                    val site = mainViewModel.getStreamById(
-                        selectedFeature.getProperty(PROPERTY_SITE_MARKER_SITE_ID).asInt
-                    )
-                    gettingTracksAndMoveToPin(site, markerId.asString)
-                    features[index]?.let {
-                        setSiteDetail(it)
-                        setFeatureSelectState(it, true)
-                    }
-                    analytics?.trackClickPinEvent()
-                } else {
-                    features[index]?.let { setFeatureSelectState(it, false) }
-                }
-            }
-            return true
-        } else {
-            hideTrackOnMap()
-        }
-
-        if (deploymentClusterFeatures != null && deploymentClusterFeatures.isNotEmpty()) {
-            val pinCount =
-                if (deploymentClusterFeatures[0].getProperty(POINT_COUNT) != null) deploymentClusterFeatures[0].getProperty(
-                    POINT_COUNT
-                ).asInt else 0
-            if (pinCount > 0) {
-                val clusterLeavesFeatureCollection =
-                    mapSource?.getClusterLeaves(deploymentClusterFeatures[0], 8000, 0)
-                if (clusterLeavesFeatureCollection != null) {
-                    moveCameraToLeavesBounds(clusterLeavesFeatureCollection)
-                }
-            }
-        }
-        clearFeatureSelected()
-        return false
-    }
-
-    private fun handleClickCallout(feature: Feature): Boolean {
-        val deploymentId = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
-        val siteName = feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE)
-        val projectName = feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME)
-
-        if (deploymentId != null) {
-            context?.let {
-                firebaseCrashlytics.setCustomKey(
-                    CrashlyticsKey.OnClickSeeDetail.key,
-                    "Site: $siteName, Project: $projectName"
-                )
-                DeploymentDetailActivity.startActivity(it, deploymentId.toInt())
-                analytics?.trackSeeDetailEvent()
-            }
-        } else {
-            setFeatureSelectState(feature, false)
-        }
-        return true
-    }
-
     fun gettingTracksAndMoveToPin(site: Stream?, markerId: String) {
         currentMarkId = markerId
         site?.let { obj ->
+            lastSelectedId = site.id
             showTrackOnMap(obj.id, obj.latitude, obj.longitude, markerId)
             if (site.serverId != null) {
                 mainViewModel.getStreamAssets(site)
                 setTrackObserver(obj, markerId)
             }
         }
-    }
-
-    private fun moveCameraToLeavesBounds(featureCollectionToInspect: FeatureCollection) {
-        val latLngList: ArrayList<LatLng> = ArrayList()
-        if (featureCollectionToInspect.features() != null) {
-            for (singleClusterFeature in featureCollectionToInspect.features()!!) {
-                val clusterPoint = singleClusterFeature.geometry() as Point?
-                if (clusterPoint != null) {
-                    latLngList.add(LatLng(clusterPoint.latitude(), clusterPoint.longitude()))
-                }
-            }
-            if (latLngList.size > 1) {
-                moveCameraWithLatLngList(latLngList)
-            }
-        }
-    }
-
-    private fun moveCameraWithLatLngList(latLngList: List<LatLng>) {
-        val latLngBounds = LatLngBounds.Builder()
-            .includes(latLngList)
-            .build()
-        mapboxMap?.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 230), 1300)
     }
 
     private fun updateUnsyncedCount(number: Int) {
@@ -963,23 +706,24 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
     }
 
     private fun combinedData() {
-        handleMarker(deploymentMarkers + streamMarkers)
+        mClusterManager.clearItems()
+        mClusterManager.cluster()
+
+        setMarker(deploymentMarkers + streamMarkers)
 
         val state = listener?.getBottomSheetState() ?: 0
 
         if (deploymentMarkers.isNotEmpty() && state != BottomSheetBehavior.STATE_EXPANDED) {
             val lastReport = deploymentMarkers.sortedByDescending { it.updatedAt }.first()
-            mapboxMap?.let {
-                it.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        LatLng(
-                            lastReport.latitude,
-                            lastReport.longitude
-                        ),
-                        it.cameraPosition.zoom
-                    )
+            map.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        lastReport.latitude,
+                        lastReport.longitude
+                    ),
+                    map.cameraPosition.zoom
                 )
-            }
+            )
         }
 
         val currentLocation = currentUserLocation
@@ -1003,15 +747,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         }
     }
 
-    private fun getFurthestSiteFromCurrentLocation(
-        currentLatLng: LatLng,
-        sites: List<Stream>
-    ): Stream? {
-        return sites.maxByOrNull {
-            currentLatLng.distanceTo(LatLng(it.latitude, it.longitude))
-        }
-    }
-
     private fun setObserver() {
         mainViewModel.getUnsyncedWorks()
             .observe(viewLifecycleOwner, getUnsyncedDeploymentsObserver)
@@ -1030,14 +765,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
                 when (it.status) {
                     Status.LOADING -> {
                     }
+
                     Status.SUCCESS -> {
-                        showTrackOnMap(
-                            site.id,
-                            site.latitude,
-                            site.longitude,
-                            markerId
-                        )
+                        if (lastSelectedId == site.id) {
+                            showTrackOnMap(
+                                site.id,
+                                site.latitude,
+                                site.longitude,
+                                markerId
+                            )
+                        }
                     }
+
                     Status.ERROR -> {
                         showToast(it.message ?: getString(R.string.error_has_occurred))
                     }
@@ -1080,6 +819,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
                 }
                 statusView.onShow(msg)
             }
+
             SyncInfo.Uploaded -> {
                 val msg = if (isSites) {
                     getString(R.string.sites_synced)
@@ -1095,238 +835,33 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         }
     }
 
-    private fun handleMarker(
-        mapMarker: List<MapMarker>
-    ) {
-        val deploymentFeatures = this.mapFeatures?.features()
-        val deploymentSelecting = deploymentFeatures?.firstOrNull { feature ->
-            feature.getBooleanProperty(PROPERTY_DEPLOYMENT_SELECTED) ?: false
-        }
-
-        // Create point
-        val mapMarkerPointFeatures = mapMarker.map {
-            // check is this deployment is selecting (to set bigger pin)
-            when (it) {
-                is MapMarker.DeploymentMarker -> {
-                    val deploymentId =
-                        deploymentSelecting?.getProperty(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID)
-                    val isSelecting =
-                        if (deploymentSelecting == null || deploymentId == null) {
-                            false
-                        } else {
-                            it.id.toString() == deploymentId.asString
-                        }
-                    val properties = mapOf(
-                        Pair(PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID, "${it.locationName}.${it.id}"),
-                        Pair(PROPERTY_WINDOW_INFO_ID, "${it.locationName}.${it.id}"),
-                        Pair(PROPERTY_DEPLOYMENT_MARKER_IMAGE, it.pin),
-                        Pair(PROPERTY_DEPLOYMENT_MARKER_TITLE, it.locationName),
-                        Pair(PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID, it.id.toString()),
-                        Pair(PROPERTY_DEPLOYMENT_MARKER_DEVICE, it.device),
-                        Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, it.projectName ?: ""),
-                        Pair(
-                            PROPERTY_SITE_MARKER_SITE_CREATED_AT,
-                            context?.let { context -> it.deploymentAt.toTimeAgo(context) } ?: ""
-                        ),
-                        Pair(PROPERTY_DEPLOYMENT_SELECTED, isSelecting.toString())
-                    )
-                    Feature.fromGeometry(
-                        Point.fromLngLat(it.longitude, it.latitude), properties.toJsonObject()
-                    )
-                }
-                is MapMarker.SiteMarker -> {
-                    val properties = mapOf(
-                        Pair(PROPERTY_SITE_MARKER_IMAGE, it.pin),
-                        Pair(PROPERTY_WINDOW_INFO_ID, "${it.name}.${it.id}"),
-                        Pair(PROPERTY_SITE_MARKER_SITE_ID, it.id.toString()),
-                        Pair(PROPERTY_SITE_MARKER_ID, "${it.name}.${it.id}"),
-                        Pair(PROPERTY_SITE_MARKER_SITE_NAME, it.name),
-                        Pair(PROPERTY_SITE_MARKER_SITE_LATITUDE, "${it.latitude}"),
-                        Pair(PROPERTY_SITE_MARKER_SITE_LONGITUDE, "${it.longitude}"),
-                        Pair(PROPERTY_SITE_MARKER_SITE_PROJECT_NAME, it.projectName ?: ""),
-                        Pair(
-                            PROPERTY_SITE_MARKER_SITE_CREATED_AT,
-                            context?.let { context -> it.createdAt.toTimeAgo(context) } ?: ""
-                        )
-                    )
-
-                    Feature.fromGeometry(
-                        Point.fromLngLat(it.longitude, it.latitude), properties.toJsonObject()
-                    )
-                }
-            }
-        }
-        this.mapFeatures = FeatureCollection.fromFeatures(mapMarkerPointFeatures)
-        refreshSource()
-    }
-
-    private fun setWindowInfoImageGenResults(windowInfoImages: HashMap<String, Bitmap>) {
-        mapboxMap?.style?.addImages(windowInfoImages)
-    }
-
-    private fun setupWindowInfo(it: Style) {
-        it.addLayer(
-            SymbolLayer(WINDOW_MARKER_ID, SOURCE_DEPLOYMENT).apply {
-                withProperties(
-                    iconImage("{$PROPERTY_WINDOW_INFO_ID}"),
-                    iconAnchor(ICON_ANCHOR_BOTTOM),
-                    iconOffset(arrayOf(-2f, -20f)),
-                    iconAllowOverlap(true)
-                )
-                withFilter(eq(get(PROPERTY_DEPLOYMENT_SELECTED), literal(true)))
-            }
-        )
-    }
-
-    private fun refreshSource() {
-        if (mapSource != null && mapFeatures != null) {
-            mapSource!!.setGeoJson(mapFeatures)
-        }
-    }
-
-    fun moveCamera(userLoc: LatLng, targetLoc: LatLng? = null, zoom: Double) {
-        mapboxMap?.moveCamera(MapboxCameraUtils.calculateLatLngForZoom(userLoc, targetLoc, zoom))
-    }
-
-    private fun checkThenAccquireLocation(style: Style) {
-        locationPermissions?.check { isAllowed: Boolean ->
-            if (isAllowed) {
-                enableLocationComponent(style)
-            }
-        }
-    }
-
-    private fun enableLocationComponent(style: Style) {
-        val customLocationComponentOptions = context?.let {
-            LocationComponentOptions.builder(it)
-                .trackingGesturesManagement(true)
-                .accuracyColor(ContextCompat.getColor(it, R.color.colorPrimary))
-                .build()
-        }
-
-        val locationComponentActivationOptions =
-            context?.let {
-                LocationComponentActivationOptions.builder(it, style)
-                    .locationComponentOptions(customLocationComponentOptions)
-                    .build()
-            }
-
-        mapboxMap?.let { it ->
-            it.locationComponent.apply {
-                if (locationComponentActivationOptions != null) {
-                    activateLocationComponent(locationComponentActivationOptions)
-                    isLocationComponentEnabled = true
-                    cameraMode = CameraMode.TRACKING
-                    renderMode = RenderMode.COMPASS
-                }
-            }
-        }
-
-        initLocationEngine()
-    }
-
-    private fun initLocationEngine() {
-        locationEngine = context?.let { LocationEngineProvider.getBestLocationEngine(it) }
-        val request =
-            LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
-                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-                .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build()
-
-        locationEngine?.requestLocationUpdates(
-            request,
-            mapboxLocationChangeCallback,
-            Looper.getMainLooper()
-        )
-
-        locationEngine?.getLastLocation(mapboxLocationChangeCallback)
-    }
-
-    private fun moveCameraOnStartWithProject() {
-        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
-            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
-            val projectName = listener?.getProjectName()
-            val locations = this.streams.filter { it.project?.name == projectName }
-            val furthestSite = getFurthestSiteFromCurrentLocation(
-                currentLatLng,
-                if (projectName != getString(R.string.none)) locations else this.streams
-            )
-            furthestSite?.let {
-                moveCamera(
-                    currentLatLng,
-                    LatLng(furthestSite.latitude, furthestSite.longitude),
-                    DefaultSetupMap.DEFAULT_ZOOM
-                )
-            }
-            context?.let { currentLatLng.saveLastLocation(it) }
-        }
-    }
-
-    private fun moveCameraToCurrentLocation() {
-        mapboxMap?.locationComponent?.lastKnownLocation?.let { curLoc ->
-            val currentLatLng = LatLng(curLoc.latitude, curLoc.longitude)
-            moveCamera(
-                currentLatLng,
-                null,
-                mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM
-            )
-        }
-    }
-
-    fun moveToDeploymentMarker(lat: Double, lng: Double) {
-        mapboxMap?.let {
-            it.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(lat, lng),
-                    mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM
-                )
-            )
-        }
-    }
-
+    @SuppressLint("Range")
     fun showTrackOnMap(id: Int, lat: Double, lng: Double, markerLocationId: String) {
-        // remove the previous one
-        hideTrackOnMap()
         val tracks = mainViewModel.getTrackingFileBySiteId(id)
         try {
-            if (tracks.isNotEmpty()) {
-                // get all track first
-                if (currentMarkId == markerLocationId) {
-                    val tempTrack = arrayListOf<Feature>()
-                    tracks.forEach { track ->
-                        val json = File(track.localPath).readText()
-                        val featureCollection = FeatureCollection.fromJson(json)
-                        val feature = featureCollection.features()?.get(0)
-                        feature?.let {
-                            tempTrack.add(it)
+            tracks.forEach { track ->
+                if (track.siteServerId != null) {
+                    val json = File(track.localPath).readText()
+                    val f = Gson().fromJson(json, FeatureCollection::class.java)
+                    val latLngList = mutableListOf<LatLng>()
+                    f.features.forEach {
+                        it.geometry.coordinates.forEach { c ->
+                            latLngList.add(LatLng(c[1], c[0]))
                         }
-                        // track always has 1 item so using get(0) is okay - also it can only be LineString
-                        val lineString = feature?.geometry() as LineString
-                        queue.add(lineString.coordinates().toList())
                     }
-                    lineSource?.setGeoJson(FeatureCollection.fromFeatures(tempTrack))
-
-                    // move camera to pin
-                    moveToDeploymentMarker(lat, lng)
+                    if (lastSelectedId == id) {
+                        polyline?.remove()
+                        polyline = map.addPolyline(
+                            PolylineOptions()
+                                .clickable(false)
+                                .addAll(latLngList)
+                                .color(Color.parseColor(f.features[0].properties.color))
+                        )
+                    }
                 }
-            } else {
-                moveToDeploymentMarker(lat, lng)
             }
-        } catch (e: JsonSyntaxException) {
-            moveToDeploymentMarker(lat, lng)
+        } catch (_: JsonSyntaxException) {
         }
-    }
-
-    private fun hideTrackOnMap() {
-        // reset source
-        lineSource?.setGeoJson(FeatureCollection.fromFeatures(listOf()))
-        routeCoordinateList = listOf()
-        routeIndex = 0
-        markerLinePointList.clear()
-        queuePivot = 0
-        queue.clear()
-        queueColor.clear()
-        currentAnimator?.end()
-        currentAnimator = null
     }
 
     private fun showToast(message: String) {
@@ -1341,30 +876,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         buttonOnMapGroup.visibility = View.GONE
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapView.onStart()
-    }
-
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
         analytics?.trackScreen(Screen.MAP)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
     }
 
     override fun onDestroy() {
@@ -1384,11 +898,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         if (::downloadStreamsWorkInfoLiveData.isInitialized) {
             downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
         }
-        if (::mapView.isInitialized) {
-            mapView.onDestroy()
-        }
-
-        locationEngine?.removeLocationUpdates(mapboxLocationChangeCallback)
         currentAnimator?.cancel()
     }
 
@@ -1396,38 +905,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         const val tag = "MapFragment"
         const val SITE_MARKER = "SITE_MARKER"
 
-        private const val SOURCE_DEPLOYMENT = "source.deployment"
-        private const val MARKER_DEPLOYMENT_ID = "marker.deployment"
-        private const val MARKER_SITE_ID = "marker.site"
-
-        private const val SOURCE_LINE = "source.line"
-
-        private const val PROPERTY_DEPLOYMENT_SELECTED = "deployment.selected"
-        private const val PROPERTY_DEPLOYMENT_MARKER_DEVICE = "deployment.device"
-        private const val PROPERTY_DEPLOYMENT_MARKER_LOCATION_ID = "deployment.location"
-        private const val PROPERTY_DEPLOYMENT_MARKER_TITLE = "deployment.title"
-        private const val PROPERTY_DEPLOYMENT_MARKER_DEPLOYMENT_ID = "deployment.deployment"
-        private const val PROPERTY_DEPLOYMENT_MARKER_IMAGE = "deployment.marker.image"
-        private const val WINDOW_MARKER_ID = "info.marker"
-        private const val PROPERTY_WINDOW_INFO_ID = "window.info.id"
-
-        private const val PROPERTY_SITE_MARKER_IMAGE = "site.marker.image"
-        private const val PROPERTY_SITE_MARKER_ID = "site.id"
-        private const val PROPERTY_SITE_MARKER_SITE_ID = "site.stream.id"
-        private const val PROPERTY_SITE_MARKER_SITE_NAME = "site.stream.name"
-        private const val PROPERTY_SITE_MARKER_SITE_LATITUDE = "site.stream.latitude"
-        private const val PROPERTY_SITE_MARKER_SITE_LONGITUDE = "site.stream.longitude"
-        private const val PROPERTY_SITE_MARKER_SITE_PROJECT_NAME = "site.stream.project.name"
-        private const val PROPERTY_SITE_MARKER_SITE_CREATED_AT = "site.stream.created.at"
-
-        private const val PROPERTY_CLUSTER_TYPE = "cluster.type"
-
-        private const val DEPLOYMENT_CLUSTER = "deployment.cluster"
-        private const val POINT_COUNT = "point_count"
-        private const val DEPLOYMENT_COUNT = "deployment.count"
         private const val WITHIN_TIME = (60 * 3) // 3 hr
-
-        private const val DURATION = 700
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
 
         const val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
         const val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
@@ -1441,45 +920,24 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
         view?.hideKeyboard()
         showSearchBar(false)
 
-        val features = this.mapFeatures?.features()
-        val selectingDeployment = features?.firstOrNull { feature ->
-            feature.getStringProperty(PROPERTY_DEPLOYMENT_MARKER_TITLE) == stream.name
-        }
-        val selectingSite = features?.firstOrNull { feature ->
-            feature.getStringProperty(PROPERTY_SITE_MARKER_SITE_NAME) == stream.name
-        }
+        val latLng = LatLng(stream.latitude, stream.longitude)
+        map.moveCamera(CameraUpdateFactory.zoomTo(20.0F))
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
 
-        if (selectingDeployment == null) {
-            if (selectingSite == null) return
-            setSiteDetail(selectingSite)
-            setFeatureSelectState(selectingSite, true)
-        } else {
-            setDeploymentDetail(selectingDeployment)
-            setFeatureSelectState(selectingDeployment, true)
-        }
+        val clusters = mClusterManager.algorithm.getClusters(21.0F)
+        val markerItems = arrayListOf<MarkerItem>()
 
-        val item = mainViewModel.getStreamById(stream.id)
-        item?.let {
-            val pointF = mapboxMap?.projection?.toScreenLocation(it.getLatLng()) ?: PointF()
-            val clusterFeatures = mapboxMap?.queryRenderedFeatures(pointF, "$DEPLOYMENT_CLUSTER-0")
-            var zoom = mapboxMap?.cameraPosition?.zoom ?: DefaultSetupMap.DEFAULT_ZOOM
-            zoom = if (zoom > DefaultSetupMap.DEFAULT_ZOOM) zoom else DefaultSetupMap.DEFAULT_ZOOM
-
-            if (!clusterFeatures.isNullOrEmpty()) {
-                val pinCount =
-                    if (clusterFeatures[0].getProperty(POINT_COUNT) != null) clusterFeatures[0].getProperty(
-                        POINT_COUNT
-                    ).asInt else 0
-                if (pinCount > 0) {
-                    zoom += 3
-                }
+        clusters.forEach { cluster ->
+            cluster.items.forEach { item ->
+                markerItems.add(item)
             }
-            mapboxMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    it.getLatLng(),
-                    zoom
-                )
-            )
+        }
+
+        mClusterManager.markerCollection.markers.forEach {
+            if (it.snippet!!.contains(stream.name)) {
+                it.showInfoWindow()
+                onClusterItemClick(markerItems.first { i -> i.snippet.contains(stream.name) })
+            }
         }
     }
 
@@ -1495,29 +953,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
 
         projectNameTextView.text = project.name
         mainViewModel.combinedData()
-        val latLngBounds =
-            project.streams?.map { LatLng(it.latitude, it.longitude) } ?: listOf()
-        if (latLngBounds.isNotEmpty()) {
-            if (latLngBounds.size > 1) {
-                moveCameraWithLatLngList(latLngBounds)
-            } else {
-                moveCamera(
-                    LatLng(latLngBounds[0].latitude, latLngBounds[0].longitude),
-                    null,
-                    DefaultSetupMap.DEFAULT_ZOOM
-                )
-            }
-        } else {
-            currentUserLocation?.let { current ->
-                moveCamera(
-                    LatLng(
-                        current.latitude,
-                        current.longitude
-                    ),
-                    null, DefaultSetupMap.DEFAULT_ZOOM
-                )
-            }
-        }
 
         if (siteRecyclerView.visibility == View.VISIBLE) {
             searchLayout.visibility = View.VISIBLE
@@ -1527,6 +962,30 @@ class MapFragment : Fragment(), OnMapReadyCallback, ProjectListener, (Stream, Bo
             showButtonOnMap()
             listener?.showBottomAppBar()
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun enableMyLocation() {
+
+        // Check if permissions are granted, if so, enable the my location layer
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            map.isMyLocationEnabled = true
+            return
+        }
+
+        // Otherwise, request permission
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
     }
 
     override fun onLockImageClicked() {

@@ -13,6 +13,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.preference.Preference
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -73,6 +75,7 @@ class GuardianDeploymentActivity :
     private val trackingFileDb by lazy { TrackingFileDb(realm) }
 
     private var useExistedLocation: Boolean = false
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private var guardianPingBlob: GuardianPing? = null
     private var adminPingBlob: AdminPing? = null
@@ -159,6 +162,7 @@ class GuardianDeploymentActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guardian_deployment)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         setupToolbar()
         setLiveData()
@@ -177,6 +181,11 @@ class GuardianDeploymentActivity :
         } else {
             setupView()
         }
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                location?.let { setCurrentLocation(it) }
+            }
     }
 
     private fun setupToolbar() {
@@ -222,7 +231,8 @@ class GuardianDeploymentActivity :
                     DetailDeploymentSiteFragment.newInstance(
                         latitude,
                         longitude,
-                        siteId
+                        siteId,
+                        streamName
                     )
                 )
             }
