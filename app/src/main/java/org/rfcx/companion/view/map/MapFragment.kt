@@ -220,6 +220,10 @@ class MapFragment :
             enableMyLocation()
         }
 
+        fusedLocationClient()
+    }
+
+    private fun fusedLocationClient() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 map.moveCamera(
@@ -426,6 +430,10 @@ class MapFragment :
         searchLayoutSearchEditText.hint = getString(R.string.site_name_hint)
 
         currentLocationButton.setOnClickListener {
+            if (locationPermissions?.allowed() == true) {
+                map.isMyLocationEnabled = true
+                fusedLocationClient()
+            }
             currentUserLocation?.let {
                 map.moveCamera(CameraUpdateFactory.newLatLng(LatLng(it.latitude, it.longitude)))
             }
