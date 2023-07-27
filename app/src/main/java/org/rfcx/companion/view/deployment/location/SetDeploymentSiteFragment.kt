@@ -116,6 +116,7 @@ class SetDeploymentSiteFragment :
     }
 
     private fun setEditText() {
+        searchLayout.visibility = View.VISIBLE
         searchLayoutSearchEditText.showKeyboard()
         searchLayoutSearchEditText.requestFocus()
         searchViewActionRightButton.visibility = View.VISIBLE
