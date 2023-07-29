@@ -63,6 +63,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
                 // insert deployments
                 val deploymentStreams = resultBody.filter { st -> st.deployment != null }
                 deploymentDb.insertOrUpdate(deploymentStreams.map { st -> st.convertToDeploymentResponse() })
+                deploymentDb.deleteDeploymentWithType("guardian")
 
                 if (it.size == SITES_LIMIT_GETTING) {
                     if (streamDb.getMaxUpdatedAt() == maxUpdatedAt) {

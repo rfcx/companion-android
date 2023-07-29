@@ -272,7 +272,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
                     val point = t.points.toListDoubleArray()
                     val trackingFile = TrackingFile(
                         deploymentId = it.id,
-                        siteId = this.stream!!.id,
+                        siteId = this._stream!!.id,
                         localPath = GeoJsonUtils.generateGeoJson(
                             this,
                             GeoJsonUtils.generateFileName(it.deployedAt, it.deploymentKey),

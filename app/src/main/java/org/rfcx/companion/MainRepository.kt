@@ -102,7 +102,4 @@ class MainRepository(
     fun deleteTracking(id: Int, context: Context) {
         localDataHelper.getTrackingLocalDb().deleteTracking(id, context)
     }
-    fun deleteDeploymentWithType(type: String) {
-        localDataHelper.getDeploymentLocalDb().deleteDeploymentWithType(type)
-    }
 }
