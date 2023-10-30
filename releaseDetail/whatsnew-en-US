@@ -1,7 +1,2 @@
 Change logs
-- Can see Guardian archived audios coverage by year and month
-- Not show the deployment not active on the list when create deployment offline
-- Fixed create new site offline it create duplicate site
-- Make user cannot create site with existing names
-- Upgrade Companion target sdk to 33
-- Fixed loading bar not hide when done sync
+- Not fetching deployment without stream to avoid sending it to the server
