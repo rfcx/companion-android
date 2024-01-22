@@ -1,6 +1,17 @@
 <resources>
 
     <string name="back">back</string>
+    <!-- Common -->
+    <string name="error_has_occurred">An error occurred. Please try again.</string>
+    <string name="select">Select</string>
+    <string name="something_went_wrong">something went wrong</string>
+    <string name="network_not_available">network not available</string>
+    <string name="deploy">Deploy</string>
+    <string name="next">Next</string>
+    <string name="yes">Yes</string>
+    <string name="sync">Sync</string>
+    <string name="see_deployment_detail">See Deployment Detail</string>
+    <string name="projects">Project</string>
 
     <!-- LoginActivity -->
     <string name="rfcx_companion">Arbimon Companion</string>
@@ -13,6 +24,12 @@
     <string name="connect_with_google">Login with Google</string>
     <string name="or">OR</string>
 
+    <!-- ProjectSelectorActivity -->
+    <string name="set_project">Set project</string>
+    <string name="choose_project">Choose which project you are working with</string>
+    <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
+    <string name="logout">logout</string>
+
     <!--  MainActivity  -->
     <string name="ok">OK</string>
     <string name="format_deploy_uploading">Syncing a deployment</string>
@@ -23,68 +40,14 @@
     <string name="menu_profile">PROFILE</string>
     <string name="setup_first_device">Welcome! %s \nGet started by adding your first \nArbimon device</string>
 
-    <!--    ConfigureFragment-->
-    <string name="let_configure">Let’s configure the device</string>
-    <string name="sample_rate">Sample Rate</string>
-    <string name="gain">Gain</string>
-    <string name="sleep_duration">Sleep (seconds)</string>
-    <string name="recording_duration">Recording (seconds)</string>
-    <string name="profile_name">Profile Name (optional)</string>
-    <string name="recording_duration_title">Recording Duration</string>
-    <string name="choose_sample_rate">Sample Rate (kHz)</string>
-    <string name="choose_gain">Gain</string>
-    <string name="kilohertz">%s kHz</string>
-    <string name="continuous">Continuous</string>
-    <string name="custom_recording_period">Custom Recording Period</string>
-    <string name="always_recording">Always Recording</string>
-    <string name="recommended">Recommended</string>
-    <string name="custom">Custom</string>
-    <string name="recommended_text">Record for 5 minutes, sleep for 10 minutes</string>
-    <string name="edge_device_battery">Arbimon Edge device battery</string>
-    <string name="minimum_1_second">The minimum is 1 second</string>
-    <string name="minimum_5_second">The minimum is 5 seconds</string>
-
-    <!--  SyncFragment -->
-    <string name="sync">Sync</string>
-    <string name="no_retry">TRY AGAIN</string>
-    <string name="yes">Yes</string>
-    <string name="ok_complete">OK, COMPLETE</string>
-    <string name="ready_send_configuration">Ready to synchronize using tone</string>
-    <string name="switch_to_off">Switch device to \"OFF\" and place near your phone</string>
-    <string name="switch_to_custom">Move switch to \"CUSTOM\" while initial tone is playing</string>
-    <string name="solid_red_flashing_green">Do you see a solid red LED and flashing green LED?</string>
-    <string name="ready_to_sync">You are ready to sync your device</string>
-    <string name="the_end">At the end of the tone you should \nhave seen the solid green LED for 1 second</string>
-    <string name="should_see">Now you should see either flashing \nred (recording) or flashing green (sleeping)</string>
-    <string name="play_initial_tone">play initial tone</string>
-    <string name="play_sync_tone">play sync tone</string>
-    <string name="syncing_instruction">Having problems</string>
-
-    <!-- DetailDeploymentActivity -->
-    <string name="title_deployment_detail">Site name</string>
-    <string name="sleep_duration_title">Sleep duration</string>
-    <string name="estimated_battery_duration">Estimated battery remaining</string>
-    <string name="photos">Photos</string>
-    <string name="detail_sec">%d second</string>
-    <string name="delete">Delete</string>
-    <string name="edit">Edit</string>
-    <string name="delete_location">Delete deployment?</string>
-    <string name="deployment_key">Deployment ID</string>
-    <string name="are_you_sure_delete_location">The device will be removed</string>
-
-    <!--  Perform Battery  -->
-    <string name="test">test</string>
-    <string name="skip">Skip</string>
-    <string name="it_full">or, if it is full then:</string>
-    <string name="red_flash">How many time did the red LED flash?</string>
-    <string name="try_again">try again</string>
-    <string name="device_configured">Device configured! \nNow let’s verify the battery level</string>
-    <string name="days">Estimated battery duration: %s days</string>
-    <string name="day">Estimated battery duration: %s day</string>
-    <string name="notification">A notification will be sent a day \nbefore the battery is due to run out</string>
-    <string name="too_low_battery">The battery level is too low \nto estimate the recording duration</string>
-    <string name="recharge_or_replace">Recharge or replace the batteries \nfor a longer recording duration</string>
-    <string name="recharging">Batteries need recharging!</string>
+    <!-- MapFragment -->
+    <string name="sites_downloading">Sites downloading</string>
+    <string name="sites_synced">All sites synced</string>
+    <string name="no_deployments">No deployments</string>
+    <string name="time_second">Just now</string>
+    <string name="just_now">just now</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="yesterday_time">yesterday,</string>
 
     <!-- EdgeCheckListFragment -->
     <string name="setting_up_edge_checklist">AudioMoth Setup Checklist</string>
@@ -97,19 +60,21 @@
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
-    <string name="finish">finish</string>
-    <string name="name_location">Site name</string>
-    <string name="new_location">New site</string>
-    <string name="existing">Existing</string>
-    <string name="next">Next</string>
-    <string name="use_your_current_location">Use current location</string>
-    <string name="change">change</string>
-    <string name="choose">Choose</string>
     <string name="altitude">Altitude</string>
-    <string name="altitude_default">0.0</string>
     <string name="altitude_digits">0123456789.</string>
     <string name="within">You are currently within 20m of the site</string>
     <string name="more_than">You are %s from the site</string>
+
+    <!-- SetDeploymentSite_1 -->
+    <string name="search_box_hint">Search place, address or lat/long</string>
+    <string name="search_or_create_box_hint">Search site or create new</string>
+    <string name="site_name_hint">Search Sites by Name…</string>
+    <string name="search_title">Search</string>
+    <string name="search_message">by name/lat,long</string>
+    <string name="search_not_found_title">No results found</string>
+    <string name="search_not_found_message">Try searching for something else</string>
+    <string name="search_error_title">An error has occurred</string>
+    <string name="search_error_message">Please try again later</string>
 
     <!--  NewSyncFragment  -->
     <string name="set_hardware_switch_to_off">Set hardware switch to OFF</string>
@@ -136,24 +101,11 @@
     <string name="repeat_sound">Repeat syncing sound</string>
 
     <!--  MapPickerFragment  -->
-    <string name="select">Select</string>
     <string name="selected_location">Selected location</string>
     <string name="please_fill_information">Site name is required.</string>
     <string name="altitude_is_required">Altitude is required.</string>
     <string name="no_result_found">No result found</string>
     <string name="not_have_sites">There are no sites in this project.</string>
-
-    <!--  SelectProfileFragment  -->
-    <string name="use_an_existing">Use an existing profile</string>
-    <string name="or_create_new">or create new</string>
-    <string name="can_not_get_profiles">Unable to download your profiles. \nPlease try again.</string>
-    <string-array name="gainLabel">
-        <item>Lowest</item>
-        <item>Low</item>
-        <item>Medium</item>
-        <item>High</item>
-        <item>Highest</item>
-    </string-array>
 
     <!--  ProfileFragment  -->
     <string name="profile_aditional_label">Additional</string>
@@ -171,23 +123,14 @@
     <string name="light_theme">Light</string>
     <string name="system_default">System default</string>
     <string name="location_group">Project</string>
-    <string name="create_new_group">Create new project</string>
-    <string name="select_a_color">Select a color</string>
-    <string name="missing_name_group">Missing name project</string>
     <string name="none">None</string>
-    <string name="projects">All projects</string>
-    <string name="group_already_exists">The project already exists</string>
-
     <string name="dd_coordinates">DD</string>
     <string name="ddm_coordinates">DDM</string>
     <string name="dms_coordinates">DMS</string>
     <string name="dd_coordinates_format">0.00000°N 0.00000°E</string>
     <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
     <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
-
-    <string name="delete_location_group_title">Do you want to delete this project?</string>
     <string name="read_only">Read Only</string>
-
     <string name="download">Download</string>
     <string name="no_internet_connection">No internet, Please try again.</string>
     <string name="unavailable">Unavailable \n(area too large)</string>
@@ -202,14 +145,13 @@
     <string name="snackbar_retry">RETRY</string>
 
     <!--  DeployFragment  -->
-    <string name="title_take_photos">Show off your installation skills</string>
+    <string name="take">Take</string>
+    <string name="choose">Choose</string>
     <string name="take_other">Take any other photo that will be helpful in relocating the device or characterizing the site</string>
     <string name="photo_taken">Photos taken: %d / %d</string>
     <string name="missing_dialog_title">Are you sure you want to continue?</string>
     <string name="button_continue">continue</string>
     <string name="follow_missing">The following photos are missing:\n%s</string>
-
-
     <string name="read_storage_permission_msg">Deploy App would like to read your storage</string>
     <string name="go_to_setting">Settings</string>
     <string name="menu_camera">Camera</string>
@@ -218,17 +160,26 @@
     <string name="these_photos_already_exists">These photos already exist</string>
     <string name="this_photo_already_exists">This photo already exists</string>
     <string name="can_not_create_image">Unable to create image file.</string>
-    <string name="open_gallery">Open gallery</string>
-    <string name="take_photo">Take photo</string>
+    <string name="audiomoth_photo_guideline_1">Take a close-up photo of the device showing the device identifier (if used)</string>
+    <string name="audiomoth_photo_guideline_2">Take a photo from 1–3 meters showing the placement to help find the device if it’s in dense vegetation</string>
+    <string name="audiomoth_photo_guideline_3">Take a photo from 5–10 meters showing the tree/bush/vine where the device is located</string>
+    <string name="audiomoth_photo_guideline_4">Take a photo from 15–20 meters showing the broader location or view from the approach to help recognize the surroundings</string>
+    <string name="audiomoth_photo_guideline_5">Take a photo showing the exit point from the road or trail used to access the device (if off-trail)</string>
+    <string name="audiomoth_placeholder_1">device id</string>
+    <string name="audiomoth_placeholder_2">placement</string>
+    <string name="audiomoth_placeholder_3">location</string>
+    <string name="audiomoth_placeholder_4">approach</string>
+    <string name="audiomoth_placeholder_5">trail</string>
 
-    <!--  MapDetailBottomSheetFragment  -->
-    <string name="see_deployment_detail">See Detail</string>
-    <string name="create_deployment">Create deployment</string>
-    <string name="no_deployment">No deployment</string>
-    <string name="deploy_at">Deployed at %s</string>
-    <string name="days_remaining">%d days remaining</string>
-    <string name="day_remaining">%s day remaining</string>
-    <string name="battery_depleted">battery depleted</string>
+    <!-- DetailDeploymentActivity -->
+    <string name="change">Change</string>
+    <string name="title_deployment_detail">Site name</string>
+    <string name="photos">Photos</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="delete_location">Delete deployment?</string>
+    <string name="deployment_key">Deployment ID</string>
+    <string name="are_you_sure_delete_location">The device will be removed</string>
 
     <!--  EditLocationActivity  -->
     <string name="edit_location">Edit site</string>
@@ -236,26 +187,17 @@
     <string name="site_name_exists">This site name already exists.</string>
 
     <!-- SelectingExistedSiteFragment -->
-    <string name="create_new_site">Create new site</string>
     <string name="site">Site</string>
 
     <!--  ChooseDeviceFragment  -->
-    <string name="choose_your_device">Choose your device</string>
     <string name="rfcx_edge_audiomoth">AudioMoth</string>
     <string name="rfcx_song_meter">Song Meter Micro</string>
-    <string name="warning_text">Sites is downloading \nBeware missing sites</string>
-
     <string name="location_permission_msg">Companion App would like to use your location</string>
 
-    <string name="maximum_ranges">The maximum number of recording ranges 4</string>
     <string name="an_error_occurred">Service unavailable</string>
-    <string name="error_has_occurred">An error occurred. Please try again.</string>
     <string name="format_in_progress_step">Not yet deployed</string>
     <string name="format_deployed">deployed</string>
-
     <string name="not_have_permission">You don’t have permission to deploy to this project. You can ask the project owner to change your user permissions.</string>
-    <string name="select_cycle_s_to_skip_between_recordings">Select cycle(s) to skip between recordings</string>
-
     <string name="connect">Connect</string>
     <string name="retry">Retry</string>
 
@@ -266,21 +208,9 @@
     <string name="notification_traking_message_format">%d minutes recorded</string>
     <string name="notification_location_not_availability">Please enable your device\'s location settings</string>
 
-    <!-- Search Location -->
-    <string name="search_box_hint">Search place, address or lat/long</string>
-    <string name="search_or_create_box_hint">Search site or create new</string>
-    <string name="site_name_hint">Search Sites by Name…</string>
-    <string name="search_title">Search</string>
-    <string name="search_message">by name/lat,long</string>
-    <string name="search_not_found_title">No results found</string>
-    <string name="search_not_found_message">Try searching for something else</string>
-    <string name="search_error_title">An error has occurred</string>
-    <string name="search_error_message">Please try again later</string>
     <string name="desc_deployment_image">Deployment Photos</string>
-
-    <string name="cancel">cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="correct_mark">\u2713</string>
-    <string name="deploy">Deploy</string>
 
     <!-- SongMeterCheckListFragment -->
     <string name="song_meter_checklist">Song Meter Setup Checklist:</string>
@@ -293,35 +223,12 @@
     <string name="sites_loading_dialog">Your full site list is still downloading.\nSome sites may not be visible until the download is complete.</string>
     <string name="sites_loading_finish_dialog">Your full site list is downloaded.</string>
 
-    <!-- MapFragment -->
-    <string name="sites_downloading">Sites downloading</string>
-    <string name="sites_synced">All sites synced</string>
-    <string name="no_deployments">No deployments</string>
-
-    <string name="time_second">Just now</string>
-    <string name="just_now">just now</string>
-    <string name="yesterday">Yesterday</string>
-    <string name="yesterday_time">yesterday,</string>
-
     <!-- layout_map_window_info -->
     <string name="created_at">Created</string>
     <string name="deployed_at">Deployed</string>
 
     <!-- SetDeploymentSiteFragment -->
     <string name="create_site">Create \"%s\"</string> <!-- If change this text, should edit logic in DetailDeploymentSiteFragment -->
-
-    <!-- ProjectSelectorActivity -->
-    <string name="choose_project">Choose which project you are working with</string>
-    <string name="something_went_wrong">something went wrong</string>
-    <string name="network_not_available">network not available</string>
-    <string name="no_content_project">There is no accessible project in this account.\nPlease contact an administrator\nor create the project in Arbimon platform.</string>
-    <string name="logout">logout</string>
-    <string name="admin_role">admin</string>
-    <string name="updater_role">updater</string>
-    <string name="up_to_date">up to date</string>
-    <string name="update">Update</string>
-    <string name="protocol">Protocol</string>
-    <string name="swarm">swarm</string>
 
     <!-- SongMeterConnectFragment -->
     <string name="_4_confirm_that_the_device_name_is_changed">4) Confirm that the device name has changed</string>
@@ -335,58 +242,17 @@
     <string name="switch_recorder_on">Turn recorder/Song Meter on</string>
     <string name="alert_songmeter">Bluetooth needs to be enabled before advancing to the next step</string>
     <string name="alert_bluetooth_songmeter">Bluetooth permission is needed before advancing to the next step</string>
-
-    <string name="ibattery_p">Internal Battery</string>
-    <string name="mbattery_p">Main Battery</string>
-    <string name="in_queue">In queue</string>
-    <string name="sentinel_module_detect">Sentinel module detected</string>
-    <string name="sentinel_module_not_detect">Sentinel module not detected</string>
-    <string name="sim_detected">SIM Card detected</string>
-    <string name="sim_not_detected">SIM Card not detected</string>
-    <string name="retest">Retest</string>
-    <string name="perfect">Perfect</string>
-    <string name="good">Good</string>
-    <string name="bad">Bad</string>
-    <string name="error">Error</string>
-    <string name="lt_93_bad"><![CDATA[< -93 Bad]]></string>
-    <string name="lt_97_ok"><![CDATA[< -97 OK]]></string>
-    <string name="lt_100_ok"><![CDATA[< -100 Good]]></string>
-    <string name="lt_104_perfect"><![CDATA[< -104 Perfect]]></string>
-    <string name="lt_110_error"><![CDATA[< -110 Error]]></string>
-    <string name="phone_number">phone number:</string>
-    <string name="swarm_id">swarm id:</string>
-    <string name="offline_mode">Offline mode</string>
-    <string name="pass_times_local_time">Off times (local time)</string>
-    <string name="plus">+</string>
-    <string name="manual">manual</string>
-    <string name="auto">auto</string>
-    <string name="there_is_no_off_time_in_this_project">There is no off time in this project</string>
-
-    <string name="delete_from_local">delete from local</string>
     <string name="sync_now">Sync Now</string>
-
     <string name="all_works_synced">All works synced</string>
     <string name="unsynced_works">Unsynced Works</string>
     <string name="syncing">Syncing</string>
     <string name="synced">Synced</string>
-    <string name="more_info">More info</string>
-
     <string name="login_failed">Login failed. Please try again.</string>
     <string name="incorrect_username_or_password">Incorrect email or password.</string>
     <string name="firebase_authentication_failed">Firebase authentication failed. Please try again.</string>
-    <string name="dismiss">dismiss</string>
     <string name="go_back">go back</string>
-    <string name="battery_voltage">Battery Voltage</string>
-    <string name="system_voltage">System Voltage</string>
-
-    <string name="dialog_start_service_upload">Look like you have a trouble with uploading.\nTry restarting service?</string>
-    <string name="dialog_start_service_update">Look like you have a trouble with updating.\nTry restarting service?</string>
-    <string name="dialog_start_service_mic">Look like you have a trouble with microphone.\nTry restarting service?</string>
-    <string name="restart">Restart</string>
-
     <string name="type_title">type:</string>
     <string name="id_title">id:</string>
-    <string name="select_month_year">Select year and month</string>
     <string name="unsynced_deployment_text">You have %d unsynced deployments</string>
     <string name="deployment">Deployment</string>
 

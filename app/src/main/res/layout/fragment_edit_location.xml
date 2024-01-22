@@ -27,7 +27,7 @@
                 android:layout_marginStart="@dimen/margin_padding_large"
                 android:layout_marginTop="@dimen/margin_padding_normal"
                 android:layout_marginEnd="@dimen/margin_padding_large"
-                android:hint="@string/name_location"
+                android:hint="@string/site"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
