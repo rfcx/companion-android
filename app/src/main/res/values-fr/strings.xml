@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common -->
+    <string name="error_has_occurred">Une erreur est survenue. Veuillez réessayer.</string>
+    <string name="select">sélectionner/choisir</string>
+    <string name="something_went_wrong">Quelque chose s\'est mal passé</string>
+    <string name="network_not_available">Réseau non disponible</string>
+    <string name="deploy">Déployer</string>
+    <string name="yes">Oui</string>
+    <string name="sync">Synchroniser</string>
+    <string name="see_deployment_detail">Voir les détails du déploiement</string>
+    <string name="projects">Projet</string>
+
+    <!-- LoginActivity -->
+    <string name="rfcx_companion">Arbimon Companion</string>
+    <string name="email">Email/Courriel</string>
+    <string name="password">Mot de passe</string>
+    <string name="login_sign_in_button_label">Connectez-Vous</string>
+    <string name="powered_by">Propulsé par</string>
+    <string name="pls_fill_email">Courriel manquant</string>
+    <string name="pls_fill_password">Mot de passe manquant</string>
+    <string name="connect_with_google">Connectez-vous avec Google</string>
+    <string name="or">OU</string>
+
+    <!-- ProjectSelectorActivity -->
+    <string name="set_project">établir un projet</string>
+    <string name="choose_project">Choisissez le projet avec lequel vous travaillez</string>
+    <string name="no_content_project">Il n\'y a aucun projet accessible dans ce compte. \nVeuillez contacter un administrateur \nou créer le projet sur la plateforme Arbimon.</string>
+    <string name="logout">déconnexion</string>
+
+    <!--  MainActivity  -->
+    <string name="ok">OK</string>
+    <string name="format_deploy_uploading">Synchronisation d\'un déploiement</string>
+    <string name="format_deploys_uploading">Synchronisation de %s déploiements</string>
+    <string name="format_deploy_waiting_network">Impossible de synchroniser lorsqu\'il n\'y a pas de connexion</string>
+    <string name="format_deploys_uploaded">Tous les déploiements synchronisés</string>
+    <string name="menu_map">CARTE</string>
+    <string name="menu_profile">PROFIL</string>
+    <string name="setup_first_device">Bienvenue! %s \nCommencez par ajouter votre premier \nappareil Arbimon</string>
+
+    <!-- MapFragment -->
+    <string name="sites_downloading">Téléchargement de sites</string>
+    <string name="sites_synced">Tous les sites synchronisés</string>
+    <string name="no_deployments">Aucun déploiement</string>
+    <string name="time_second">Tout à l\' heure</string>
+    <string name="just_now">tout à l\' heure</string>
+    <string name="yesterday">Hier</string>
+    <string name="yesterday_time">hier,</string>
+
+    <!-- EdgeCheckListFragment -->
+    <string name="setting_up_edge_checklist">Liste de configuration AudioMoth</string>
+    <string name="setup">Configuration</string>
+    <string name="optional">Optionnel</string>
+    <string name="set_deployment_site">Définissez le site de déploiement</string>
+    <string name="synchronize_with_audioMoth">Synchronisez avec AudioMoth</string>
+    <string name="add_photo">prendre des photos</string>
+
+    <!-- SetDeploymentSite_1 -->
+    <string name="search_box_hint">Rechercher un lieu, une adresse ou une latitude/longitude</string>
+    <string name="search_or_create_box_hint">Rechercher un site ou créer un nouveau</string>
+    <string name="site_name_hint">Rechercher des sites par nom…</string>
+    <string name="search_title">Recherche</string>
+    <string name="search_message">par nom/latitude,longitude</string>
+    <string name="search_not_found_title">Aucun résultat trouvé</string>
+    <string name="search_not_found_message">Essayez de chercher autre chose</string>
+    <string name="search_error_title">Une erreur est survenue</string>
+    <string name="search_error_message">Veuillez réessayer plus tard</string>
+
+    <!--  LocationFragment  -->
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="altitude">Altitude</string>
+    <string name="altitude_digits">0123456789.</string>
+    <string name="within">Vous êtes actuellement à moins de 20m du site</string>
+    <string name="more_than">Vous êtes à %s du site</string>
+
+    <!--  NewSyncFragment  -->
+    <string name="set_hardware_switch_to_off">Configurer l’interrupteur du Hardware sur OFF</string>
+    <string name="set_hardware_switch_to_custom">Configurer l’interrupteur du Hardware sur CUSTOM</string>
+    <string name="lights_audiomoth">L’éclairage de l’AudioMoth doit être: \nROUGE Fixe &amp; VERT CLIGNOTANT</string>
+    <string name="move_phone_near">Déplacer le téléphone près de AudioMoth</string>
+    <string name="keep_phone_near">Garder le téléphone près de AudioMoth</string>
+    <string name="sync_in_progress">Synchronisation avec AudioMoth en cours</string>
+    <string name="begin_sync">Début de la synchronisation</string>
+    <string name="sync_audiomoth">Synchronisation avec AudioMoth</string>
+    <string name="one">1)</string>
+    <string name="two">2) Entendez-vous un son fort ?(vérifier si le volume est trop faible ou en mode silencieux)</string>
+    <string name="three">3)</string>
+    <string name="four">4)</string>
+    <string name="five">5)</string>
+    <string name="six">6) Vérifier que L’éclairage ROUGE N’EST PAS Fixe</string>
+    <string name="one_text">1) La synchronisation avec AudioMoth a commencé…</string>
+    <string name="two_text">2) Lecture initiale du son…</string>
+    <string name="three_text">3) Configurer l’interrupteur du Hardware sur CUSTOM</string>
+    <string name="four_text">4) L’éclairage de l’AudioMoth doit être :</string>
+    <string name="four_text_two">CLIGNOTANT VERT &amp; ROUGE FIXE</string>
+    <string name="five_text">5) Profil envoyé à AudioMoth</string>
+    <string name="no">Non</string>
+    <string name="repeat_sound">Répéter le son de synchronisation</string>
+
+    <!--  MapPickerFragment  -->
+    <string name="selected_location">emplacement/ Lieu sélectionné</string>
+    <string name="please_fill_information">Le nom du site est obligatoire.</string>
+    <string name="altitude_is_required">L\'altitude est requise.</string>
+    <string name="no_result_found">Aucun résultat trouvé</string>
+    <string name="not_have_sites">Il n’y a pas de sites dans ce projet..</string>
+
+    <!--  ProfileFragment  -->
+    <string name="profile_aditional_label">Additionnel</string>
+    <string name="profile_app_version_label">Version de l\'application</string>
+    <string name="account">Compte</string>
+    <string name="profile_sign_out_label">se déconnecter</string>
+    <string name="version_app">%s (%s)</string>
+    <string name="profile_feedback_label">Commentaire</string>
+    <string name="profile_offline_map_label">Carte hors ligne</string>
+    <string name="coordinates">Coordonnées</string>
+    <string name="location">Site</string>
+    <string name="display">écran</string>
+    <string name="theme">Thème</string>
+    <string name="dark_theme">Sombre</string>
+    <string name="light_theme">Clair</string>
+    <string name="system_default">Défaillance du système</string>
+    <string name="location_group">Projet</string>
+    <string name="none">None</string>
+    <string name="dd_coordinates">DD</string>
+    <string name="ddm_coordinates">DDM</string>
+    <string name="dms_coordinates">DMS</string>
+    <string name="dd_coordinates_format">0.00000°N 0.00000°E</string>
+    <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
+    <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
+    <string name="read_only">Lecture seulement</string>
+    <string name="download">Télécharger</string>
+    <string name="no_internet_connection">Pas d\'Internet, veuillez réessayer.</string>
+    <string name="unavailable">Indisponible \n(zone trop grande)</string>
+
+    <!--  FeedbackActivity  -->
+    <string name="app_feedback_share_ideas">Laissez vos commentaires ou partagez vos idées sur l’application</string>
+    <string name="from">Depuis: %s</string>
+    <string name="maximum_number_of_attachments">Le nombre maximum de pièces jointes est de 5. Essayez de supprimer certains éléments avant d’en ajouter d’autres.</string>
+    <string name="feedback_submitted">Commentaires Soumis Merci de votre temps :)</string>
+    <string name="profile_send_feedback">Envoyer un commentaire</string>
+    <string name="feedback_submission_failed">La soumission des commentaires a échoué! Veuillez réessayer</string>
+    <string name="snackbar_retry">RETENTER</string>
+
+    <!--  DeployFragment  -->
+    <string name="take">Prendre</string>
+    <string name="choose">Choisir</string>
+    <string name="take_other">Prenez toute autre photo qui sera utile pour relocaliser l’appareil ou caractériser le site</string>
+    <string name="photo_taken">Photos prises: %d / %d</string>
+    <string name="missing_dialog_title">Vous êtes sûr de vouloir continuer ?</string>
+    <string name="button_continue">Continuer</string>
+    <string name="follow_missing">Les photos suivantes se manquent:\n%s</string>
+    <string name="read_storage_permission_msg">L\'application souhaite lire votre espace de stockage</string>
+    <string name="go_to_setting">Paramètres</string>
+    <string name="menu_camera">Caméra</string>
+    <string name="menu_gallery">Galerie</string>
+    <string name="some_photo_already_exists">Certaines photos existent déjà</string>
+    <string name="these_photos_already_exists">These photos already exist</string>
+    <string name="this_photo_already_exists">Ces photos existent déjà</string>
+    <string name="can_not_create_image">Impossible de créer le fichier image.</string>
+    <string name="audiomoth_photo_guideline_1">Prenez une photo rapprochée de l’appareil montrant l’identifiant de l’appareil (si utilisé)</string>
+    <string name="audiomoth_photo_guideline_2">Prenez une photo de 1–3 mètres montrant l’emplacement pour aider à trouver l’appareil s’il est dans une végétation dense</string>
+    <string name="audiomoth_photo_guideline_3">Prenez une photo de 5–10 mètres montrant l’arbre / buisson / vigne où l’appareil est situé</string>
+    <string name="audiomoth_photo_guideline_4">Prenez une photo de 15–20 mètres montrant l’emplacement ou la vue plus large du proximité pour aider à reconnaître les environs</string>
+    <string name="audiomoth_photo_guideline_5">Prenez une photo montrant le point de sortie de la route ou du piste utilisé pour accéder à l’appareil (si hors piste)</string>
+    <string name="audiomoth_placeholder_1">ID d’appareil</string>
+    <string name="audiomoth_placeholder_2">Placement</string>
+    <string name="audiomoth_placeholder_3">Localisation</string>
+    <string name="audiomoth_placeholder_4">Proximité</string>
+    <string name="audiomoth_placeholder_5">Piste</string>
+
+    <!-- DetailDeploymentActivity -->
+    <string name="change">Changement</string>
+    <string name="title_deployment_detail">Nom du site</string>
+    <string name="photos">Photos</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
+    <string name="delete_location">Supprimer le déploiement?</string>
+    <string name="deployment_key">ID de déploiement</string>
+    <string name="are_you_sure_delete_location">L\'appareil sera supprimé</string>
+
+    <!--  EditLocationActivity  -->
+    <string name="edit_location">Modifier le site</string>
+    <string name="save">Sauvegarder</string>
+    <string name="site_name_exists">Ce nom de site existe déjà.</string>
+
+    <!-- SelectingExistedSiteFragment -->
+    <string name="site">Site</string>
+
+    <!--  ChooseDeviceFragment  -->
+    <string name="rfcx_edge_audiomoth">AudioMoth</string>
+    <string name="rfcx_song_meter">Song Meter Micro</string>
+    <string name="location_permission_msg">Companion App aimerais utiliser votre position</string>
+
+    <string name="an_error_occurred">Service non disponible</string>
+    <string name="format_in_progress_step">Pas encore déployé</string>
+    <string name="format_deployed">déployé</string>
+    <string name="not_have_permission">Vous n\'êtes pas autorisé à déployer sur ce projet. Vous pouvez demander au propriétaire du projet de modifier vos autorisations utilisateur.</string>
+    <string name="connect">Connecter</string>
+    <string name="retry">Retenter</string>
+
+    <!-- LocationTrackerService -->
+    <string name="track">Piste</string>
+    <string name="tracking_enabled">En service et suivi activé</string>
+    <string name="location_setting">Veuillez activer les paramètres de localisation de votre appareil</string>
+    <string name="notification_traking_message_format">%d minutes enregistrées</string>
+    <string name="notification_location_not_availability">Veuillez activer les paramètres de localisation de votre appareil</string>
+
+    <string name="desc_deployment_image">Photos de déploiement</string>
+    <string name="cancel">Annuler</string>
+    <string name="correct_mark">\u2713</string>
+
+    <!-- SongMeterCheckListFragment -->
+    <string name="song_meter_checklist">Liste de vérification de la configuration du song meter:</string>
+    <string name="synchronize_with_song_meter">Synchronisation avec le Song Meter</string>
+
+    <!-- ConnectInstructionDiaglogFragment -->
+    <string name="got_it">J\'ai compris</string>
+
+    <!-- SelectExistedSites -->
+    <string name="sites_loading_dialog">Le téléchargement de votre liste complète de sites est toujours en cours.\nCertains sites peuvent ne pas être visibles tant que le téléchargement n\'est pas terminé.</string>
+    <string name="sites_loading_finish_dialog">Votre liste complète de sites est téléchargée.</string>
+
+    <!-- layout_map_window_info -->
+    <string name="created_at">Créé</string>
+    <string name="deployed_at">Déployé</string>
+
+    <!-- SetDeploymentSiteFragment -->
+    <string name="create_site">Créer \"%s\"</string> <!-- If change this text, should edit logic in DetailDeploymentSiteFragment -->
+
+    <!-- SongMeterConnectFragment -->
+    <string name="next">Suivant</string>
+    <string name="_4_confirm_that_the_device_name_is_changed">4) Confirmez que le nom de l\'appareil a changé</string>
+    <string name="step_4_with_id">4) Confirme que el nombre del dispositivo ha cambiado a %s</string>
+    <string name="_3_device_is_synced">3) L\'appareil est synchronisé…</string>
+    <string name="hold_press_on_switch_until_bluetooth_blinking">Mantenga presionado el botón hasta que la luz LED de Bluetooth parpadee.</string>
+    <string name="_3">3)</string>
+    <string name="_2_device_is_detected">2) L\'appareil est détecté…</string>
+    <string name="_2_do_you_see_a_device_select_one_to_sync">2) ¿Ves un dispositivo? Selecciona uno para sincronizar</string>
+    <string name="_1_the_recorder_is_on">1) L\'enregistreur est allumé…</string>
+    <string name="switch_recorder_on">Encienda la grabadora/Song Meter</string>
+    <string name="alert_songmeter">Bluetooth doit être activé avant de passer à l\'étape suivante</string>
+    <string name="alert_bluetooth_songmeter">L\'autorisation Bluetooth est nécessaire avant de passer à l\'étape suivante</string>
+    <string name="sync_now">Synchroniser maintenant</string>
+    <string name="all_works_synced">Toutes les œuvres synchronisées</string>
+    <string name="unsynced_works">Travaux non synchronisés</string>
+    <string name="syncing">Synchronisation</string>
+    <string name="synced">Synchronisé</string>
+    <string name="login_failed">La connexion a échoué. Veuillez réessayer.</string>
+    <string name="incorrect_username_or_password">E-mail ou mot de passe incorrect.</string>
+    <string name="firebase_authentication_failed">L\'authentification Firebase a échoué. Veuillez réessayer.</string>
+    <string name="go_back">Retourner</string>
+    <string name="type_title">taper:</string>
+    <string name="id_title">id:</string>
+    <string name="unsynced_deployment_text">Vous avez %d déploiements non synchronisés</string>
+    <string name="deployment">Déploiement</string>
+</resources>

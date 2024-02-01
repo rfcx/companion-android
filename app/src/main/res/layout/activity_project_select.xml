@@ -14,7 +14,7 @@
         android:layout_marginTop="@dimen/margin_padding_xlarge"
         android:layout_marginEnd="@dimen/margin_padding_normal"
         android:layout_marginBottom="@dimen/margin_padding_xlarge"
-        android:text="Set Project"
+        android:text="@string/set_project"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

@@ -1,163 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Common -->
+    <string name="error_has_occurred">Ocorreu um erro. Por favor tentar novamente.</string>
+    <string name="select">Selecionar</string>
+    <string name="something_went_wrong">Algo deu errado</string>
+    <string name="network_not_available">Rede não disponível</string>
+    <string name="deploy">Implantar</string>
+    <string name="yes">Sim</string>
+    <string name="sync">Sincronizar</string>
+    <string name="see_deployment_detail">Veja detalhes de implantação</string>
+    <string name="projects">Projeto</string>
+
     <!-- LoginActivity -->
-    <string name="rfcx_companion">RFCx Companion</string>
+    <string name="rfcx_companion">Arbimon Companion</string>
     <string name="email">Email</string>
     <string name="password">Senha</string>
-    <string name="login_sign_in_button_label">Logar, entrar</string>
-    <string name="powered_by">Dsenvolvido por</string>
-    <string name="pls_fill_email">Email faltando</string>
-    <string name="pls_fill_password">Senha faltando</string>
-    <string name="connect_with_facebook">Entrar com o Facebook</string>
-    <string name="connect_with_sms">Entrar com o número de telefone</string>
+    <string name="login_sign_in_button_label">Inciar sessão</string>
+    <string name="powered_by">Movido por</string>
+    <string name="pls_fill_email">Email ausente</string>
+    <string name="pls_fill_password">Senha ausente</string>
+    <string name="connect_with_google">Entrar com Google</string>
     <string name="or">OU</string>
+
+    <!-- ProjectSelectorActivity -->
+    <string name="set_project">Estabelecer projeto</string>
+    <string name="choose_project">Escolha qual projeto você está trabalhando</string>
+    <string name="no_content_project">Não há nenhum projeto acessível nesta conta. \nEntre em contato com um administrador \nou crie o projeto na plataforma Arbimon.</string>
+    <string name="logout">Encerrar</string>
 
     <!--  MainActivity  -->
     <string name="ok">OK</string>
-    <string name="format_deploy_uploading">Sincronizando a instalação</string>
-    <string name="format_deploys_uploading">Sincronizando %s  instalações</string>
-    <string name="format_deploy_waiting_network">Impossível sincronizar enquanto estiver sem conexão</string>
-    <string name="format_deploys_uploaded">Todas as instalações sincronizadas</string>
+    <string name="format_deploy_uploading">Sincronizando uma implantação</string>
+    <string name="format_deploys_uploading">Sincronizando %s implantações</string>
+    <string name="format_deploy_waiting_network">Não é possível sincronizar enquanto não há conexão</string>
+    <string name="format_deploys_uploaded">Todas as implantações sincronizadas</string>
     <string name="menu_map">MAPA</string>
     <string name="menu_profile">PERFIL</string>
-    <string name="setup_first_device">Welcome! %s \nComece agora adicionando o seu \nprimeiro gravador da RFCx</string>
+    <string name="setup_first_device">Bem vindo! %s \nComece por adicionando seu primeiro \ndispositivo Arbimon</string>
 
-    <!--  SyncFragment -->
-    <string name="yes">Sim</string>
-
-    <!-- DetailDeploymentActivity -->
-    <string name="title_deployment_detail">Nome do local</string>
-    <string name="photos">Fotos</string>
-    <string name="delete">Apagar</string>
-    <string name="edit">Editar</string>
-    <string name="delete_location">Apagar o local?</string>
-    <string name="are_you_sure_delete_location">O gravador e o local serão removidos</string>
+    <!-- MapFragment -->
+    <string name="sites_downloading">Baixando sítios</string>
+    <string name="sites_synced">Todos os sítios sincronizados</string>
+    <string name="no_deployments">No implantação</string>
+    <string name="time_second">Agora mesmo</string>
+    <string name="just_now">agora mesmo</string>
+    <string name="yesterday">Ontem</string>
+    <string name="yesterday_time">Ontem,</string>
 
     <!-- EdgeCheckListFragment -->
-    <string name="setting_up_edge_checklist">Verificação de configuração do AudioMoth:</string>
+    <string name="setting_up_edge_checklist">Configurar lista de verificação do AudioMoth</string>
     <string name="setup">Configuração</string>
-    <string name="optional">"Opcional "</string>
-    <string name="deploy">Instalar</string>
-    <string name="set_deployment_site">Definir o local de instalação</string>
-    <string name="synchronize_with_audioMoth">Sincronizar com o AudioMoth</string>
+    <string name="optional">Opcional</string>
+    <string name="set_deployment_site">Estabelecer sítio de implantação</string>
+    <string name="synchronize_with_audioMoth">Sincrozinar com AudioMoth</string>
+    <string name="add_photo">Fotografar</string>
+
+    <!-- SetDeploymentSite_1 -->
+    <string name="search_box_hint">Pesquise local, endereço ou latitude/longitude</string>
+    <string name="search_or_create_box_hint">Buscar sítio ou procurar um novo</string>
+    <string name="site_name_hint">Pesquisar sites por nome…</string>
+    <string name="search_title">Procurar</string>
+    <string name="search_message">por nome/latitude,longitude</string>
+    <string name="search_not_found_title">Nenhum resultado encontrado</string>
+    <string name="search_not_found_message">Tente pesquisar por outra coisa</string>
+    <string name="search_error_title">Ocorreu um erro</string>
+    <string name="search_error_message">Por favor, tente novamente mais tarde</string>
 
     <!--  LocationFragment  -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="altitude">Altitude</string>
-    <string name="name_location">Nome do local</string>
-    <string name="new_location">Novo site</string>
-    <string name="change">mudar</string>
-    <string name="choose">Escolher</string>
-    <string name="altitude_default">0.0</string>
     <string name="altitude_digits">0123456789.</string>
-    <string name="within">Você está atualmente a 20m do local</string>
-    <string name="more_than">Você está a %s do local</string>
-    <string name="next">Próximo</string>
+    <string name="within">Você está à 20m de um sítio</string>
+    <string name="more_than">Você está a %s de um sítio</string>
 
     <!--  NewSyncFragment  -->
-    <string name="set_hardware_switch_to_off">Coloque o gravador em OFF</string>
-    <string name="set_hardware_switch_to_custom">Coloque o gravador em CUSTOM</string>
-    <string name="lights_audiomoth">As luzes no AudioMoth devem estar: \nVERMELHA E VERDE PISCANDO</string>
-    <string name="move_phone_near">Aproxime o telefone perto do AudioMoth</string>
-    <string name="keep_phone_near">Mantenha um telefone perto do AudioMoth</string>
-    <string name="two">2) Você ouve um tom de áudio alto?</string>
-    <string name="sync_in_progress">Sincronização com AudioMoth em andamento</string>
-    <string name="begin_sync">Começo da sincronização</string>
-    <string name="sync_audiomoth">Sincronizar com o AudioMoth</string>
-    <string name="six">6) Confirme que a luz VERMELHA está PISCANDO</string>
-    <string name="one_text">1) Sincronização com o AudioMoth começou...</string>
-    <string name="two_text">2) Reprodução do tom de áudio inicial...</string>
-    <string name="three_text">3) Gravador colocado em modo CUSTOM</string>
-    <string name="four_text">"4) As luzes do AudioMoth são:  "</string>
-    <string name="four_text_two">VERDE PISCANDO E VERMELHO</string>
-    <string name="five_text">5) Perfil enviado para o AudioMoth</string>
+    <string name="set_hardware_switch_to_off">Configurar o interruptor do hardware para OFF</string>
+    <string name="set_hardware_switch_to_custom">Configure o interruptor de hardware para CUSTOM</string>
+    <string name="lights_audiomoth">Luzes no AudioMoth deve estar: \nVermelho constante e Verde intermitente</string>
+    <string name="move_phone_near">Coloque o telefone próximo ao AudiMoth</string>
+    <string name="keep_phone_near">Mantenha o telefone próximo ao AudioMoth</string>
+    <string name="sync_in_progress">Sincronização com Audiomoth em progresso</string>
+    <string name="begin_sync">Iniciar sincronização</string>
+    <string name="sync_audiomoth">Sincronizar com o Audiomoth</string>
+    <string name="one">1)</string>
+    <string name="two">2) Você escuta um tom de áudio? (Confirmar que o volume não está baixo ou em modo silencioso)</string>
+    <string name="three">3)</string>
+    <string name="four">4)</string>
+    <string name="five">5)</string>
+    <string name="six">6) Confirmar que a luz VERMELHA não está constante</string>
+    <string name="one_text">1) Sincronização com AudioMoth iniciada…</string>
+    <string name="two_text">2) Tom de áudio inicial reproduzindo…</string>
+    <string name="three_text">3) Interruptor de hardware configurado em CUSTOM</string>
+    <string name="four_text">4) As luzes do AudioMoth são:</string>
+    <string name="four_text_two">Verde intermitente E Vermelho constante.</string>
+    <string name="five_text">5) Profile sent to AudioMoth</string>
     <string name="no">NÃO</string>
+    <string name="repeat_sound">Repetir som de sincronização</string>
 
     <!--  MapPickerFragment  -->
-    <string name="select">Selecionar</string>
     <string name="selected_location">Localização selecionada</string>
     <string name="please_fill_information">O nome do site é obrigatório.</string>
+    <string name="altitude_is_required">É necessária altitude.</string>
     <string name="no_result_found">Nenhum resultado encontrado</string>
-    <string name="not_have_sites">Não existem locais nesse projeto</string>
+    <string name="not_have_sites">Não têm sítios neste projeto.</string>
 
     <!--  ProfileFragment  -->
     <string name="profile_aditional_label">Adicional</string>
-    <string name="profile_app_version_label">Versão do aplicativo</string>
+    <string name="profile_app_version_label">Versão do app</string>
     <string name="account">Conta</string>
-    <string name="profile_sign_out_label">Sair ou fechar o programa</string>
+    <string name="profile_sign_out_label">Sair</string>
+    <string name="version_app">%s (%s)</string>
     <string name="profile_feedback_label">Comentário</string>
+    <string name="profile_offline_map_label">Mapa off-line</string>
     <string name="coordinates">Coordenadas</string>
-    <string name="location">Local</string>
-    <string name="display">Exibir</string>
+    <string name="location">Sítio</string>
+    <string name="display">Tela</string>
     <string name="theme">Tema</string>
     <string name="dark_theme">Escuro</string>
     <string name="light_theme">Claro</string>
-    <string name="system_default">Padrão do sistema</string>
+    <string name="system_default">Sistema Padrão</string>
     <string name="location_group">Projeto</string>
     <string name="none">None</string>
+    <string name="dd_coordinates">DD</string>
+    <string name="ddm_coordinates">DDM</string>
+    <string name="dms_coordinates">DMS</string>
+    <string name="dd_coordinates_format">0.00000°N 0.00000°E</string>
+    <string name="ddm_coordinates_format">0°0.0000\'N 0°0.0000\'E</string>
+    <string name="dms_coordinates_format">0°0\'0.0\"N 0°0\'0.0\"E</string>
+    <string name="read_only">Somente leitura</string>
+    <string name="download">Download</string>
+    <string name="no_internet_connection">Sem internet, tente novamente.</string>
+    <string name="unavailable">Indisponível \n(área muito grande)</string>
 
     <!--  FeedbackActivity  -->
-    <string name="app_feedback_share_ideas">Deixar o comentário sobre o aplicativo ou compartilhar suas ideias</string>
+    <string name="app_feedback_share_ideas">Deixe comentários sobre o app ou mande suas ideias</string>
     <string name="from">De: %s</string>
-    <string name="maximum_number_of_attachments">O número máximo de anexos é 5. Tente remover alguns items antes de adicionar mais.</string>
-    <string name="feedback_submitted">Comentário submetido. Obrigado pelo seu tempo :)</string>
-    <string name="profile_send_feedback">Enviar o comentário</string>
-    <string name="feedback_submission_failed">Houve uma falha ao enviar o comentário! Por favor tente novamente.</string>
+    <string name="maximum_number_of_attachments">O máximo de anexos são 5. Tente remover alguns antes de adicionar outros.</string>
+    <string name="feedback_submitted">Comentários enviados. Obrigado por seu tempo :)</string>
+    <string name="profile_send_feedback">Enviar comentários</string>
+    <string name="feedback_submission_failed">Falha no envio de comentários. Por favor tentar novamente.</string>
+    <string name="snackbar_retry">TENTAR DE NOVO</string>
 
     <!--  DeployFragment  -->
-    <string name="menu_camera">Câmera fotográfica</string>
+    <string name="take">Tirar</string>
+    <string name="choose">Escolher</string>
+    <string name="take_other">Tire qualquer outra foto que pode auxiliar na busca pelo dispositivo ou que caracteriza o sítio.</string>
+    <string name="photo_taken">Fotos tiradas: %d / %d</string>
+    <string name="missing_dialog_title">ATem certeza que quer continuar?</string>
+    <string name="button_continue">continuar</string>
+    <string name="follow_missing">As seguintes fotos estão faltando:\n%s</string>
+    <string name="read_storage_permission_msg">O aplicativo gostaria de ler seu armazenamento</string>
+    <string name="go_to_setting">Configurações</string>
+    <string name="menu_camera">Câmera</string>
     <string name="menu_gallery">Galeria</string>
-    <string name="some_photo_already_exists">Algumas fotos já existem</string>
+    <string name="some_photo_already_exists">Alguma foto já existe</string>
     <string name="these_photos_already_exists">Essas fotos já existem</string>
     <string name="this_photo_already_exists">Essa foto já existe</string>
-    <string name="can_not_create_image">Impossível criar uma imagem</string>
-    <string name="take_photo">Faça a foto</string>
-    <string name="open_gallery">Abra a galeria</string>
+    <string name="can_not_create_image">Não foi possível criar o arquivo de imagem.</string>
+    <string name="audiomoth_photo_guideline_1">Tire uma foto do dispositivo mostrando o identificador do dispositivo (se usado)</string>
+    <string name="audiomoth_photo_guideline_2">Tire uma foto a 1–3m mostrando a colocação para auxiliar na busca pelo dispositivo na vegetação densa.</string>
+    <string name="audiomoth_photo_guideline_3">Tire uma foto a 5–10m mostrando as árvores/arbustos/cipós onde está localizado o dispositivo</string>
+    <string name="audiomoth_photo_guideline_4">Tire uma foto de 15–20m mostrando a localização ao redor para facilitar a localização.</string>
+    <string name="audiomoth_photo_guideline_5">Tire uma foto do ponto de saída da estrada ou trilha usada para acessar o dispositivo (se fora da trilha)</string>
+    <string name="audiomoth_placeholder_1">ID do dispositivo</string>
+    <string name="audiomoth_placeholder_2">Colocação</string>
+    <string name="audiomoth_placeholder_3">Localização</string>
+    <string name="audiomoth_placeholder_4">Aproximar</string>
+    <string name="audiomoth_placeholder_5">Trilha</string>
 
-    <!--  MapDetailBottomSheetFragment  -->
-    <string name="see_deployment_detail">veja os detalhes</string>
-    <string name="deploy_at">Instalado em  %s</string>
-    <string name="no_deployment">Sem implantação</string>
+    <!-- DetailDeploymentActivity -->
+    <string name="change">Mudar</string>
+    <string name="title_deployment_detail">Nome do site</string>
+    <string name="photos">Fotos</string>
+    <string name="delete">Excluir</string>
+    <string name="edit">Editar</string>
+    <string name="delete_location">Excluir implantação?</string>
+    <string name="deployment_key">ID de implantação</string>
+    <string name="are_you_sure_delete_location">O dispositivo será removido</string>
 
     <!--  EditLocationActivity  -->
-    <string name="edit_location">Editar o local</string>
-    <string name="save">salvar</string>
+    <string name="edit_location">Editar site</string>
+    <string name="save">Salvar</string>
+    <string name="site_name_exists">Este nome de site já existe.</string>
 
     <!-- SelectingExistedSiteFragment -->
-    <string name="create_new_site">Crie um novo local</string>
-    <string name="site">Local</string>
+    <string name="site">Site</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="rfcx_edge_audiomoth">AudioMoth</string>
-    <string name="rfcx_guardian">RFCx Guardião</string>
-    <string name="error_has_occurred">Ocorreu um erro. Por favor tente novamente.</string>
+    <string name="rfcx_song_meter">Song Meter Micro</string>
+    <string name="location_permission_msg">Companion App gostaria de usar sua localização</string>
+
+    <string name="an_error_occurred">Serviço não disponível</string>
+    <string name="format_in_progress_step">Ainda não implantado</string>
+    <string name="format_deployed">implantado</string>
+    <string name="not_have_permission">Você não tem permissão para implantar neste projeto. Você pode pedir ao proprietário do projeto para alterar suas permissões de usuário.</string>
+    <string name="connect">Conectar</string>
+    <string name="retry">Tentar novamente</string>
 
     <!-- LocationTrackerService -->
-    <string name="track">Caminho</string>
-    <string name="tracking_enabled">Em serviço e rastreamento habilitado</string>
-    <string name="notification_traking_message_format">%d minutos gravados</string>
+    <string name="track">Acompanhar</string>
+    <string name="tracking_enabled">Em serviço e rastreamento ativado</string>
+    <string name="location_setting">Ative as configurações de localização do seu dispositivo</string>
+    <string name="notification_traking_message_format">%d minutos registrados</string>
+    <string name="notification_location_not_availability">Ative as configurações de localização do seu dispositivo</string>
 
-    <!-- Search Location -->
-    <string name="search_box_hint">Procurar local, endereço ou latitude/longitude</string>
-    <string name="site_name_hint">Procurar Locais pelo Nome</string>
-    <string name="search_message">Pelo nome/latitude, longitude</string>
-    <string name="search_title">Procurar</string>
-    <string name="search_not_found_title">Nenhum resultado encontrado</string>
-    <string name="search_not_found_message">Tente procurar por algo mais</string>
-    <string name="search_error_title">Ocorreu um erro</string>
+    <string name="desc_deployment_image">Fotos de implantação</string>
     <string name="cancel">Cancelar</string>
-    <string name="notification_yes">SIM</string>
+    <string name="correct_mark">\u2713</string>
 
-    <!-- MapFragment -->
-    <string name="sites_downloading">Baixando locais</string>
-    <string name="sites_synced">Todos os locais sincronizados</string>
-    <string name="no_deployments">Sem instalações</string>
-    <string name="projects">Todos os projetos</string>
+    <!-- SongMeterCheckListFragment -->
+    <string name="song_meter_checklist">Lista de verificação de configuração do Song Meter:</string>
+    <string name="synchronize_with_song_meter">Sincronizar com Song Meter</string>
+
+    <!-- ConnectInstructionDiaglogFragment -->
+    <string name="got_it">Entendi</string>
 
     <!-- SelectExistedSites -->
-    <string name="sites_loading_dialog">A sua lista completa de locais ainda está sendo baixada. Alguns locais podem não estar visíveis até que sejam baixados.</string>
-    <string name="got_it">Entendi</string>
-    <string name="sites_loading_finish_dialog">A sua lista completa de locais está pronta para ser baixada.</string>
+    <string name="sites_loading_dialog">O download da sua lista completa de sites ainda está em andamento.\nAlguns sites podem não ficar visíveis até que o download seja concluído.</string>
+    <string name="sites_loading_finish_dialog">Sua lista completa de sites foi baixada.</string>
 
+    <!-- layout_map_window_info -->
+    <string name="created_at">Criado</string>
+    <string name="deployed_at">Implantado</string>
+
+    <!-- SetDeploymentSiteFragment -->
+    <string name="create_site">Criar \"%s\"</string> <!-- If change this text, should edit logic in DetailDeploymentSiteFragment -->
+
+    <!-- SongMeterConnectFragment -->
+    <string name="next">Seguinte</string>
+    <string name="_4_confirm_that_the_device_name_is_changed">4) Confirme que o nome do dispositivo foi alterado</string>
+    <string name="step_4_with_id">4) Confirme que o nome do dispositivo foi trocado para %s</string>
+    <string name="_3_device_is_synced">3) O dispositivo está sincronizado…</string>
+    <string name="hold_press_on_switch_until_bluetooth_blinking">Aperte e segure o botão até o LED do Bluetooth esteja piscando</string>
+    <string name="_3">3)</string>
+    <string name="_2_device_is_detected">2) O dispositivo foi detectado…</string>
+    <string name="_2_do_you_see_a_device_select_one_to_sync">2) Encontrou algum dispositivo? Selecione um para sincronizar</string>
+    <string name="_1_the_recorder_is_on">1) O gravador está ligado…</string>
+    <string name="switch_recorder_on">Ligar gravador/Song Meter</string>
+    <string name="alert_songmeter">O Bluetooth precisa ser ativado antes de avançar para a próxima etapa</string>
+    <string name="alert_bluetooth_songmeter">A permissão do Bluetooth é necessária antes de avançar para a próxima etapa</string>
+    <string name="sync_now">Sincronize agora</string>
+    <string name="all_works_synced">Todos os trabalhos sincronizados</string>
+    <string name="unsynced_works">Obras não sincronizadas</string>
+    <string name="syncing">Sincronizando</string>
+    <string name="synced">Sincronizado</string>
+    <string name="login_failed">Login failed. Please try again.</string>
+    <string name="incorrect_username_or_password">Falha no login. Por favor, tente novamente.</string>
+    <string name="firebase_authentication_failed">Falha na autenticação do Firebase. Por favor, tente novamente.</string>
+    <string name="go_back">volte</string>
+    <string name="type_title">tipo:</string>
+    <string name="id_title">id:</string>
+    <string name="unsynced_deployment_text">Você tem %d implantações não sincronizadas</string>
+    <string name="deployment">Implantação</string>
 </resources>
