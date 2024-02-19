@@ -42,11 +42,11 @@
     </string-array>
 
     <string-array name="audiomoth_placeholders">
-        <item>@string/audiomoth_placeholder_1</item>
-        <item>@string/audiomoth_placeholder_2</item>
-        <item>@string/audiomoth_placeholder_3</item>
-        <item>@string/audiomoth_placeholder_4</item>
-        <item>@string/audiomoth_placeholder_5</item>
+        <item>device id</item>
+        <item>placement</item>
+        <item>location</item>
+        <item>approach</item>
+        <item>trail</item>
     </string-array>
 
     <string-array name="audiomoth_guideline_texts">
@@ -58,11 +58,11 @@
     </string-array>
 
     <string-array name="songmeter_placeholders">
-        <item>@string/audiomoth_placeholder_1</item>
-        <item>@string/audiomoth_placeholder_2</item>
-        <item>@string/audiomoth_placeholder_3</item>
-        <item>@string/audiomoth_placeholder_4</item>
-        <item>@string/audiomoth_placeholder_5</item>
+        <item>device id</item>
+        <item>placement</item>
+        <item>location</item>
+        <item>approach</item>
+        <item>trail</item>
     </string-array>
 
     <string-array name="songmeter_guideline_texts">

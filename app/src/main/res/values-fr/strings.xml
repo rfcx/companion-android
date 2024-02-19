@@ -255,4 +255,5 @@
     <string name="id_title">id:</string>
     <string name="unsynced_deployment_text">Vous avez %d déploiements non synchronisés</string>
     <string name="deployment">Déploiement</string>
+    <string name="other">Autre</string>
 </resources>
