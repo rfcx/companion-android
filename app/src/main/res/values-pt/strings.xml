@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Common -->
+    <string name="back">Voltar</string>
     <string name="error_has_occurred">Ocorreu um erro. Por favor tentar novamente.</string>
     <string name="select">Selecionar</string>
     <string name="something_went_wrong">Algo deu errado</string>
@@ -16,7 +17,7 @@
     <string name="email">Email</string>
     <string name="password">Senha</string>
     <string name="login_sign_in_button_label">Inciar sessão</string>
-    <string name="powered_by">Movido por</string>
+    <string name="powered_by">Distríbuido por</string>
     <string name="pls_fill_email">Email ausente</string>
     <string name="pls_fill_password">Senha ausente</string>
     <string name="connect_with_google">Entrar com Google</string>
@@ -41,7 +42,7 @@
     <!-- MapFragment -->
     <string name="sites_downloading">Baixando sítios</string>
     <string name="sites_synced">Todos os sítios sincronizados</string>
-    <string name="no_deployments">No implantação</string>
+    <string name="no_deployments">Sem implementações</string>
     <string name="time_second">Agora mesmo</string>
     <string name="just_now">agora mesmo</string>
     <string name="yesterday">Ontem</string>
@@ -147,7 +148,7 @@
     <string name="choose">Escolher</string>
     <string name="take_other">Tire qualquer outra foto que pode auxiliar na busca pelo dispositivo ou que caracteriza o sítio.</string>
     <string name="photo_taken">Fotos tiradas: %d / %d</string>
-    <string name="missing_dialog_title">ATem certeza que quer continuar?</string>
+    <string name="missing_dialog_title">Tem certeza que quer continuar?</string>
     <string name="button_continue">continuar</string>
     <string name="follow_missing">As seguintes fotos estão faltando:\n%s</string>
     <string name="read_storage_permission_msg">O aplicativo gostaria de ler seu armazenamento</string>
@@ -159,7 +160,7 @@
     <string name="this_photo_already_exists">Essa foto já existe</string>
     <string name="can_not_create_image">Não foi possível criar o arquivo de imagem.</string>
     <string name="audiomoth_photo_guideline_1">Tire uma foto do dispositivo mostrando o identificador do dispositivo (se usado)</string>
-    <string name="audiomoth_photo_guideline_2">Tire uma foto a 1–3m mostrando a colocação para auxiliar na busca pelo dispositivo na vegetação densa.</string>
+    <string name="audiomoth_photo_guideline_2">Tire uma foto a 1–3m mostrando a colocação para auxiliar na busca pelo dispositivo na vegetação densa</string>
     <string name="audiomoth_photo_guideline_3">Tire uma foto a 5–10m mostrando as árvores/arbustos/cipós onde está localizado o dispositivo</string>
     <string name="audiomoth_photo_guideline_4">Tire uma foto de 15–20m mostrando a localização ao redor para facilitar a localização.</string>
     <string name="audiomoth_photo_guideline_5">Tire uma foto do ponto de saída da estrada ou trilha usada para acessar o dispositivo (se fora da trilha)</string>
@@ -170,22 +171,22 @@
     <string name="audiomoth_placeholder_5">Trilha</string>
 
     <!-- DetailDeploymentActivity -->
-    <string name="change">Mudar</string>
+    <string name="change">Trocar</string>
     <string name="title_deployment_detail">Nome do site</string>
     <string name="photos">Fotos</string>
-    <string name="delete">Excluir</string>
+    <string name="delete">Apagar</string>
     <string name="edit">Editar</string>
     <string name="delete_location">Excluir implantação?</string>
     <string name="deployment_key">ID de implantação</string>
     <string name="are_you_sure_delete_location">O dispositivo será removido</string>
 
     <!--  EditLocationActivity  -->
-    <string name="edit_location">Editar site</string>
+    <string name="edit_location">Editar Sítio</string>
     <string name="save">Salvar</string>
     <string name="site_name_exists">Este nome de site já existe.</string>
 
     <!-- SelectingExistedSiteFragment -->
-    <string name="site">Site</string>
+    <string name="site">Sítio</string>
 
     <!--  ChooseDeviceFragment  -->
     <string name="rfcx_edge_audiomoth">AudioMoth</string>
@@ -195,15 +196,15 @@
     <string name="an_error_occurred">Serviço não disponível</string>
     <string name="format_in_progress_step">Ainda não implantado</string>
     <string name="format_deployed">implantado</string>
-    <string name="not_have_permission">Você não tem permissão para implantar neste projeto. Você pode pedir ao proprietário do projeto para alterar suas permissões de usuário.</string>
+    <string name="not_have_permission">Você não tem permissão para implantar neste projeto. Você pode pedir ao proprietário do projeto para alterar suas permissões de usuário</string>
     <string name="connect">Conectar</string>
     <string name="retry">Tentar novamente</string>
 
     <!-- LocationTrackerService -->
-    <string name="track">Acompanhar</string>
-    <string name="tracking_enabled">Em serviço e rastreamento ativado</string>
+    <string name="track">"Gravar trilha "</string>
+    <string name="tracking_enabled">Em serviço e registro do caminho habilitado</string>
     <string name="location_setting">Ative as configurações de localização do seu dispositivo</string>
-    <string name="notification_traking_message_format">%d minutos registrados</string>
+    <string name="notification_traking_message_format">%d minutos gravados</string>
     <string name="notification_location_not_availability">Ative as configurações de localização do seu dispositivo</string>
 
     <string name="desc_deployment_image">Fotos de implantação</string>
@@ -218,7 +219,7 @@
     <string name="got_it">Entendi</string>
 
     <!-- SelectExistedSites -->
-    <string name="sites_loading_dialog">O download da sua lista completa de sites ainda está em andamento.\nAlguns sites podem não ficar visíveis até que o download seja concluído.</string>
+    <string name="sites_loading_dialog">O download da sua lista completa de sites ainda está em andamento.\nAlguns sites podem não ficar visíveis até que o download seja concluído</string>
     <string name="sites_loading_finish_dialog">Sua lista completa de sites foi baixada.</string>
 
     <!-- layout_map_window_info -->
@@ -248,8 +249,8 @@
     <string name="synced">Sincronizado</string>
     <string name="login_failed">Login failed. Please try again.</string>
     <string name="incorrect_username_or_password">Falha no login. Por favor, tente novamente.</string>
-    <string name="firebase_authentication_failed">Falha na autenticação do Firebase. Por favor, tente novamente.</string>
-    <string name="go_back">volte</string>
+    <string name="firebase_authentication_failed">Falha na autenticação do Firebase. Por favor, tente novamente</string>
+    <string name="go_back">Voltar</string>
     <string name="type_title">tipo:</string>
     <string name="id_title">id:</string>
     <string name="unsynced_deployment_text">Você tem %d implantações não sincronizadas</string>
