@@ -9,6 +9,8 @@ class RealmHelper {
 
         fun migrationConfig(): RealmConfiguration {
             return RealmConfiguration.Builder().apply {
+                allowWritesOnUiThread(true)
+                allowQueriesOnUiThread(true)
                 schemaVersion(schemaVersion)
                 migration(CompanionRealmMigration())
             }.build()
@@ -16,6 +18,8 @@ class RealmHelper {
 
         fun fallbackConfig(): RealmConfiguration {
             return RealmConfiguration.Builder().apply {
+                allowWritesOnUiThread(true)
+                allowQueriesOnUiThread(true)
                 schemaVersion(schemaVersion)
                 deleteRealmIfMigrationNeeded()
             }.build()
