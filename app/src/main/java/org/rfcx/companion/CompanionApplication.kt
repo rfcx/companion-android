@@ -3,7 +3,6 @@ package org.rfcx.companion
 import android.app.Application
 import com.google.firebase.FirebaseApp
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import io.realm.exceptions.RealmMigrationNeededException
 import org.rfcx.companion.service.DeploymentCleanupWorker
 import org.rfcx.companion.util.*
