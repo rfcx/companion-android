@@ -38,69 +38,73 @@ class DeploymentSyncWorker(val context: Context, params: WorkerParameters) :
         deployments.forEach {
             Log.d(TAG, "doWork: sending id ${it.id}")
 
-            if (it.serverId == null) {
-                val result = ApiManager.getInstance().getDeviceApi(context)
-                    .createDeployment(it.toRequestBody()).execute()
+            try {
+                if (it.serverId == null) {
+                    val result = ApiManager.getInstance().getDeviceApi(context)
+                        .createDeployment(it.toRequestBody()).execute()
 
-                val error = result.errorBody()?.string()
-                when {
-                    result.isSuccessful -> {
-                        val fullId = result.headers().get("Location")
-                        val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
-                        markSentDeployment(id, db, locateDb, it.id)
-                    }
-                    error?.contains("this deploymentKey is already existed") ?: false -> {
-                        markSentDeployment(it.deploymentKey, db, locateDb, it.id)
-                    }
-                    else -> {
-                        errors.add(
-                            UnsyncedDeployment(
-                                it.id,
-                                it.stream!!.name,
-                                it.deployedAt,
-                                (error ?: "Unexpected error")
-                            )
-                        )
-                        db.markUnsent(it.id)
-                        someFailed = true
-                    }
-                }
-            } else {
-                val deploymentLocation = it.stream
-                val serverId = it.serverId ?: ""
-                deploymentLocation?.let { location ->
-                    if (it.deletedAt != null) {
-                        val result = ApiManager.getInstance().getDeviceApi(context)
-                            .deleteDeployments(serverId).execute()
-                        if (result.isSuccessful) {
-                            db.deleteDeployment(it.id)
+                    val error = result.errorBody()?.string()
+                    when {
+                        result.isSuccessful -> {
+                            val fullId = result.headers().get("Location")
+                            val id = fullId?.substring(fullId.lastIndexOf("/") + 1, fullId.length) ?: ""
+                            markSentDeployment(id, db, locateDb, it.id)
                         }
-                    } else {
-                        val req = EditDeploymentRequest(location.toRequestBody())
-                        val result = ApiManager.getInstance().getDeviceApi(context)
-                            .editDeployments(serverId, req).execute()
-                        if (result.isSuccessful) {
-                            db.markSent(it.serverId!!, it.id)
-                        } else {
+                        error?.contains("this deploymentKey is already existed") ?: false -> {
+                            markSentDeployment(it.deploymentKey, db, locateDb, it.id)
+                        }
+                        else -> {
                             errors.add(
                                 UnsyncedDeployment(
                                     it.id,
                                     it.stream!!.name,
                                     it.deployedAt,
-                                    (result.errorBody()?.string() ?: "Unexpected error")
+                                    (error ?: "Unexpected error")
                                 )
                             )
                             db.markUnsent(it.id)
                             someFailed = true
                         }
                     }
+                } else {
+                    val deploymentLocation = it.stream
+                    val serverId = it.serverId ?: ""
+                    deploymentLocation?.let { location ->
+                        if (it.deletedAt != null) {
+                            val result = ApiManager.getInstance().getDeviceApi(context)
+                                .deleteDeployments(serverId).execute()
+                            if (result.isSuccessful) {
+                                db.deleteDeployment(it.id)
+                            }
+                        } else {
+                            val req = EditDeploymentRequest(location.toRequestBody())
+                            val result = ApiManager.getInstance().getDeviceApi(context)
+                                .editDeployments(serverId, req).execute()
+                            if (result.isSuccessful) {
+                                db.markSent(it.serverId!!, it.id)
+                            } else {
+                                errors.add(
+                                    UnsyncedDeployment(
+                                        it.id,
+                                        it.stream!!.name,
+                                        it.deployedAt,
+                                        (result.errorBody()?.string() ?: "Unexpected error")
+                                    )
+                                )
+                                db.markUnsent(it.id)
+                                someFailed = true
+                            }
+                        }
+                    }
                 }
+            } catch (e: Exception) {
+                someFailed = true
             }
         }
         isRunning = DeploymentSyncState.FINISH
         ImageSyncWorker.enqueue(context)
 
-        return if (someFailed) Result.retry() else Result.success()
+        return if (someFailed) Result.failure() else Result.success()
     }
 
     private fun markSentDeployment(
