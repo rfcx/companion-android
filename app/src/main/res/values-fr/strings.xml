@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Common -->
+    <string name="back">revenir</string>
     <string name="error_has_occurred">Une erreur est survenue. Veuillez réessayer.</string>
-    <string name="select">sélectionner/choisir</string>
+    <string name="select">Sélectionner</string>
     <string name="something_went_wrong">Quelque chose s\'est mal passé</string>
     <string name="network_not_available">Réseau non disponible</string>
     <string name="deploy">Déployer</string>
@@ -135,7 +136,7 @@
 
     <!--  FeedbackActivity  -->
     <string name="app_feedback_share_ideas">Laissez vos commentaires ou partagez vos idées sur l’application</string>
-    <string name="from">Depuis: %s</string>
+    <string name="from">DE: %s</string>
     <string name="maximum_number_of_attachments">Le nombre maximum de pièces jointes est de 5. Essayez de supprimer certains éléments avant d’en ajouter d’autres.</string>
     <string name="feedback_submitted">Commentaires Soumis Merci de votre temps :)</string>
     <string name="profile_send_feedback">Envoyer un commentaire</string>
@@ -147,7 +148,7 @@
     <string name="choose">Choisir</string>
     <string name="take_other">Prenez toute autre photo qui sera utile pour relocaliser l’appareil ou caractériser le site</string>
     <string name="photo_taken">Photos prises: %d / %d</string>
-    <string name="missing_dialog_title">Vous êtes sûr de vouloir continuer ?</string>
+    <string name="missing_dialog_title">Vous êtes sûr de vouloir continuer?</string>
     <string name="button_continue">Continuer</string>
     <string name="follow_missing">Les photos suivantes se manquent:\n%s</string>
     <string name="read_storage_permission_msg">L\'application souhaite lire votre espace de stockage</string>
@@ -181,7 +182,7 @@
 
     <!--  EditLocationActivity  -->
     <string name="edit_location">Modifier le site</string>
-    <string name="save">Sauvegarder</string>
+    <string name="save">Sauver</string>
     <string name="site_name_exists">Ce nom de site existe déjà.</string>
 
     <!-- SelectingExistedSiteFragment -->
@@ -200,7 +201,7 @@
     <string name="retry">Retenter</string>
 
     <!-- LocationTrackerService -->
-    <string name="track">Piste</string>
+    <string name="track">Morceau</string>
     <string name="tracking_enabled">En service et suivi activé</string>
     <string name="location_setting">Veuillez activer les paramètres de localisation de votre appareil</string>
     <string name="notification_traking_message_format">%d minutes enregistrées</string>
@@ -223,7 +224,7 @@
 
     <!-- layout_map_window_info -->
     <string name="created_at">Créé</string>
-    <string name="deployed_at">Déployé</string>
+    <string name="deployed_at">Implementado</string>
 
     <!-- SetDeploymentSiteFragment -->
     <string name="create_site">Créer \"%s\"</string> <!-- If change this text, should edit logic in DetailDeploymentSiteFragment -->
@@ -233,12 +234,12 @@
     <string name="_4_confirm_that_the_device_name_is_changed">4) Confirmez que le nom de l\'appareil a changé</string>
     <string name="step_4_with_id">4) Confirme que el nombre del dispositivo ha cambiado a %s</string>
     <string name="_3_device_is_synced">3) L\'appareil est synchronisé…</string>
-    <string name="hold_press_on_switch_until_bluetooth_blinking">Mantenga presionado el botón hasta que la luz LED de Bluetooth parpadee.</string>
+    <string name="hold_press_on_switch_until_bluetooth_blinking">appuyez et  Maintenez sur le bouton jusqu’à ce que le sign bluetooth clignote</string>
     <string name="_3">3)</string>
     <string name="_2_device_is_detected">2) L\'appareil est détecté…</string>
     <string name="_2_do_you_see_a_device_select_one_to_sync">2) ¿Ves un dispositivo? Selecciona uno para sincronizar</string>
     <string name="_1_the_recorder_is_on">1) L\'enregistreur est allumé…</string>
-    <string name="switch_recorder_on">Encienda la grabadora/Song Meter</string>
+    <string name="switch_recorder_on">Activez L’enregistreur/Song Meter</string>
     <string name="alert_songmeter">Bluetooth doit être activé avant de passer à l\'étape suivante</string>
     <string name="alert_bluetooth_songmeter">L\'autorisation Bluetooth est nécessaire avant de passer à l\'étape suivante</string>
     <string name="sync_now">Synchroniser maintenant</string>
@@ -254,4 +255,5 @@
     <string name="id_title">id:</string>
     <string name="unsynced_deployment_text">Vous avez %d déploiements non synchronisés</string>
     <string name="deployment">Déploiement</string>
+    <string name="other">Autre</string>
 </resources>

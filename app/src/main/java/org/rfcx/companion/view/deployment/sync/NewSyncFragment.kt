@@ -156,14 +156,22 @@ class NewSyncFragment : Fragment() {
     }
 
     private fun setLabelColor(view: View) {
-        var isPortuguese = Locale.getDefault().language == "pt"
+        val isPortuguese = Locale.getDefault().language == "pt"
+        val isEs = Locale.getDefault().language == "es"
+        val isFr = Locale.getDefault().language == "fr"
 
         val spannableString = SpannableString(getString(R.string.lights_audiomoth))
         val red = ForegroundColorSpan(Color.RED) // red color
         val green = ForegroundColorSpan(ContextCompat.getColor(view.context, R.color.colorPrimary)) // green color
         if (isPortuguese) {
-            spannableString.setSpan(red, 34, 44, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            spannableString.setSpan(green, 46, 61, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableString.setSpan(red, 32, 50, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableString.setSpan(green, 53, 71, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else if (isEs) {
+            spannableString.setSpan(red, 32, 47, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableString.setSpan(green, 49, 67, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else if (isFr) {
+            spannableString.setSpan(red, 37, 50, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannableString.setSpan(green, 52, 67, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         } else {
             spannableString.setSpan(red, 32, 41, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             spannableString.setSpan(green, 44, 58, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -172,7 +180,11 @@ class NewSyncFragment : Fragment() {
 
         val confirmLight = SpannableString(getString(R.string.six))
         if (isPortuguese) {
-            confirmLight.setSpan(red, 22, 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            confirmLight.setSpan(red, 22, 31, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else if (isEs) {
+            confirmLight.setSpan(red, 22, 28, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        } else if (isFr) {
+            confirmLight.setSpan(red, 28, 33, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         } else {
             confirmLight.setSpan(red, 20, 23, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             confirmLight.setSpan(UnderlineSpan(), 33, 36, 0)
