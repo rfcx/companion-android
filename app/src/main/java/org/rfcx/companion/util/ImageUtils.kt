@@ -17,7 +17,7 @@ object ImageUtils {
 
     // region Take a photo
     fun createImageFile(): File {
-        val directoryName = "RFCx-Guardian-App"
+        val directoryName = "Arbimon-Companion"
         val imageFileName = "IMG_${Date().time}"
         val directory = File(
             Environment.getExternalStoragePublicDirectory(
