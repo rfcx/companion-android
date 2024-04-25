@@ -333,7 +333,7 @@ class MapFragment :
     }
 
     private fun setMarker(mapMarker: List<MapMarker>) {
-        val deploymentMarkers = mapMarker.filterIsInstance<MapMarker.DeploymentMarker>().map { mm->
+        val deploymentMarkers = mapMarker.filterIsInstance<MapMarker.DeploymentMarker>().map { mm ->
             MarkerItem(
                 mm.latitude,
                 mm.longitude,
@@ -341,7 +341,7 @@ class MapFragment :
                 Gson().toJson(mm.toInfoWindowMarker())
             )
         }
-        val siteMarkers = mapMarker.filterIsInstance<MapMarker.SiteMarker>().map { mm->
+        val siteMarkers = mapMarker.filterIsInstance<MapMarker.SiteMarker>().map { mm ->
             MarkerItem(
                 mm.latitude,
                 mm.longitude,
@@ -704,7 +704,6 @@ class MapFragment :
                     setMarker(deploymentMarkers + streamMarkers)
                     delay(500)
                 }
-
             }
         }
 
