@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -47,6 +48,10 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
 import kotlinx.android.synthetic.main.layout_map_window_info.view.*
 import kotlinx.android.synthetic.main.layout_search_view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
@@ -142,7 +147,7 @@ class MapFragment :
                 WorkInfo.State.RUNNING -> updateSyncInfo(SyncInfo.Uploading, true)
                 WorkInfo.State.SUCCEEDED -> {
                     updateSyncInfo(SyncInfo.Uploaded, true)
-                    mainViewModel.updateProjectBounds()
+//                    mainViewModel.updateProjectBounds()
                 }
 
                 else -> updateSyncInfo(isSites = true)
@@ -156,7 +161,7 @@ class MapFragment :
             }
 
             Status.SUCCESS -> {
-                mainViewModel.updateProjectBounds()
+//                mainViewModel.updateProjectBounds()
                 projectSwipeRefreshView.isRefreshing = false
 
                 this.projects = mainViewModel.getProjectsFromLocal()
@@ -328,50 +333,26 @@ class MapFragment :
     }
 
     private fun setMarker(mapMarker: List<MapMarker>) {
-        mapMarker.map {
-            when (it) {
-                is MapMarker.DeploymentMarker -> {
-                    setMarker(it)
-                }
-
-                is MapMarker.SiteMarker -> {
-                    setMarker(it)
-                }
-            }
+        val deploymentMarkers = mapMarker.filterIsInstance<MapMarker.DeploymentMarker>().map { mm->
+            MarkerItem(
+                mm.latitude,
+                mm.longitude,
+                mm.locationName,
+                Gson().toJson(mm.toInfoWindowMarker())
+            )
         }
-    }
-
-    private fun setMarker(data: MapMarker.SiteMarker) {
-        // Add Marker
-        val latlng = LatLng(data.latitude, data.longitude)
-        val item = MarkerItem(
-            data.latitude,
-            data.longitude,
-            data.name,
-            Gson().toJson(data.toInfoWindowMarker())
-        )
-        mClusterManager.addItem(item)
-        mClusterManager.cluster()
-
-        // Move Camera
-        map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-        map.animateCamera(CameraUpdateFactory.zoomTo(13.0f))
-    }
-
-    private fun setMarker(data: MapMarker.DeploymentMarker) {
-        // Add Marker
-        val latlng = LatLng(data.latitude, data.longitude)
-        val item = MarkerItem(
-            data.latitude,
-            data.longitude,
-            data.locationName,
-            Gson().toJson(data.toInfoWindowMarker())
-        )
-        mClusterManager.addItem(item)
-        mClusterManager.cluster()
-
-        // Move Camera
-        map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+        val siteMarkers = mapMarker.filterIsInstance<MapMarker.SiteMarker>().map { mm->
+            MarkerItem(
+                mm.latitude,
+                mm.longitude,
+                mm.name,
+                Gson().toJson(mm.toInfoWindowMarker())
+            )
+        }
+        lifecycleScope.launch(Dispatchers.Main) {
+            mClusterManager.addItems(deploymentMarkers + siteMarkers)
+            mClusterManager.cluster()
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -717,7 +698,15 @@ class MapFragment :
         mClusterManager.clearItems()
         mClusterManager.cluster()
 
-        setMarker(deploymentMarkers + streamMarkers)
+        lifecycleScope.launch {
+            (deploymentMarkers + streamMarkers).chunked(333).forEach {
+                withContext(Dispatchers.IO) {
+                    setMarker(deploymentMarkers + streamMarkers)
+                    delay(500)
+                }
+
+            }
+        }
 
         val state = listener?.getBottomSheetState() ?: 0
 
@@ -764,6 +753,23 @@ class MapFragment :
             .observe(viewLifecycleOwner, getDeploymentMarkerObserver)
         mainViewModel.getStreamMarkers().observe(viewLifecycleOwner, getStreamMarkerObserver)
         mainViewModel.getStreams().observe(viewLifecycleOwner, getStreamObserver)
+    }
+
+    private fun pauseObserver() {
+        if (::mainViewModel.isInitialized) {
+            mainViewModel.onDestroy()
+            mainViewModel.getProjectsFromRemote().removeObserver(getProjectsFromRemoteObserver)
+            mainViewModel.getDeploymentMarkers().removeObserver(getDeploymentMarkerObserver)
+            mainViewModel.getStreamMarkers().removeObserver(getStreamMarkerObserver)
+            mainViewModel.getStreams().removeObserver(getStreamObserver)
+            mainViewModel.getUnsyncedWorks().removeObserver(getUnsyncedDeploymentsObserver)
+        }
+        if (::deploymentWorkInfoLiveData.isInitialized) {
+            deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
+        }
+        if (::downloadStreamsWorkInfoLiveData.isInitialized) {
+            downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
+        }
     }
 
     private fun setTrackObserver(site: Stream, markerId: String) {
@@ -887,26 +893,17 @@ class MapFragment :
     override fun onResume() {
         super.onResume()
         analytics?.trackScreen(Screen.MAP)
+        setObserver()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pauseObserver()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        if (::mainViewModel.isInitialized) {
-            mainViewModel.onDestroy()
-            mainViewModel.getProjectsFromRemote().removeObserver(getProjectsFromRemoteObserver)
-            mainViewModel.getDeploymentMarkers().removeObserver(getDeploymentMarkerObserver)
-            mainViewModel.getStreamMarkers().removeObserver(getStreamMarkerObserver)
-            mainViewModel.getStreams().removeObserver(getStreamObserver)
-            mainViewModel.getUnsyncedWorks().removeObserver(getUnsyncedDeploymentsObserver)
-        }
-        if (::deploymentWorkInfoLiveData.isInitialized) {
-            deploymentWorkInfoLiveData.removeObserver(deploymentWorkInfoObserve)
-        }
-        if (::downloadStreamsWorkInfoLiveData.isInitialized) {
-            downloadStreamsWorkInfoLiveData.removeObserver(downloadStreamsWorkInfoObserve)
-        }
-        currentAnimator?.cancel()
+        pauseObserver()
     }
 
     companion object {
