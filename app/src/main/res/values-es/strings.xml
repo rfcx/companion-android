@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Common -->
+    <string name="back">Atras</string>
     <string name="error_has_occurred">Ha ocurrido un error. Por favor intente de nuevo</string>
     <string name="select">Seleccionar</string>
     <string name="something_went_wrong">Algo salió mal</string>
@@ -41,7 +42,7 @@
     <!-- MapFragment -->
     <string name="sites_downloading">Descarga de sitios</string>
     <string name="sites_synced">Todos los sitios sincronizados</string>
-    <string name="no_deployments">No implementación</string>
+    <string name="no_deployments">Sin implementaciones</string>
     <string name="time_second">En este momento</string>
     <string name="just_now">en este momento</string>
     <string name="yesterday">Ayer</string>
@@ -173,7 +174,7 @@
     <string name="change">Cambiar</string>
     <string name="title_deployment_detail">Nombre del sitio</string>
     <string name="photos">Fotos</string>
-    <string name="delete">Borrar</string>
+    <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
     <string name="delete_location">¿Eliminar implementación?</string>
     <string name="deployment_key">ID de implementación</string>
@@ -181,7 +182,7 @@
 
     <!--  EditLocationActivity  -->
     <string name="edit_location">Editar sitio</string>
-    <string name="save">Ahorrar</string>
+    <string name="save">Guardar</string>
     <string name="site_name_exists">Este nombre de sitio ya existe.</string>
 
     <!-- SelectingExistedSiteFragment -->
@@ -200,7 +201,7 @@
     <string name="retry">Rever</string>
 
     <!-- LocationTrackerService -->
-    <string name="track">Pista</string>
+    <string name="track">Realizar un seguimiento</string>
     <string name="tracking_enabled">En servicio y seguimiento habilitado</string>
     <string name="location_setting">Habilite la configuración de ubicación de su dispositivo</string>
     <string name="notification_traking_message_format">%d minutos registrados</string>
@@ -254,4 +255,5 @@
     <string name="id_title">id:</string>
     <string name="unsynced_deployment_text">Tienes %d implementaciones no sincronizadas</string>
     <string name="deployment">Implementación</string>
+    <string name="other">Otro</string>
 </resources>

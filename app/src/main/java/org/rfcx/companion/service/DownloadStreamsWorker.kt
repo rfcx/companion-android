@@ -36,7 +36,7 @@ class DownloadStreamsWorker(val context: Context, params: WorkerParameters) :
                 Log.d(TAG, "downloaded $count sites")
                 isRunning = DownloadStreamState.FINISH
                 // Trigger delete streams after download streams successfully
-                DeleteStreamsWorker.enqueue(context, PROJECT_ID)
+//                DeleteStreamsWorker.enqueue(context, PROJECT_ID)
             } else {
                 isRunning = DownloadStreamState.NOT_RUNNING
                 someFailed = true

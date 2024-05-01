@@ -27,12 +27,6 @@ class DeviceApiServiceImpl(private val context: Context) : DeviceApiService {
         return ApiManager.getInstance().getDeviceApi2(context).getDeletedProjects(limit, offset, onlyDeleted, fields)
     }
 
-    override fun getProjectOffTime(
-        id: String
-    ): Call<ProjectOffTimeResponse> {
-        return ApiManager.getInstance().getDeviceApi2(context).getProjectOffTime(id)
-    }
-
     override fun getStreamAssets(
         id: String
     ): Call<List<DeploymentAssetResponse>> {

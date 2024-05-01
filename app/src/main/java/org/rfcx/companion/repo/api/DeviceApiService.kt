@@ -24,11 +24,6 @@ interface DeviceApiService {
         @Query("fields") fields: List<String> = listOf("id")
     ): Call<List<ProjectResponse>>
 
-    @GET("projects/{id}/offtimes")
-    fun getProjectOffTime(
-        @Path("id") id: String
-    ): Call<ProjectOffTimeResponse>
-
     @GET("streams/{id}/assets")
     fun getStreamAssets(
         @Path("id") id: String
