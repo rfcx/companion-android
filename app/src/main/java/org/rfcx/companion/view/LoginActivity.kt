@@ -26,7 +26,6 @@ import org.rfcx.companion.repo.api.DeviceApiServiceImpl
 import org.rfcx.companion.repo.local.LocalDataHelper
 import org.rfcx.companion.util.*
 import org.rfcx.companion.util.Preferences.Companion.DISPLAY_THEME
-import org.rfcx.companion.util.Preferences.Companion.USER_FIREBASE_UID
 import org.rfcx.companion.view.project.ProjectSelectActivity
 
 class LoginActivity : AppCompatActivity() {
@@ -152,56 +151,6 @@ class LoginActivity : AppCompatActivity() {
                     Status.LOADING -> {}
                     Status.SUCCESS -> {
                         it.data?.let { data ->
-                            loginViewModel.getFirebaseAuth()
-                        }
-                    }
-                    Status.ERROR -> {
-                        loading(false)
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@LoginActivity,
-                                it.message ?: getString(R.string.error_has_occurred),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                }
-            }
-        )
-
-        loginViewModel.firebaseAuthState().observe(
-            this,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        it.data?.let { token ->
-                            loginViewModel.signInWithFirebaseToken(this, token)
-                        }
-                    }
-                    Status.ERROR -> {
-                        loading(false)
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@LoginActivity,
-                                it.message ?: getString(R.string.firebase_authentication_failed),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                }
-            }
-        )
-
-        loginViewModel.signInWithFirebaseTokenState().observe(
-            this,
-            Observer {
-                when (it.status) {
-                    Status.LOADING -> {}
-                    Status.SUCCESS -> {
-                        it.data?.let { uid ->
-                            val preferences = Preferences.getInstance(this)
-                            preferences.putString(USER_FIREBASE_UID, uid)
                             ProjectSelectActivity.startActivity(this@LoginActivity)
                             finish()
                         }
@@ -211,7 +160,7 @@ class LoginActivity : AppCompatActivity() {
                         runOnUiThread {
                             Toast.makeText(
                                 this@LoginActivity,
-                                it.message ?: getString(R.string.firebase_authentication_failed),
+                                it.message ?: getString(R.string.error_has_occurred),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
