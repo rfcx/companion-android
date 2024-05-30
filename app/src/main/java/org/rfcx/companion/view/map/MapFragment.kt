@@ -695,8 +695,10 @@ class MapFragment :
     }
 
     private fun combinedData() {
-        mClusterManager.clearItems()
-        mClusterManager.cluster()
+        if (::mClusterManager.isInitialized) {
+            mClusterManager.clearItems()
+            mClusterManager.cluster()
+        }
 
         lifecycleScope.launch {
             (deploymentMarkers + streamMarkers).chunked(333).forEach {

@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
-                app:constraint_referenced_ids="googleLoginButton,poweredByTextView,rfcxLogoImageView,loginEmailLayout,loginPasswordLayout,leftLineView,orTextView,rightLineView,signInButton" />
+                app:constraint_referenced_ids="googleLoginButton,loginEmailLayout,loginPasswordLayout,leftLineView,orTextView,rightLineView,signInButton" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/bellLogoImageView"
@@ -32,7 +32,7 @@
                 android:layout_height="@dimen/ic_audiomoth_size"
                 android:layout_marginTop="@dimen/margin_padding_large"
                 android:layout_marginBottom="@dimen/margin_padding_small"
-                android:src="@drawable/ic_logo_gray"
+                android:src="@drawable/ic_arbimon_no_bg"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -154,30 +154,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/rightLineView" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/poweredByTextView"
-                style="@style/AudioMothText.Body.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_padding_xlarge"
-                android:layout_marginBottom="@dimen/margin_padding_small"
-                android:text="@string/powered_by"
-                app:layout_constraintBottom_toTopOf="@id/rfcxLogoImageView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/googleLoginButton" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/rfcxLogoImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="27dp"
-                android:layout_marginBottom="@dimen/margin_padding_large"
-                android:src="@drawable/rfcx_logo"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/poweredByTextView" />
 
             <ProgressBar
                 android:id="@+id/loginProgressBar"
