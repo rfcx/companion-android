@@ -305,7 +305,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
             getDeployment()?.deploymentKey?.chunked(2)?.map { it.toInt(radix = 16) }?.toTypedArray()
                 ?: arrayOf()
         Thread {
-            audioMothDeploymentViewModel.playSyncSound(Calendar.getInstance(), deploymentIdArrayInt)
+            audioMothDeploymentViewModel.playSyncSound(Calendar.getInstance(), _stream?.latitude, _stream?.longitude, deploymentIdArrayInt)
             this@AudioMothDeploymentActivity.runOnUiThread {
                 val fragment =
                     supportFragmentManager.findFragmentById(R.id.contentContainer)

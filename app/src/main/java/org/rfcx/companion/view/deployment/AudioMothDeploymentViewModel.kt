@@ -154,9 +154,11 @@ class AudioMothDeploymentViewModel(
         return audioMothDeploymentRepository.getDeploymentById(id)
     }
 
-    fun playSyncSound(calendar: Calendar, deploymentID: Array<Int>) {
+    fun playSyncSound(calendar: Calendar, latitude: Double?, longitude: Double?, deploymentID: Array<Int>) {
         audioMothConnector.playTimeAndDeploymentID(
             calendar,
+            latitude,
+            longitude,
             deploymentID
         )
     }

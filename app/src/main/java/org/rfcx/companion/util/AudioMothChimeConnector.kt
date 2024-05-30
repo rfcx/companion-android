@@ -5,7 +5,9 @@
  *****************************************************************************/
 
 package org.rfcx.companion.util
+
 import java.util.*
+import kotlin.math.*
 
 class AudioMothChimeConnector {
 
@@ -15,7 +17,13 @@ class AudioMothChimeConnector {
     private val BITS_IN_INT16: Int = 16
     private val BITS_IN_INT32: Int = 32
 
-    private val LENGTH_OF_CHIME_PACKET: Int = 6
+    private val BITS_IN_LATITUDE_AND_LONGITUDE: Int = 28
+
+    private val LATITUDE_PRECISION: Double = 1000000.0
+    private val LONGITUDE_PRECISION: Double = 500000.0
+
+    private val LENGTH_OF_TIME: Int = 6
+    private val LENGTH_OF_LOCATION: Int = 7
     private val LENGTH_OF_DEPLOYMENT_ID: Int = 8
 
     private val MILLISECONDS_IN_SECOND = 1000
@@ -42,9 +50,11 @@ class AudioMothChimeConnector {
         if (value) {
 
             state.bytes[byte] = state.bytes[byte] or (1 shl bit)
+
         }
 
         state.index += 1
+
     }
 
     private fun setBits(state: State, value: Int, length: Int) {
@@ -54,14 +64,16 @@ class AudioMothChimeConnector {
             val mask = (1 shl i)
 
             setBit(state, (value and mask) == mask)
+
         }
+
     }
 
-    private fun setTimeData(calendar: Calendar, state: State) {
+    private fun encodeTime(calendar: Calendar, state: State) {
 
         /* Calculate timestamp and offset */
 
-        val timestamp: Int = ((calendar.timeInMillis + MILLISECONDS_IN_SECOND / 2) / MILLISECONDS_IN_SECOND).toInt()
+        val timestamp: Int = ((calendar.timeInMillis + MILLISECONDS_IN_SECOND / 2 ) / MILLISECONDS_IN_SECOND).toInt()
 
         val timezoneMinutes: Int =
             (calendar.timeZone.rawOffset + calendar.timeZone.dstSavings) / SECONDS_IN_MINUTE / MILLISECONDS_IN_SECOND
@@ -71,6 +83,31 @@ class AudioMothChimeConnector {
         setBits(state, timestamp, BITS_IN_INT32)
 
         setBits(state, timezoneMinutes, BITS_IN_INT16)
+
+    }
+
+    private fun encodeLocation(latitude: Double, longitude: Double, state: State) {
+
+        val intLatitude: Int = (round(max(-90.0, min(90.0, latitude)) * LATITUDE_PRECISION)).toInt()
+
+        val intLongitude: Int = (round(max(-180.0, min(180.0, longitude)) * LONGITUDE_PRECISION)).toInt()
+
+        setBits(state, intLatitude, BITS_IN_LATITUDE_AND_LONGITUDE)
+
+        setBits(state, intLongitude, BITS_IN_LATITUDE_AND_LONGITUDE)
+
+    }
+
+    private fun encodeDeploymentID(deploymentID: Array<Int>, state: State) {
+
+        for (i in 0 until LENGTH_OF_DEPLOYMENT_ID) {
+
+            state.bytes[state.index / BITS_PER_BYTE] = deploymentID[LENGTH_OF_DEPLOYMENT_ID - 1 - i] and 0xFF
+
+            state.index += BITS_PER_BYTE
+
+        }
+
     }
 
     /* Public interface function */
@@ -78,13 +115,18 @@ class AudioMothChimeConnector {
     fun playTone(duration: Int) {
 
         audioMothChime.tone(duration, arrayOf("C5:1"))
+
     }
 
-    fun playTime(calendar: Calendar) {
+    fun playTime(calendar: Calendar, latitude: Double?, longitude: Double?) {
 
         /* Set up array */
 
-        val data = Array<Int>(LENGTH_OF_CHIME_PACKET) { 0 }
+        val locationValid: Boolean = latitude != null && longitude != null
+
+        val length: Int = LENGTH_OF_TIME + if (locationValid) LENGTH_OF_LOCATION else 0
+
+        val data = Array<Int>(length) { 0 }
 
         val state =
             State(
@@ -94,46 +136,60 @@ class AudioMothChimeConnector {
 
         /* Set the time date */
 
-        var delay = MILLISECONDS_IN_SECOND - calendar.getTimeInMillis() % MILLISECONDS_IN_SECOND - ACOUSTIC_LAG
+        var delay = MILLISECONDS_IN_SECOND - calendar.timeInMillis % MILLISECONDS_IN_SECOND - ACOUSTIC_LAG
 
         if (delay < MINIMUM_DELAY) { delay += MILLISECONDS_IN_SECOND }
 
         val sendTime = Calendar.getInstance()
 
-        sendTime.setTimeInMillis(calendar.getTimeInMillis() + delay)
+        sendTime.timeInMillis = calendar.timeInMillis + delay
 
-        setTimeData(sendTime, state)
+        encodeTime(sendTime, state)
+
+        if (locationValid) encodeLocation(latitude!!, longitude!!, state)
 
         /* Play the data */
+
+        var tune = arrayOf(
+            "C5:1",
+            "D5:1",
+            "E5:1",
+            "C5:3"
+        )
+
+        if (locationValid) tune += arrayOf(
+            "D5:1",
+            "E5:1",
+            "C5:3"
+        )
 
         audioMothChime.chime(
             sendTime,
             data,
-            arrayOf(
-                "C5:1",
-                "D5:1",
-                "E5:1",
-                "C5:3"
-            )
+            tune
         )
+
     }
 
-    fun playTimeAndDeploymentID(calendar: Calendar, deploymentID: Array<Int>) {
+    fun playTimeAndDeploymentID(calendar: Calendar, latitude: Double?, longitude: Double?, deploymentID: Array<Int>) {
 
         /* Check deployment ID length */
 
         if (deploymentID.size != LENGTH_OF_DEPLOYMENT_ID) {
 
-            println("AUDIOMOTHCHIME_CONNECTOR: Deployment ID is incorrect length")
+            println("AUDIOMOTH CHIME CONNECTOR: Deployment ID is incorrect length")
 
             return
+
         }
 
         /* Set up array */
 
-        val size = LENGTH_OF_CHIME_PACKET + LENGTH_OF_DEPLOYMENT_ID
+        val locationValid: Boolean = latitude != null && longitude != null
 
-        val data = Array<Int>(size) { 0 }
+        val length: Int = LENGTH_OF_TIME + LENGTH_OF_DEPLOYMENT_ID + if (locationValid) LENGTH_OF_LOCATION else 0
+
+        val data = Array<Int>(length) { 0 }
 
         val state =
             State(
@@ -143,39 +199,46 @@ class AudioMothChimeConnector {
 
         /* Set the time date */
 
-        var delay = MILLISECONDS_IN_SECOND - calendar.getTimeInMillis() % MILLISECONDS_IN_SECOND - ACOUSTIC_LAG
+        var delay = MILLISECONDS_IN_SECOND - calendar.timeInMillis % MILLISECONDS_IN_SECOND - ACOUSTIC_LAG
 
         if (delay < MINIMUM_DELAY) { delay += MILLISECONDS_IN_SECOND }
 
         val sendTime = Calendar.getInstance()
 
-        sendTime.setTimeInMillis(calendar.getTimeInMillis() + delay)
+        sendTime.timeInMillis = calendar.timeInMillis + delay
 
-        setTimeData(sendTime, state)
+        encodeTime(sendTime, state)
 
-        /* Set the deployment ID */
+        if (locationValid) encodeLocation(latitude!!, longitude!!, state)
 
-        for (i in 0 until LENGTH_OF_DEPLOYMENT_ID) {
-
-            data[size - 1 - i] = deploymentID[i] and 0xFF
-        }
+        encodeDeploymentID(deploymentID, state)
 
         /* Play the data */
+
+        var tune = arrayOf(
+            "Eb5:1",
+            "G5:1",
+            "D5:1",
+            "F#5:1",
+            "Db5:1",
+            "F5:1",
+            "C5:1",
+            "E5:5"
+        )
+
+        if (locationValid) tune += arrayOf(
+            "Db5:1",
+            "F5:1",
+            "C5:1",
+            "E5:4"
+        )
 
         audioMothChime.chime(
             sendTime,
             data,
-            arrayOf(
-                "Eb5:1",
-                "G5:1",
-                "D5:1",
-                "F#5:1",
-                "Db5:1",
-                "F5:1",
-                "C5:1",
-                "E5:5"
-            )
+            tune
         )
+
     }
 
     fun stopPlay() {
