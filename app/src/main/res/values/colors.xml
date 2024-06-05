@@ -24,6 +24,8 @@
     <color name="colorPrimaryDark">#ff2c9a46</color>
     <color name="colorAccent">#ff2c9a46</color>
 
+    <color name="logo_color">#000000</color>
+
     <!-- Text color -->
     <color name="text_primary">#47525E</color>
     <color name="text_secondary">#969FAA</color>

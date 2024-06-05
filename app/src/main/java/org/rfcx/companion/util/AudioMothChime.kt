@@ -5,13 +5,16 @@
  *****************************************************************************/
 
 package org.rfcx.companion.util
+
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
-import java.util.Calendar
+
 import kotlin.math.*
+
+import java.util.Calendar
 
 class AudioMothChime {
 
@@ -271,6 +274,7 @@ class AudioMothChime {
         if (xor > 0) out = out xor CRC_POLY
 
         return out
+
     }
 
     private fun createCRC16(bytes: Array<Int>): CRC16 {
@@ -291,6 +295,7 @@ class AudioMothChime {
             crc and 0xFF,
             (crc shr 8) and 0xFF
         )
+
     }
 
     /* Function to encode bytes */
@@ -310,6 +315,7 @@ class AudioMothChime {
                     bitSequence.add(HAMMING_CODE[low][x])
                     bitSequence.add(HAMMING_CODE[high][x])
                 }
+
             } else {
 
                 for (x in 0 until 8) {
@@ -317,11 +323,15 @@ class AudioMothChime {
                     val mask = (0x01 shl x)
 
                     bitSequence.add(if ((it and mask) == mask) 1 else 0)
+
                 }
+
             }
+
         }
 
         return bitSequence
+
     }
 
     /* Functions to parses notes */
@@ -346,12 +356,15 @@ class AudioMothChime {
                         )
                     )
                 }
+
             }
+
         }
 
         if (notes.size == 0) notes.add(Note())
 
         return notes
+
     }
 
     /* Functions to generate waveforms */
@@ -404,7 +417,9 @@ class AudioMothChime {
             state.x = x
 
             state.y = y
+
         }
+
     }
 
     private fun createWaveform(
@@ -449,6 +464,7 @@ class AudioMothChime {
                 )
 
                 phase *= -1.0f
+
             }
 
             /* Generate bit sequence */
@@ -488,6 +504,7 @@ class AudioMothChime {
                 )
 
                 phase *= -1.0f
+
             }
 
             /* Stop bits */
@@ -506,10 +523,12 @@ class AudioMothChime {
                 )
 
                 phase *= -1.0f
+
             }
+
         } else {
 
-            val tonePairs: Int = floor(max(MIN_TONE_DURATION, min(MAX_TONE_DURATION, duration!!)) / 1000.0f / (2 * BIT_RISE + HIGH_BIT_SUSTAIN + LOW_BIT_SUSTAIN + 2 * BIT_FALL)).toInt()
+            val tonePairs: Int = floor(max(MIN_TONE_DURATION, min(MAX_TONE_DURATION, duration!!)) / 1000.0f / (2 * BIT_RISE + HIGH_BIT_SUSTAIN + LOW_BIT_SUSTAIN + 2 * BIT_FALL)).toInt();
 
             for (i in 0 until tonePairs) {
 
@@ -538,7 +557,9 @@ class AudioMothChime {
                 )
 
                 phase *= -1.0f
+
             }
+
         }
 
         /* Reset counter */
@@ -571,6 +592,7 @@ class AudioMothChime {
                 noteDuration * note.duration,
                 noteFallDuration
             )
+
         }
 
         /* Sum the waveforms */
@@ -580,6 +602,7 @@ class AudioMothChime {
         for (i in 0 until length) waveform.add(waveform1[i] / 4.0f + waveform2[i] / 2.0f)
 
         return waveform
+
     }
 
     /* Function to generate sound */
@@ -591,22 +614,30 @@ class AudioMothChime {
         noteArray: Array<String>
     ) {
 
-        /* Configure AudioTrack */
+        /* Generate waveform */
 
         val sampleRate: Int = AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC)
 
-        val minBufferSize = AudioTrack.getMinBufferSize(
-            sampleRate,
-            AudioFormat.CHANNEL_OUT_MONO,
-            AudioFormat.ENCODING_PCM_16BIT
-        )
+        val waveform: ArrayList<Float> = createWaveform(sampleRate, duration, byteArray, noteArray)
+
+        val buffer = ShortArray(waveform.size)
+
+        waveform.forEachIndexed { index, fl ->
+            buffer[index] = (fl * Short.MAX_VALUE).toInt().toShort()
+        }
+
+        /* Configure AudioTrack */
+
+        val BYTES_IN_SHORT: Int = 2
+
+        val sizeOfAudioBuffer: Int = BYTES_IN_SHORT * buffer.size
 
         player = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             AudioTrack.Builder()
                 .setAudioAttributes(
                     AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .build()
                 )
                 .setAudioFormat(
@@ -616,29 +647,20 @@ class AudioMothChime {
                         .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
                         .build()
                 )
-                .setBufferSizeInBytes(minBufferSize)
+                .setBufferSizeInBytes(sizeOfAudioBuffer)
+                .setTransferMode(AudioTrack.MODE_STATIC)
                 .build()
         } else {
             AudioTrack(
                 AudioManager.STREAM_MUSIC, sampleRate,
                 AudioFormat.CHANNEL_OUT_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
-                minBufferSize,
+                sizeOfAudioBuffer,
                 AudioTrack.MODE_STATIC
             )
         }
 
-        /* Generate waveform */
-
-        val waveform: ArrayList<Float> = createWaveform(sampleRate, duration, byteArray, noteArray)
-
-        /* Play waveform */
-
-        val buffer = ShortArray(waveform.size)
-
-        waveform.forEachIndexed { index, fl ->
-            buffer[index] = (fl * Short.MAX_VALUE).toInt().toShort()
-        }
+        player?.write(buffer, 0, buffer.size)
 
         /* Play the waveform at the appropriate time */
 
@@ -657,17 +679,19 @@ class AudioMothChime {
                     now = Calendar.getInstance()
 
                     delay = sendTime.getTimeInMillis() - now.getTimeInMillis()
+
                 }
+
             }
+
         }
 
         println("AUDIOMOTH CHIME: Start")
 
         player?.play()
 
-        player?.write(buffer, 0, waveform.size)
-
         println("AUDIOMOTH CHIME: Done")
+
     }
 
     /* Public chime function */
@@ -675,11 +699,13 @@ class AudioMothChime {
     fun tone(duration: Int, noteArray: Array<String>) {
 
         play(null, duration, null, noteArray)
+
     }
 
     fun chime(sendTime: Calendar?, byteArray: Array<Int>, noteArray: Array<String>) {
 
         play(sendTime, null, byteArray, noteArray)
+
     }
 
     fun stop() {
@@ -687,4 +713,5 @@ class AudioMothChime {
         player?.release()
         player = null
     }
+
 }
