@@ -22,7 +22,7 @@
     <string name="pls_fill_email">Missing Email</string>
     <string name="pls_fill_password">Missing Password</string>
     <string name="connect_with_google">Sign in with Google</string>
-    <string name="or">OR</string>
+    <string name="or">or</string>
 
     <!-- ProjectSelectorActivity -->
     <string name="set_project">Set project</string>
