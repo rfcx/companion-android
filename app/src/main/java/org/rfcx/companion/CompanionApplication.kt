@@ -2,6 +2,8 @@ package org.rfcx.companion
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
+import com.posthog.android.PostHogAndroid
+import com.posthog.android.PostHogAndroidConfig
 import io.realm.Realm
 import io.realm.exceptions.RealmMigrationNeededException
 import org.rfcx.companion.service.DeploymentCleanupWorker
@@ -11,6 +13,7 @@ class CompanionApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
+        setupPostHog()
         Realm.init(this)
         setupRealm()
         DeploymentCleanupWorker.enqueuePeriodically(this)
@@ -25,6 +28,22 @@ class CompanionApplication : Application() {
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             defaultHandler?.uncaughtException(thread, throwable)
         }
+    }
+
+    // Self-hosted PostHog product analytics (replaces Firebase Analytics).
+    // Conservative config, consistent with the other rfcx clients: no screen-view
+    // autocapture (screens are sent manually via Analytics.trackScreen) and no UI
+    // autocapture / session replay. App lifecycle events are kept (low-noise).
+    private fun setupPostHog() {
+        val config = PostHogAndroidConfig(
+            apiKey = BuildConfig.POSTHOG_API_KEY,
+            host = BuildConfig.POSTHOG_HOST
+        ).apply {
+            captureScreenViews = false
+            captureDeepLinks = false
+            sessionReplay = false
+        }
+        PostHogAndroid.setup(this, config)
     }
 
     private fun setupRealm() {

@@ -1,34 +1,52 @@
 package org.rfcx.companion.util
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import com.google.firebase.analytics.FirebaseAnalytics
+import com.posthog.PostHog
 import org.rfcx.companion.entity.Event
 import org.rfcx.companion.entity.Screen
 
+// Product analytics is self-hosted PostHog (track.rfcx.org) as of 2026-07-15,
+// replacing Firebase Analytics. Crashlytics (error logging) stays on Firebase.
+// The public API of this class (trackScreen + the trackXEvent methods) and every
+// call site are unchanged; only the two backing methods below send to PostHog
+// instead of Firebase. Firebase event ids + param keys are preserved verbatim so
+// the analytics taxonomy is byte-identical — only the destination changed.
 class Analytics(context: Context) {
-    private var firebaseAnalytics = FirebaseAnalytics.getInstance(context)
     private var context: Context? = context
+
+    // Convert the existing Firebase Bundle params to the Map PostHog expects.
+    private fun Bundle.toMap(): Map<String, Any> {
+        val map = HashMap<String, Any>()
+        for (key in keySet()) {
+            @Suppress("DEPRECATION")
+            get(key)?.let { map[key] = it }
+        }
+        return map
+    }
 
     // region track screen
     fun trackScreen(screen: Screen) {
-        firebaseAnalytics.setCurrentScreen(context as Activity, screen.id, null)
+        // Manual screen capture (autocapture is off). PostHog's screen event.
+        PostHog.screen(screen.id)
     }
 
     // region track event
     private fun trackEvent(eventName: String, params: Bundle) {
         val preferences = context?.let { Preferences.getInstance(it) }
         val user = preferences?.getString(Preferences.USER_FIREBASE_UID, "")
-        firebaseAnalytics.setUserProperty(USER_UID, user)
-        firebaseAnalytics.logEvent(eventName, params)
+        // Identity = the RFCx/Firebase user id (matches the old USER_UID posture).
+        if (!user.isNullOrEmpty()) {
+            PostHog.identify(user)
+        }
+        PostHog.capture(eventName, properties = params.toMap())
     }
 
     fun trackLoginEvent(type: String, status: String) {
         val bundle = Bundle()
         bundle.putString(LOGIN_TYPE, type)
         bundle.putString(STATUS, status)
-        trackEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+        trackEvent(EVENT_LOGIN, bundle)
     }
 
     fun trackLogoutEvent() {
@@ -54,12 +72,12 @@ class Analytics(context: Context) {
 
     fun trackChangeCoordinatesEvent(format: String) {
         val bundle = Bundle()
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, format)
+        bundle.putString(ITEM_NAME, format)
         trackEvent(Event.CHANGE_COORDINATES.id, bundle)
     }
     fun trackChangeThemeEvent(theme: String) {
         val bundle = Bundle()
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, theme)
+        bundle.putString(ITEM_NAME, theme)
         trackEvent(Event.CHANGE_THEME.id, bundle)
     }
 
@@ -149,5 +167,9 @@ class Analytics(context: Context) {
         const val STATUS = "status"
         const val FROM_PAGE = "from_page"
         const val DEVICE = "device"
+        // Firebase reserved names, preserved verbatim as the destination changed
+        // to PostHog (so the taxonomy is byte-identical to the Firebase era).
+        const val EVENT_LOGIN = "login"
+        const val ITEM_NAME = "item_name"
     }
 }
