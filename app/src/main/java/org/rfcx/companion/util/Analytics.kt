@@ -34,10 +34,11 @@ class Analytics(context: Context) {
     // region track event
     private fun trackEvent(eventName: String, params: Bundle) {
         val preferences = context?.let { Preferences.getInstance(it) }
-        val user = preferences?.getString(Preferences.USER_FIREBASE_UID, "")
-        // Identity = the RFCx/Firebase user id (matches the old USER_UID posture).
-        if (!user.isNullOrEmpty()) {
-            PostHog.identify(user)
+        // Identity = the user's account email (operator decision 2026-07-15),
+        // shared across all rfcx clients.
+        val email = preferences?.getString(Preferences.EMAIL, "")
+        if (!email.isNullOrEmpty()) {
+            PostHog.identify(email)
         }
         PostHog.capture(eventName, properties = params.toMap())
     }
