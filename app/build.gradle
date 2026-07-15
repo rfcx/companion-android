@@ -36,6 +36,9 @@ android {
     productFlavors {
         common {
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
+            // Self-hosted PostHog (track.rfcx.org, RFCx project). Public client token.
+            buildConfigField 'String', 'POSTHOG_API_KEY', '"phc_zQeWTDJUoE3tXnEcNZPMpC5DL353MDturnpsdtaQEQpe"'
+            buildConfigField 'String', 'POSTHOG_HOST', '"https://track.rfcx.org"'
         }
         internal {
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
@@ -109,12 +112,15 @@ dependencies {
     //noinspection GradleCompatible
     implementation 'com.android.support:design:28.0.0'
 
-    // Firebase
-    implementation 'com.google.firebase:firebase-analytics:21.0.0'
+    // Firebase (Analytics removed 2026-07-15 — product analytics is self-hosted
+    // PostHog now; Crashlytics/Firestore/Storage/Auth stay on Firebase)
     implementation 'com.google.firebase:firebase-firestore-ktx:24.0.2'
     implementation 'com.google.firebase:firebase-storage:20.0.1'
     implementation 'com.google.firebase:firebase-crashlytics:18.2.11'
     implementation 'com.google.firebase:firebase-auth:21.0.5'
+
+    // Self-hosted product analytics (track.rfcx.org). Replaces Firebase Analytics.
+    implementation 'com.posthog:posthog-android:3.+'
 
     // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5'
