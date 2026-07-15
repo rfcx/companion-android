@@ -42,6 +42,10 @@ class CompanionApplication : Application() {
             captureScreenViews = false
             captureDeepLinks = false
             sessionReplay = false
+            // We don't use PostHog feature flags/surveys here — skip the preload
+            // network call (conservative, fewer requests). Event capture is
+            // unaffected. captureApplicationLifecycleEvents stays on (default).
+            preloadFeatureFlags = false
         }
         PostHogAndroid.setup(this, config)
     }
