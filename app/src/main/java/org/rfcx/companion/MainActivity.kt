@@ -15,12 +15,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip
 import io.realm.Realm
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.layout_bottom_navigation_menu.*
-import kotlinx.android.synthetic.main.layout_search_view.*
 import kotlinx.coroutines.runBlocking
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.ActivityMainBinding
 import org.rfcx.companion.entity.CrashlyticsKey
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.isGuest
@@ -40,6 +37,7 @@ import org.rfcx.companion.widget.BottomNavigationMenuItem
 
 class MainActivity : AppCompatActivity(), MainActivityListener {
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var binding: ActivityMainBinding
 
     private var currentFragment: Fragment? = null
     private val locationPermissions by lazy { LocationPermissions(this) }
@@ -100,7 +98,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setViewModel()
 
         firebaseCrashlytics.setCustomKey(CrashlyticsKey.EmailUser.key, this.getEmailUser())
@@ -119,10 +118,10 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
             }
         }
 
-        createLocationButton.setOnClickListener {
+        binding.createLocationButton.setOnClickListener {
             addTooltip = SimpleTooltip.Builder(this)
                 .arrowColor(ContextCompat.getColor(this, R.color.tooltipColor))
-                .anchorView(createLocationButton)
+                .anchorView(binding.createLocationButton)
                 .gravity(Gravity.TOP)
                 .modal(true)
                 .dismissOnInsideTouch(false)
@@ -155,7 +154,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
             setupFragments()
         }
 
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetContainer)
         bottomSheetBehavior.addBottomSheetCallback(object :
                 BottomSheetBehavior.BottomSheetCallback() {
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {}
@@ -187,7 +186,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
             SimpleTooltip.Builder(this)
                 .arrowColor(ContextCompat.getColor(this, R.color.backgroundColor))
-                .anchorView(createLocationButton)
+                .anchorView(binding.createLocationButton)
                 .text(getString(R.string.setup_first_device, this.getUserNickname()))
                 .gravity(Gravity.TOP)
                 .animationPadding(10F)
@@ -200,11 +199,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     }
 
     private fun setupBottomMenu() {
-        menuMap.setOnClickListener {
+        binding.bottomNavigationMenu.menuMap.setOnClickListener {
             onBottomMenuClick(it)
         }
 
-        menuProfile.setOnClickListener {
+        binding.bottomNavigationMenu.menuProfile.setOnClickListener {
             onBottomMenuClick(it)
         }
     }
@@ -212,16 +211,16 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     private fun onBottomMenuClick(menu: View) {
         if ((menu as BottomNavigationMenuItem).menuSelected) return
         when (menu.id) {
-            menuMap.id -> {
-                menuMap.menuSelected = true
-                menuProfile.menuSelected = false
+            binding.bottomNavigationMenu.menuMap.id -> {
+                binding.bottomNavigationMenu.menuMap.menuSelected = true
+                binding.bottomNavigationMenu.menuProfile.menuSelected = false
 
                 showMap()
             }
 
-            menuProfile.id -> {
-                menuMap.menuSelected = false
-                menuProfile.menuSelected = true
+            binding.bottomNavigationMenu.menuProfile.id -> {
+                binding.bottomNavigationMenu.menuMap.menuSelected = false
+                binding.bottomNavigationMenu.menuProfile.menuSelected = true
 
                 showProfile()
             }
@@ -249,7 +248,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     private fun showAboveAppbar(show: Boolean) {
         val contentContainerPaddingBottom =
             if (show) resources.getDimensionPixelSize(R.dimen.size_battery_lv_button) else 0
-        contentContainer.setPadding(0, 0, 0, contentContainerPaddingBottom)
+        binding.contentContainer.setPadding(0, 0, 0, contentContainerPaddingBottom)
     }
 
     private fun getMap(): MapFragment =
@@ -262,16 +261,16 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     private fun setupFragments() {
         supportFragmentManager.beginTransaction()
-            .add(contentContainer.id, getProfile(), ProfileFragment.tag)
-            .add(contentContainer.id, getMap(), MapFragment.tag)
+            .add(binding.contentContainer.id, getProfile(), ProfileFragment.tag)
+            .add(binding.contentContainer.id, getMap(), MapFragment.tag)
             .commit()
 
-        menuMap.performClick()
+        binding.bottomNavigationMenu.menuMap.performClick()
     }
 
     override fun showSnackbar(msg: String, duration: Int) {
-        snackbar = Snackbar.make(mainRootView, msg, duration)
-        snackbar?.anchorView = createLocationButton
+        snackbar = Snackbar.make(binding.mainRootView, msg, duration)
+        snackbar?.anchorView = binding.createLocationButton
         snackbar?.show()
     }
 
@@ -305,8 +304,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     }
 
     override fun hideBottomAppBar() {
-        createLocationButton.visibility = View.GONE
-        bottomBar.visibility = View.GONE
+        binding.createLocationButton.visibility = View.GONE
+        binding.bottomBar.visibility = View.GONE
 
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
@@ -315,8 +314,8 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     }
 
     override fun showBottomAppBar() {
-        bottomBar.visibility = View.VISIBLE
-        createLocationButton.visibility = View.VISIBLE
+        binding.bottomBar.visibility = View.VISIBLE
+        binding.createLocationButton.visibility = View.VISIBLE
 
         val mapFragment = supportFragmentManager.findFragmentByTag(MapFragment.tag)
         if (mapFragment is MapFragment) {
@@ -331,11 +330,11 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
     override fun showBottomSheet(fragment: Fragment) {
         hideSnackbar()
         hideBottomAppBar()
-        val layoutParams: CoordinatorLayout.LayoutParams = bottomSheetContainer.layoutParams as CoordinatorLayout.LayoutParams
+        val layoutParams: CoordinatorLayout.LayoutParams = binding.bottomSheetContainer.layoutParams as CoordinatorLayout.LayoutParams
         layoutParams.anchorGravity = Gravity.BOTTOM
-        bottomSheetContainer.layoutParams = layoutParams
+        binding.bottomSheetContainer.layoutParams = layoutParams
         supportFragmentManager.beginTransaction()
-            .replace(bottomSheetContainer.id, fragment, BOTTOM_SHEET)
+            .replace(binding.bottomSheetContainer.id, fragment, BOTTOM_SHEET)
             .commit()
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
@@ -352,14 +351,18 @@ class MainActivity : AppCompatActivity(), MainActivityListener {
 
     override fun onBackPressed() {
         addTooltip?.dismiss()
+        val projectRecyclerView = findViewById<View?>(R.id.projectRecyclerView)
+        val projectSwipeRefreshView = findViewById<View?>(R.id.projectSwipeRefreshView)
+        val searchLayout = findViewById<View?>(R.id.searchLayout)
+        val siteSwipeRefreshView = findViewById<View?>(R.id.siteSwipeRefreshView)
         when {
-            projectRecyclerView.visibility == View.VISIBLE -> {
+            projectRecyclerView?.visibility == View.VISIBLE -> {
                 projectRecyclerView.visibility = View.GONE
-                projectSwipeRefreshView.visibility = View.GONE
+                projectSwipeRefreshView?.visibility = View.GONE
                 setSearchBar()
             }
-            searchLayout.visibility == View.VISIBLE -> {
-                siteSwipeRefreshView.visibility = View.GONE
+            searchLayout?.visibility == View.VISIBLE -> {
+                siteSwipeRefreshView?.visibility = View.GONE
                 setSearchBar()
             }
             bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED -> {

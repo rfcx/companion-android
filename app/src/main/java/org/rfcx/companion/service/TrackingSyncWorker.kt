@@ -5,9 +5,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import io.realm.Realm
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.rfcx.companion.localdb.TrackingFileDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.FileUtils.getMimeType
@@ -29,7 +29,7 @@ class TrackingSyncWorker(val context: Context, params: WorkerParameters) :
         tracking.forEach {
             val file = File(it.localPath)
             val mimeType = file.getMimeType()
-            val requestFile = RequestBody.create(MediaType.parse(mimeType), file)
+            val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
             val result = ApiManager.getInstance().getDeviceApi(context)
                 .uploadAssets(it.deploymentServerId!!, body).execute()

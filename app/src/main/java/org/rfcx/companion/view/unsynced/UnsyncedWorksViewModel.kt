@@ -29,9 +29,7 @@ class UnsyncedWorksViewModel(
     }
 
     private fun fetchLiveData() {
-        deploymentLiveData = Transformations.map(
-            repository.getAllDeploymentLocalResultsAsync().asLiveData()
-        ) { it }
+        deploymentLiveData = repository.getAllDeploymentLocalResultsAsync().asLiveData().map { it }
         deploymentLiveData.observeForever(deploymentObserve)
     }
 

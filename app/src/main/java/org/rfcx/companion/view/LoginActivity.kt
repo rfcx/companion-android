@@ -15,9 +15,9 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.activity_login.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.ActivityLoginBinding
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -34,10 +34,12 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
     private var userAuthResponse: UserAuthResponse? = null
     private val firebaseCrashlytics by lazy { Crashlytics() }
+    private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setViewModel()
         setObserver()
         setupDisplayTheme()
@@ -47,9 +49,9 @@ class LoginActivity : AppCompatActivity() {
             finish()
         }
 
-        signInButton.setOnClickListener {
-            val email = loginEmailEditText.text.toString().trim()
-            val password = loginPasswordEditText.text.toString()
+        binding.signInButton.setOnClickListener {
+            val email = binding.loginEmailEditText.text.toString().trim()
+            val password = binding.loginPasswordEditText.text.toString()
             firebaseCrashlytics.setCustomKey(CrashlyticsKey.LoginWith.key, email)
             it.hideKeyboard()
 
@@ -67,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        googleLoginButton.setOnClickListener {
+        binding.googleLoginButton.setOnClickListener {
             loading()
             loginViewModel.loginWithGoogle(this)
         }
@@ -200,16 +202,16 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loading(start: Boolean = true) {
-        loginGroupView.visibility = if (start) View.INVISIBLE else View.VISIBLE
-        loginProgressBar.visibility = if (start) View.VISIBLE else View.GONE
+        binding.loginGroupView.visibility = if (start) View.INVISIBLE else View.VISIBLE
+        binding.loginProgressBar.visibility = if (start) View.VISIBLE else View.GONE
     }
 
     private fun validateInput(email: String?, password: String?): Boolean {
         if (email.isNullOrEmpty()) {
-            loginEmailEditText.error = getString(R.string.pls_fill_email)
+            binding.loginEmailEditText.error = getString(R.string.pls_fill_email)
             return false
         } else if (password.isNullOrEmpty()) {
-            loginPasswordEditText.error = getString(R.string.pls_fill_password)
+            binding.loginPasswordEditText.error = getString(R.string.pls_fill_password)
             return false
         }
         return true

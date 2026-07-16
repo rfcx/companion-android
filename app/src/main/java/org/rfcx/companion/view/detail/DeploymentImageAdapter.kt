@@ -10,9 +10,9 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_image.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.BaseListItem
+import org.rfcx.companion.databinding.ItemImageBinding
 import org.rfcx.companion.entity.SyncState
 import org.rfcx.companion.extension.setDeploymentImage
 import org.rfcx.companion.util.getIdToken
@@ -141,9 +141,9 @@ class DeploymentImageAdapter :
         context = parent.context
         return when (viewType) {
             VIEW_TYPE_IMAGE -> {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_image, parent, false)
-                ImageAdapterViewHolder(view, onImageAdapterClickListener)
+                val binding = ItemImageBinding
+                    .inflate(LayoutInflater.from(parent.context), parent, false)
+                ImageAdapterViewHolder(binding, onImageAdapterClickListener)
             }
             VIEW_TYPE_ADD_IMAGE -> {
                 val view = LayoutInflater.from(parent.context)
@@ -155,13 +155,13 @@ class DeploymentImageAdapter :
     }
 
     inner class ImageAdapterViewHolder(
-        itemView: View,
+        private val binding: ItemImageBinding,
         private val onImageAdapterClickListener: OnImageAdapterClickListener?
-    ) : RecyclerView.ViewHolder(itemView) {
-        private val imageView = itemView.image
-        private val deleteButton = itemView.deleteImageButton
-        private val syncImageView = itemView.syncImage
-        private val progress = itemView.progressBarOfImageView
+    ) : RecyclerView.ViewHolder(binding.root) {
+        private val imageView = binding.image
+        private val deleteButton = binding.deleteImageButton
+        private val syncImageView = binding.syncImage
+        private val progress = binding.progressBarOfImageView
 
         fun bind(item: DeploymentImageView, canDelete: Boolean) {
             syncImageView.visibility = View.VISIBLE

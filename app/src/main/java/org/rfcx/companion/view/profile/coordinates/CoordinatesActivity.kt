@@ -5,9 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_coordinates.*
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ActivityCoordinatesBinding
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.Preferences
@@ -15,28 +14,30 @@ import org.rfcx.companion.util.getCoordinatesFormat
 
 class CoordinatesActivity : AppCompatActivity() {
     private val analytics by lazy { Analytics(this) }
+    private lateinit var binding: ActivityCoordinatesBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_coordinates)
+        binding = ActivityCoordinatesBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupToolbar()
 
         val preferences = Preferences.getInstance(this)
         this.getCoordinatesFormat()?.let { showChecker(it) }
 
-        ddLayout.setOnClickListener {
+        binding.ddLayout.setOnClickListener {
             preferences.putString(Preferences.COORDINATES_FORMAT, DD_FORMAT)
             showChecker(DD_FORMAT)
             finish()
         }
 
-        ddmLayout.setOnClickListener {
+        binding.ddmLayout.setOnClickListener {
             preferences.putString(Preferences.COORDINATES_FORMAT, DDM_FORMAT)
             showChecker(DDM_FORMAT)
             finish()
         }
 
-        dmsLayout.setOnClickListener {
+        binding.dmsLayout.setOnClickListener {
             preferences.putString(Preferences.COORDINATES_FORMAT, DMS_FORMAT)
             showChecker(DMS_FORMAT)
             finish()
@@ -47,25 +48,25 @@ class CoordinatesActivity : AppCompatActivity() {
         analytics.trackChangeCoordinatesEvent(format)
         when (format) {
             DD_FORMAT -> {
-                checkDDImageView.visibility = View.VISIBLE
-                checkDDMImageView.visibility = View.INVISIBLE
-                checkDMSImageView.visibility = View.INVISIBLE
+                binding.checkDDImageView.visibility = View.VISIBLE
+                binding.checkDDMImageView.visibility = View.INVISIBLE
+                binding.checkDMSImageView.visibility = View.INVISIBLE
             }
             DDM_FORMAT -> {
-                checkDDImageView.visibility = View.INVISIBLE
-                checkDDMImageView.visibility = View.VISIBLE
-                checkDMSImageView.visibility = View.INVISIBLE
+                binding.checkDDImageView.visibility = View.INVISIBLE
+                binding.checkDDMImageView.visibility = View.VISIBLE
+                binding.checkDMSImageView.visibility = View.INVISIBLE
             }
             DMS_FORMAT -> {
-                checkDDImageView.visibility = View.INVISIBLE
-                checkDDMImageView.visibility = View.INVISIBLE
-                checkDMSImageView.visibility = View.VISIBLE
+                binding.checkDDImageView.visibility = View.INVISIBLE
+                binding.checkDDMImageView.visibility = View.INVISIBLE
+                binding.checkDMSImageView.visibility = View.VISIBLE
             }
         }
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)

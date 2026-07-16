@@ -10,10 +10,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.android.synthetic.main.activity_project_select.*
 import org.rfcx.companion.MainActivity
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.ActivityProjectSelectBinding
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -39,9 +39,12 @@ class ProjectSelectActivity :
 
     private var selectedProject = -1
 
+    private lateinit var binding: ActivityProjectSelectBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_project_select)
+        binding = ActivityProjectSelectBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         try {
             if (preferences.getInt(Preferences.SELECTED_PROJECT) != -1) {
@@ -62,23 +65,23 @@ class ProjectSelectActivity :
             addProjectsToAdapter()
         }
 
-        projectSwipeRefreshView.apply {
+        binding.projectSwipeRefreshView.apply {
             setOnRefreshListener(this@ProjectSelectActivity)
             setColorSchemeResources(R.color.colorPrimary)
         }
 
-        projectView.apply {
+        binding.projectView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = projectSelectAdapter
         }
 
-        selectProjectButton.setOnClickListener {
+        binding.selectProjectButton.setOnClickListener {
             preferences.putInt(Preferences.SELECTED_PROJECT, selectedProject)
             MainActivity.startActivity(this)
             finish()
         }
 
-        logoutButton.setOnClickListener {
+        binding.logoutButton.setOnClickListener {
             DeploymentCleanupWorker.stopAllWork(this)
             this.logout()
             LocationTrackingManager.set(this, false)
@@ -111,9 +114,9 @@ class ProjectSelectActivity :
                         hideLoading()
                         it.data?.let { projects ->
                             if (projects.isEmpty()) {
-                                noContentTextView.visibility = View.VISIBLE
+                                binding.noContentTextView.visibility = View.VISIBLE
                             } else {
-                                noContentTextView.visibility = View.GONE
+                                binding.noContentTextView.visibility = View.GONE
                             }
                         }
                         addProjectsToAdapter()
@@ -137,12 +140,12 @@ class ProjectSelectActivity :
     }
 
     private fun showLoading() {
-        noContentTextView.visibility = View.GONE
-        projectSwipeRefreshView.isRefreshing = true
+        binding.noContentTextView.visibility = View.GONE
+        binding.projectSwipeRefreshView.isRefreshing = true
     }
 
     private fun hideLoading() {
-        projectSwipeRefreshView.isRefreshing = false
+        binding.projectSwipeRefreshView.isRefreshing = false
     }
 
     override fun onRefresh() {
@@ -158,7 +161,7 @@ class ProjectSelectActivity :
 
     override fun onClicked(project: Project) {
         selectedProject = project.id
-        selectProjectButton.isEnabled = true
+        binding.selectProjectButton.isEnabled = true
     }
 
     override fun onLockImageClicked() {

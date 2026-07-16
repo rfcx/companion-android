@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_site.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ItemSiteBinding
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.util.setFormatLabel
 import org.rfcx.companion.util.toTimeSinceStringAlternativeTimeAgo
@@ -23,9 +23,9 @@ class SiteAdapter(private val itemClickListener: (Stream, Boolean) -> Unit) :
         parent: ViewGroup,
         viewType: Int
     ): SiteAdapter.SiteAdapterViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_site, parent, false)
-        return SiteAdapterViewHolder(view)
+        val binding =
+            ItemSiteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return SiteAdapterViewHolder(binding)
     }
 
     override fun getItemCount(): Int = items.size
@@ -43,12 +43,12 @@ class SiteAdapter(private val itemClickListener: (Stream, Boolean) -> Unit) :
         notifyDataSetChanged()
     }
 
-    inner class SiteAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val siteNameTextView = itemView.siteNameTextView
-        private val createdSiteNameTextView = itemView.createdSiteNameTextView
-        private val detailTextView = itemView.detailTextView
-        private val distanceTextView = itemView.distanceTextView
-        private val iconAddImageView = itemView.iconAddImageView
+    inner class SiteAdapterViewHolder(binding: ItemSiteBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val siteNameTextView = binding.siteNameTextView
+        private val createdSiteNameTextView = binding.createdSiteNameTextView
+        private val detailTextView = binding.detailTextView
+        private val distanceTextView = binding.distanceTextView
+        private val iconAddImageView = binding.iconAddImageView
 
         fun bind(site: SiteWithLastDeploymentItem) {
             createdSiteNameTextView.text =

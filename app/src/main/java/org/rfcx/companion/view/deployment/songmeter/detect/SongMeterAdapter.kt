@@ -1,12 +1,11 @@
 package org.rfcx.companion.view.deployment.songmeter.detect
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_songmeter.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ItemSongmeterBinding
 import org.rfcx.companion.entity.songmeter.Advertisement
 
 class SongMeterAdapter(private val onRecorderClickListener: (Advertisement) -> Unit) : RecyclerView.Adapter<SongMeterAdapter.SongMeterViewHolder>() {
@@ -25,8 +24,8 @@ class SongMeterAdapter(private val onRecorderClickListener: (Advertisement) -> U
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongMeterViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_songmeter, parent, false)
-        return SongMeterViewHolder(view)
+        val binding = ItemSongmeterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return SongMeterViewHolder(binding)
     }
 
     override fun getItemCount(): Int = items.size
@@ -38,9 +37,9 @@ class SongMeterAdapter(private val onRecorderClickListener: (Advertisement) -> U
         holder.bind(songMeter)
 
         if (selectedPosition == position) {
-            holder.itemView.apply {
-                songMeterPrefixesTextView.setTextColor(ContextCompat.getColor(this.context, R.color.colorPrimary))
-                songMeterSerialNumberTextView.setTextColor(ContextCompat.getColor(this.context, R.color.colorPrimary))
+            holder.binding.apply {
+                songMeterPrefixesTextView.setTextColor(ContextCompat.getColor(root.context, R.color.colorPrimary))
+                songMeterSerialNumberTextView.setTextColor(ContextCompat.getColor(root.context, R.color.colorPrimary))
                 songMeterPrefixesTextView.setCompoundDrawablesWithIntrinsicBounds(
                     0,
                     0,
@@ -49,9 +48,9 @@ class SongMeterAdapter(private val onRecorderClickListener: (Advertisement) -> U
                 )
             }
         } else {
-            holder.itemView.apply {
-                songMeterPrefixesTextView.setTextColor(ContextCompat.getColor(this.context, R.color.text_secondary))
-                songMeterSerialNumberTextView.setTextColor(ContextCompat.getColor(this.context, R.color.text_secondary))
+            holder.binding.apply {
+                songMeterPrefixesTextView.setTextColor(ContextCompat.getColor(root.context, R.color.text_secondary))
+                songMeterSerialNumberTextView.setTextColor(ContextCompat.getColor(root.context, R.color.text_secondary))
                 songMeterPrefixesTextView.setCompoundDrawablesWithIntrinsicBounds(
                     0,
                     0,
@@ -68,9 +67,9 @@ class SongMeterAdapter(private val onRecorderClickListener: (Advertisement) -> U
         }
     }
 
-    inner class SongMeterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val prefixes = itemView.songMeterPrefixesTextView
-        private val serialName = itemView.songMeterSerialNumberTextView
+    inner class SongMeterViewHolder(val binding: ItemSongmeterBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val prefixes = binding.songMeterPrefixesTextView
+        private val serialName = binding.songMeterSerialNumberTextView
 
         fun bind(ads: Advertisement) {
             prefixes.text = ads.prefixes

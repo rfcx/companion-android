@@ -13,9 +13,9 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import io.realm.RealmList
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.ActivitySongMeterDeploymentBinding
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -65,6 +65,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     private var menuAll: Menu? = null
 
+    private lateinit var binding: ActivitySongMeterDeploymentBinding
+
     companion object {
         const val TAG = "SongMeterDeploymentActivity"
         const val loadingDialogTag = "LoadingDialog"
@@ -79,7 +81,8 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_song_meter_deployment)
+        binding = ActivitySongMeterDeploymentBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         setupToolbar()
@@ -355,11 +358,11 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
     }
 
     override fun showToolbar() {
-        toolbar?.visibility = View.VISIBLE
+        binding.toolbarLayout.toolbar.visibility = View.VISIBLE
     }
 
     override fun hideToolbar() {
-        toolbar?.visibility = View.GONE
+        binding.toolbarLayout.toolbar.visibility = View.GONE
     }
 
     override fun setMenuToolbar(isVisibility: Boolean) {
@@ -383,7 +386,7 @@ class SongMeterDeploymentActivity : BaseDeploymentActivity(), SongMeterDeploymen
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayShowTitleEnabled(true)
             setDisplayHomeAsUpEnabled(true)

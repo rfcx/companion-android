@@ -11,10 +11,10 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.FragmentDeployBinding
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -55,6 +55,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     private var deploymentId: Int? = -1
     private var newImages: List<Image>? = null
     private var maxImages = 10
+
+    private lateinit var binding: FragmentDeployBinding
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -123,7 +125,8 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
             }
         }
 
-        setContentView(R.layout.fragment_deploy)
+        binding = FragmentDeployBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setViewModel()
         initIntent()
         getPlaceHolder()
@@ -131,7 +134,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
         setupImageRecycler()
         updatePhotoTakenNumber()
 
-        finishButton.setOnClickListener {
+        binding.finishButton.setOnClickListener {
             val missing = getImageAdapter().getMissingImages()
             if (missing.isEmpty()) {
                 handleNextStep()
@@ -161,7 +164,7 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     }
 
     private fun setupImageRecycler() {
-        attachImageRecycler.apply {
+        binding.attachImageRecycler.apply {
             adapter = getImageAdapter()
             layoutManager = GridLayoutManager(context, 3)
         }
@@ -202,9 +205,9 @@ class AddImageActivity : AppCompatActivity(), ImageClickListener, GuidelineButto
     }
 
     private fun updatePhotoTakenNumber() {
-        photoTakenTextView.visibility = View.VISIBLE
+        binding.photoTakenTextView.visibility = View.VISIBLE
         val number = getImageAdapter().getExistingImages().size
-        photoTakenTextView.text =
+        binding.photoTakenTextView.text =
             getString(R.string.photo_taken, number, getImageAdapter().itemCount)
     }
 

@@ -9,9 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import io.realm.RealmList
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.ActivityDeploymentBinding
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -49,9 +49,12 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     private var deployments = listOf<Deployment>()
     private var sites = listOf<Stream>()
 
+    private lateinit var binding: ActivityDeploymentBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_deployment)
+        binding = ActivityDeploymentBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         setupToolbar()
@@ -106,7 +109,7 @@ class AudioMothDeploymentActivity : BaseDeploymentActivity(), AudioMothDeploymen
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayShowTitleEnabled(true)
             setDisplayHomeAsUpEnabled(true)

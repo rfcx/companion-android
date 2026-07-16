@@ -12,10 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_set_deployment_site.*
-import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.FragmentSetDeploymentSiteBinding
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -48,6 +47,9 @@ class SetDeploymentSiteFragment :
     private var searchItem: MenuItem? = null
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+
+    private var _binding: FragmentSetDeploymentSiteBinding? = null
+    private val binding get() = _binding!!
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -84,7 +86,13 @@ class SetDeploymentSiteFragment :
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_set_deployment_site, container, false)
+        _binding = FragmentSetDeploymentSiteBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,33 +112,33 @@ class SetDeploymentSiteFragment :
         this.lastSyncingInfo = status
         when (status) {
             SyncInfo.Starting, SyncInfo.Uploading -> {
-                statusSiteView.onShow(getString(R.string.sites_downloading))
+                binding.statusSiteView.onShow(getString(R.string.sites_downloading))
             }
             SyncInfo.Uploaded -> {
-                statusSiteView.onShowWithDelayed(getString(R.string.sites_synced))
+                binding.statusSiteView.onShowWithDelayed(getString(R.string.sites_synced))
             }
             else -> {
-                statusSiteView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
+                binding.statusSiteView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
             }
         }
     }
 
     private fun setEditText() {
-        searchLayout.visibility = View.VISIBLE
-        searchLayoutSearchEditText.showKeyboard()
-        searchLayoutSearchEditText.requestFocus()
-        searchViewActionRightButton.visibility = View.VISIBLE
-        searchLayoutSearchEditText.hint = context?.getString(R.string.search_or_create_box_hint)
+        binding.searchView.searchLayout.visibility = View.VISIBLE
+        binding.searchView.searchLayoutSearchEditText.showKeyboard()
+        binding.searchView.searchLayoutSearchEditText.requestFocus()
+        binding.searchView.searchViewActionRightButton.visibility = View.VISIBLE
+        binding.searchView.searchLayoutSearchEditText.hint = context?.getString(R.string.search_or_create_box_hint)
 
-        searchViewActionRightButton.setOnClickListener {
-            if (searchLayoutSearchEditText.text.isNullOrBlank()) {
+        binding.searchView.searchViewActionRightButton.setOnClickListener {
+            if (binding.searchView.searchLayoutSearchEditText.text.isNullOrBlank()) {
                 it.hideKeyboard()
             } else {
-                searchLayoutSearchEditText.text = null
+                binding.searchView.searchLayoutSearchEditText.text = null
             }
         }
 
-        searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
+        binding.searchView.searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 searchItem?.isVisible = s?.length == 0
                 if (s?.length == 0) {
@@ -143,7 +151,7 @@ class SetDeploymentSiteFragment :
                             it.stream.name.toLowerCase().contains(text)
                         }
                     )
-                    noResultFound.visibility = View.GONE
+                    binding.noResultFound.visibility = View.GONE
                     val createNew = arrayListOf(
                         SiteWithLastDeploymentItem(
                             Stream(
@@ -193,7 +201,7 @@ class SetDeploymentSiteFragment :
     }
 
     private fun setupAdapter() {
-        existedRecyclerView.apply {
+        binding.existedRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = existedSiteAdapter
         }
@@ -220,7 +228,7 @@ class SetDeploymentSiteFragment :
     }
 
     private fun setSwipeSite() {
-        siteSwipeRefreshView.apply {
+        binding.siteSwipeRefreshView.apply {
             setOnRefreshListener {
                 val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
                 val project = audioMothDeploymentViewModel.getProjectById(projectId)

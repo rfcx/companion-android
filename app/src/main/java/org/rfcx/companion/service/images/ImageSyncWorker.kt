@@ -7,9 +7,10 @@ import androidx.work.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import io.realm.Realm
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.rfcx.companion.localdb.DeploymentImageDb
 import org.rfcx.companion.repo.ApiManager
 import org.rfcx.companion.util.FileUtils.getMimeType
@@ -34,13 +35,13 @@ class ImageSyncWorker(val context: Context, params: WorkerParameters) :
         deploymentImage.forEach {
             val file = File(it.localPath)
             val mimeType = file.getMimeType("image/jpeg")
-            val requestFile = RequestBody.create(MediaType.parse(mimeType), storage.compressFile(context, file))
+            val requestFile = storage.compressFile(context, file).asRequestBody(mimeType.toMediaTypeOrNull())
             val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
             val gson = Gson()
             val obj = JsonObject()
             obj.addProperty("label", it.imageLabel)
-            val label = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(obj))
+            val label = gson.toJson(obj).toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
             val result = ApiManager.getInstance().getDeviceApi(context)
                 .uploadAssets(it.deploymentServerId!!, body, label).execute()
 

@@ -5,10 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_unsynced_deployment.view.*
-import kotlinx.android.synthetic.main.item_unsynced_deployment.view.deleteButton
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.UnsyncedWorksViewItem
+import org.rfcx.companion.databinding.ItemUnsyncedDeploymentBinding
 import org.rfcx.companion.util.toTimeAgo
 
 class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkListener) :
@@ -39,8 +38,9 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
     ): RecyclerView.ViewHolder {
         return when (viewType) {
             DEPLOYMENT_ITEM -> UnsyncedDeploymentViewHolder(
-                LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_unsynced_deployment, parent, false)
+                ItemUnsyncedDeploymentBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
             )
             else -> HeaderItemViewHolder(
                 LayoutInflater.from(parent.context)
@@ -58,11 +58,11 @@ class UnsyncedWorksAdapter(private val unsyncedDeploymentListener: UnsyncedWorkL
 
     override fun getItemCount(): Int = listOfUnsynced.size
 
-    inner class UnsyncedDeploymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val name = itemView.unsyncedName
-        private val error = itemView.unsyncedError
-        private val deployedAt = itemView.deployedAt
-        val deleteButton = itemView.deleteButton
+    inner class UnsyncedDeploymentViewHolder(binding: ItemUnsyncedDeploymentBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val name = binding.unsyncedName
+        private val error = binding.unsyncedError
+        private val deployedAt = binding.deployedAt
+        val deleteButton = binding.deleteButton
 
         fun bind(deployment: UnsyncedWorksViewItem.Deployment) {
             name.text = deployment.name

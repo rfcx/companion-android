@@ -9,8 +9,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -18,11 +18,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_deployment_detail.*
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.ActivityDeploymentDetailBinding
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.localdb.DatabaseCallback
@@ -67,6 +66,8 @@ class DeploymentDetailActivity :
 
     private var toAddImage = false
 
+    private lateinit var binding: ActivityDeploymentDetailBinding
+
     private lateinit var deploymentLiveData: LiveData<List<Deployment>>
     private val deploymentObserve = Observer<List<Deployment>> {
         deployment?.let {
@@ -82,19 +83,18 @@ class DeploymentDetailActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_deployment_detail)
+        binding = ActivityDeploymentDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setViewModel()
 
-        deploymentLiveData = Transformations.map(
-            viewModel.getAllDeploymentLocateResultsAsync().asLiveData()
-        ) { it }
+        deploymentLiveData = viewModel.getAllDeploymentLocateResultsAsync().asLiveData().map { it }
         deploymentLiveData.observeForever(deploymentObserve)
 
         val preferences = Preferences.getInstance(this)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         val project = viewModel.getProjectById(projectId)
 
-        deleteButton.visibility =
+        binding.deleteButton.visibility =
             if (project?.permissions == Permissions.ADMIN.value) View.VISIBLE else View.GONE
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
@@ -116,11 +116,11 @@ class DeploymentDetailActivity :
         setupClickListener()
 
         // setup onclick
-        deleteButton.setOnClickListener {
+        binding.deleteButton.setOnClickListener {
             confirmationDialog()
         }
 
-        editButton.setOnClickListener {
+        binding.editButton.setOnClickListener {
             deployment?.let {
                 val stream = deployment?.stream
                 stream?.let { st ->
@@ -257,10 +257,10 @@ class DeploymentDetailActivity :
         observeDeploymentImage(deployment.id, deployment.device ?: Device.AUDIOMOTH.value)
         val location = deployment.stream
         location?.let { locate ->
-            latitudeValue.text = locate.latitude.latitudeCoordinates(this)
-            longitudeValue.text = locate.longitude.longitudeCoordinates(this)
-            altitudeValue.text = locate.altitude.setFormatLabel()
-            deploymentIdTextView.text = deployment.deploymentKey
+            binding.latitudeValue.text = locate.latitude.latitudeCoordinates(this)
+            binding.longitudeValue.text = locate.longitude.longitudeCoordinates(this)
+            binding.altitudeValue.text = locate.altitude.setFormatLabel()
+            binding.deploymentIdTextView.text = deployment.deploymentKey
         }
     }
 
@@ -272,7 +272,7 @@ class DeploymentDetailActivity :
 
     private fun observeDeploymentImage(deploymentId: Int, device: String) {
         deployImageLiveData =
-            Transformations.map(viewModel.getAllResultsAsync(deploymentId, device).asLiveData()) {
+            viewModel.getAllResultsAsync(deploymentId, device).asLiveData().map {
                 it
             }
         deployImageLiveData.observeForever(deploymentImageObserve)
@@ -287,7 +287,7 @@ class DeploymentDetailActivity :
     }
 
     private fun setupImageRecycler() {
-        deploymentImageRecycler.apply {
+        binding.deploymentImageRecycler.apply {
             adapter = deploymentImageAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
@@ -308,7 +308,7 @@ class DeploymentDetailActivity :
         map?.animateCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM))
     }
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)

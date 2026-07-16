@@ -8,9 +8,8 @@ import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_photo_advise.view.*
 import org.rfcx.companion.BuildConfig
-import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ItemPhotoAdviseBinding
 import org.rfcx.companion.extension.setDeploymentImage
 import org.rfcx.companion.util.getIdToken
 import java.io.Serializable
@@ -140,9 +139,9 @@ class ImageAdapter(
         parent: ViewGroup,
         viewType: Int
     ): ImageAdapterViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_photo_advise, parent, false)
-        return ImageAdapterViewHolder(view)
+        val binding =
+            ItemPhotoAdviseBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ImageAdapterViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ImageAdapterViewHolder, position: Int) {
@@ -164,10 +163,10 @@ class ImageAdapter(
         }
     }
 
-    inner class ImageAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val placeHolderButton: AppCompatButton = itemView.placeHolderButton
-        val imageView: ImageView = itemView.image
-        val deleteButton: ImageButton = itemView.deleteImageButton
+    inner class ImageAdapterViewHolder(binding: ItemPhotoAdviseBinding) : RecyclerView.ViewHolder(binding.root) {
+        val placeHolderButton: AppCompatButton = binding.placeHolderButton
+        val imageView: ImageView = binding.image
+        val deleteButton: ImageButton = binding.deleteImageButton
 
         fun bind(image: Image) {
             if (image.path == null) {

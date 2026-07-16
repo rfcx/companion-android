@@ -9,11 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import kotlinx.android.synthetic.main.fragment_complete.*
-import org.rfcx.companion.R
+import org.rfcx.companion.databinding.FragmentCompleteBinding
 
 class CompleteFragment : DialogFragment() {
     private var completeListener: CompleteListener? = null
+    private var _binding: FragmentCompleteBinding? = null
+    private val binding get() = _binding!!
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -25,14 +26,20 @@ class CompleteFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_complete, container, false)
+        _binding = FragmentCompleteBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        animationView.addAnimatorListener(object : Animator.AnimatorListener {
+        binding.animationView.addAnimatorListener(object : Animator.AnimatorListener {
             override fun onAnimationRepeat(animation: Animator) {}
 
             override fun onAnimationEnd(animation: Animator) {

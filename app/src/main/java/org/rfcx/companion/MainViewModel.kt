@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.AuthenticationException
@@ -79,12 +79,10 @@ class MainViewModel(
 
     private fun fetchLiveData() {
         streamLiveData =
-            Transformations.map(mainRepository.getAllLocateResultsAsync().asLiveData()) { it }
+            mainRepository.getAllLocateResultsAsync().asLiveData().map { it }
         streamLiveData.observeForever(streamObserve)
 
-        deploymentLiveData = Transformations.map(
-            mainRepository.getAllDeploymentLocateResultsAsync().asLiveData()
-        ) { it }
+        deploymentLiveData = mainRepository.getAllDeploymentLocateResultsAsync().asLiveData().map { it }
         deploymentLiveData.observeForever(deploymentObserve)
     }
 

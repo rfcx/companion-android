@@ -5,14 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import kotlinx.android.synthetic.main.fragment_photo_guideline.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.FragmentPhotoGuidelineBinding
 
 class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: GuidelineButtonClickListener) :
     DialogFragment() {
 
     private var guidelineText = ""
     private var photoId = ""
+    private var _binding: FragmentPhotoGuidelineBinding? = null
+    private val binding get() = _binding!!
 
     override fun onStart() {
         super.onStart()
@@ -31,7 +33,13 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
     ): View? {
         guidelineText = arguments?.getString(ARG_TEXT) ?: ""
         photoId = arguments?.getString(ARG_PHOTO) ?: ""
-        return inflater.inflate(R.layout.fragment_photo_guideline, container, false)
+        _binding = FragmentPhotoGuidelineBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,12 +48,12 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
         setExamplePhoto(photoId)
         setExampleText(guidelineText)
 
-        takePhotoButton.setOnClickListener {
+        binding.takePhotoButton.setOnClickListener {
             dismiss()
             guidelineButtonClickListener.onTakePhotoClick()
         }
 
-        choosePhotoButton.setOnClickListener {
+        binding.choosePhotoButton.setOnClickListener {
             dismiss()
             guidelineButtonClickListener.onChoosePhotoClick()
         }
@@ -57,11 +65,11 @@ class PhotoGuidelineDialogFragment(private val guidelineButtonClickListener: Gui
         val id = resources.getIdentifier(photoId, "drawable", requireContext().packageName)
         if (id == 0) return
 
-        guidelineImage.setImageResource(resources.getIdentifier(photoId, "drawable", requireContext().packageName))
+        binding.guidelineImage.setImageResource(resources.getIdentifier(photoId, "drawable", requireContext().packageName))
     }
 
     private fun setExampleText(text: String) {
-        guidelineTextView.text = text.ifEmpty { getString(R.string.take_other) }
+        binding.guidelineTextView.text = text.ifEmpty { getString(R.string.take_other) }
     }
 
     companion object {

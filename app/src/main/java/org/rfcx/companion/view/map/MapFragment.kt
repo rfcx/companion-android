@@ -44,10 +44,6 @@ import com.google.gson.JsonSyntaxException
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import io.realm.Realm
-import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.layout_deployment_window_info.view.*
-import kotlinx.android.synthetic.main.layout_map_window_info.view.*
-import kotlinx.android.synthetic.main.layout_search_view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -56,6 +52,7 @@ import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.MainViewModel
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.FragmentMapBinding
 import org.rfcx.companion.entity.*
 import org.rfcx.companion.localdb.TrackingDb
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -118,6 +115,9 @@ class MapFragment :
 
     private val handler: Handler = Handler()
 
+    private var _binding: FragmentMapBinding? = null
+    private val binding get() = _binding!!
+
     private var currentAnimator: Animator? = null
     private var polyline: Polyline? = null
     private var currentMarkId = ""
@@ -162,7 +162,7 @@ class MapFragment :
 
             Status.SUCCESS -> {
 //                mainViewModel.updateProjectBounds()
-                projectSwipeRefreshView.isRefreshing = false
+                _binding?.projectSwipeRefreshView?.isRefreshing = false
 
                 this.projects = mainViewModel.getProjectsFromLocal()
                 locationGroupAdapter.items = listOf()
@@ -174,7 +174,7 @@ class MapFragment :
 
             Status.ERROR -> {
                 combinedData()
-                projectSwipeRefreshView.isRefreshing = false
+                _binding?.projectSwipeRefreshView?.isRefreshing = false
                 showToast(it.message ?: getString(R.string.error_has_occurred))
             }
         }
@@ -381,7 +381,13 @@ class MapFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_map, container, false)
+        _binding = FragmentMapBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -404,13 +410,13 @@ class MapFragment :
         }
 
         context?.let { setTextTrackingButton(LocationTrackingManager.isTrackingOn(it)) }
-        projectNameTextView.text =
+        binding.projectNameTextView.text =
             if (listener?.getProjectName() != getString(R.string.none)) listener?.getProjectName() else getString(
                 R.string.projects
             )
-        searchLayoutSearchEditText.hint = getString(R.string.site_name_hint)
+        binding.searchView.searchLayoutSearchEditText.hint = getString(R.string.site_name_hint)
 
-        currentLocationButton.setOnClickListener {
+        binding.currentLocationButton.setOnClickListener {
             if (locationPermissions?.allowed() == true) {
                 map.isMyLocationEnabled = true
                 fusedLocationClient()
@@ -420,25 +426,25 @@ class MapFragment :
             }
         }
 
-        zoomOutButton.setOnClickListener {
+        binding.zoomOutButton.setOnClickListener {
             map.animateCamera(CameraUpdateFactory.zoomOut())
         }
 
-        zoomInButton.setOnClickListener {
+        binding.zoomInButton.setOnClickListener {
             map.animateCamera(CameraUpdateFactory.zoomIn())
         }
 
-        projectNameTextView.setOnClickListener {
+        binding.projectNameTextView.setOnClickListener {
             setOnClickProjectName()
         }
 
-        unSyncedDpNumber.setOnClickListener {
+        binding.unSyncedDpNumber.setOnClickListener {
             if (unsyncedDeploymentCount != 0) {
                 UnsyncedWorksActivity.startActivity(requireContext())
             }
         }
 
-        projectSwipeRefreshView.apply {
+        binding.projectSwipeRefreshView.apply {
             setOnRefreshListener {
                 mainViewModel.fetchProjects()
                 isRefreshing = true
@@ -446,7 +452,7 @@ class MapFragment :
             setColorSchemeResources(R.color.colorPrimary)
         }
 
-        siteSwipeRefreshView.apply {
+        binding.siteSwipeRefreshView.apply {
             setOnRefreshListener {
                 mainViewModel.retrieveLocations()
                 isRefreshing = false
@@ -454,16 +460,16 @@ class MapFragment :
             setColorSchemeResources(R.color.colorPrimary)
         }
 
-        iconOpenProjectList.setOnClickListener {
+        binding.iconOpenProjectList.setOnClickListener {
             setOnClickProjectName()
         }
 
-        siteRecyclerView.apply {
+        binding.siteRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = siteAdapter
         }
 
-        projectRecyclerView.apply {
+        binding.projectRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = locationGroupAdapter
             locationGroupAdapter.screen = Screen.MAP.id
@@ -484,61 +490,61 @@ class MapFragment :
 
     private fun setOnClickProjectName() {
         val state = listener?.getBottomSheetState() ?: 0
-        if (state == BottomSheetBehavior.STATE_EXPANDED && searchLayout.visibility != View.VISIBLE) {
+        if (state == BottomSheetBehavior.STATE_EXPANDED && binding.searchView.searchLayout.visibility != View.VISIBLE) {
             listener?.hideBottomSheet()
         }
 
-        if (projectRecyclerView.visibility == View.VISIBLE) {
-            projectRecyclerView.visibility = View.GONE
-            projectSwipeRefreshView.visibility = View.GONE
-            searchButton.visibility = View.VISIBLE
-            trackingLayout.visibility = View.VISIBLE
+        if (binding.projectRecyclerView.visibility == View.VISIBLE) {
+            binding.projectRecyclerView.visibility = View.GONE
+            binding.projectSwipeRefreshView.visibility = View.GONE
+            binding.searchButton.visibility = View.VISIBLE
+            binding.trackingLayout.visibility = View.VISIBLE
             showButtonOnMap()
             listener?.showBottomAppBar()
         } else {
-            projectRecyclerView.visibility = View.VISIBLE
-            projectSwipeRefreshView.visibility = View.VISIBLE
+            binding.projectRecyclerView.visibility = View.VISIBLE
+            binding.projectSwipeRefreshView.visibility = View.VISIBLE
             showSearchBar(false)
-            searchButton.visibility = View.GONE
-            trackingLayout.visibility = View.GONE
+            binding.searchButton.visibility = View.GONE
+            binding.trackingLayout.visibility = View.GONE
             hideButtonOnMap()
             listener?.hideBottomAppBar()
         }
 
-        if (siteRecyclerView.visibility == View.VISIBLE) {
-            searchLayout.visibility = View.GONE
+        if (binding.siteRecyclerView.visibility == View.VISIBLE) {
+            binding.searchView.searchLayout.visibility = View.GONE
             hideLabel()
-            searchLayoutSearchEditText.text = null
+            binding.searchView.searchLayoutSearchEditText.text = null
         }
     }
 
     private fun showLabel(isNotFound: Boolean) {
-        if (siteRecyclerView.visibility == View.VISIBLE && projectRecyclerView.visibility != View.VISIBLE) {
-            showLabelLayout.visibility = View.VISIBLE
-            notHaveSiteTextView.visibility = if (isNotFound) View.GONE else View.VISIBLE
-            notHaveResultTextView.visibility = if (isNotFound) View.VISIBLE else View.GONE
+        if (binding.siteRecyclerView.visibility == View.VISIBLE && binding.projectRecyclerView.visibility != View.VISIBLE) {
+            binding.showLabelLayout.visibility = View.VISIBLE
+            binding.notHaveSiteTextView.visibility = if (isNotFound) View.GONE else View.VISIBLE
+            binding.notHaveResultTextView.visibility = if (isNotFound) View.VISIBLE else View.GONE
         }
     }
 
     private fun hideLabel() {
-        showLabelLayout.visibility = View.GONE
+        binding.showLabelLayout.visibility = View.GONE
     }
 
     private fun setupSearch() {
-        searchButton.setOnClickListener {
+        binding.searchButton.setOnClickListener {
             showSearchBar(true)
         }
 
-        searchViewActionRightButton.setOnClickListener {
-            if (searchLayoutSearchEditText.text.isNullOrBlank()) {
+        binding.searchView.searchViewActionRightButton.setOnClickListener {
+            if (binding.searchView.searchLayoutSearchEditText.text.isNullOrBlank()) {
                 showSearchBar(false)
                 it.hideKeyboard()
             } else {
-                searchLayoutSearchEditText.text = null
+                binding.searchView.searchLayoutSearchEditText.text = null
             }
         }
 
-        searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
+        binding.searchView.searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 context?.let {
                     val text = s.toString().lowercase(Locale.getDefault())
@@ -557,7 +563,7 @@ class MapFragment :
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        trackingLayout.setOnClickListener {
+        binding.trackingLayout.setOnClickListener {
             if (locationPermissions?.allowed() == false) {
                 locationPermissions?.check { /* do nothing */ }
             } else {
@@ -590,25 +596,25 @@ class MapFragment :
     }
 
     fun showSearchBar(show: Boolean) {
-        searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        siteRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        siteSwipeRefreshView.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        searchButton.visibility = if (show) View.GONE else View.VISIBLE
-        trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
+        binding.searchView.searchLayout.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        binding.siteRecyclerView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        binding.siteSwipeRefreshView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        binding.searchView.searchViewActionRightButton.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        binding.searchButton.visibility = if (show) View.GONE else View.VISIBLE
+        binding.trackingLayout.visibility = if (show) View.GONE else View.VISIBLE
 
         if (show) {
             lastZoom = map.cameraPosition.zoom
             map.moveCamera(CameraUpdateFactory.zoomTo(21.0F))
             setSearchView()
-            searchLayout.setBackgroundResource(R.color.backgroundColorSite)
+            binding.searchView.searchLayout.setBackgroundResource(R.color.backgroundColorSite)
         } else {
             map.moveCamera(CameraUpdateFactory.zoomTo(lastZoom))
-            searchLayoutSearchEditText.text = null
-            searchLayout.setBackgroundResource(R.color.transparent)
+            binding.searchView.searchLayoutSearchEditText.text = null
+            binding.searchView.searchLayout.setBackgroundResource(R.color.transparent)
 
             hideLabel()
-            siteRecyclerView.visibility = View.GONE
+            binding.siteRecyclerView.visibility = View.GONE
             listener?.showBottomAppBar()
         }
     }
@@ -637,7 +643,7 @@ class MapFragment :
     private fun setTextTrackingButton(isOn: Boolean) {
         context?.let { context ->
             if (isOn) {
-                trackingImageView.setImageDrawable(
+                binding.trackingImageView.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
                         R.drawable.ic_tracking_on
@@ -646,8 +652,8 @@ class MapFragment :
                 startCounting()
             } else {
                 handler.removeCallbacks(run)
-                trackingTextView.text = getString(R.string.track)
-                trackingImageView.setImageDrawable(
+                binding.trackingTextView.text = getString(R.string.track)
+                binding.trackingImageView.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
                         R.drawable.ic_tracking_off
@@ -664,7 +670,7 @@ class MapFragment :
     private val run: Runnable = object : Runnable {
         override fun run() {
             context?.let {
-                trackingTextView.text = "${LocationTrackingManager.getDistance(trackingDb).setFormatLabel()}  ${LocationTrackingManager.getOnDutyTimeMinute(it)} min"
+                _binding?.trackingTextView?.text = "${LocationTrackingManager.getDistance(trackingDb).setFormatLabel()}  ${LocationTrackingManager.getOnDutyTimeMinute(it)} min"
             }
             handler.postDelayed(this, 20 * 1000L)
         }
@@ -684,12 +690,12 @@ class MapFragment :
 
     private fun updateUnsyncedCount(number: Int) {
         if (number == 0) {
-            unSyncedDpNumber.text = ""
-            unSyncedDpNumber.background =
+            binding.unSyncedDpNumber.text = ""
+            binding.unSyncedDpNumber.background =
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_check_circledp)
         } else {
-            unSyncedDpNumber.text = number.toString()
-            unSyncedDpNumber.background =
+            binding.unSyncedDpNumber.text = number.toString()
+            binding.unSyncedDpNumber.background =
                 ContextCompat.getDrawable(requireContext(), R.drawable.circle_unsynced)
         }
     }
@@ -832,7 +838,7 @@ class MapFragment :
                         getString(R.string.format_deploy_uploading)
                     }
                 }
-                statusView.onShow(msg)
+                binding.statusView.onShow(msg)
             }
 
             SyncInfo.Uploaded -> {
@@ -841,11 +847,11 @@ class MapFragment :
                 } else {
                     getString(R.string.format_deploys_uploaded)
                 }
-                statusView.onShowWithDelayed(msg)
+                binding.statusView.onShowWithDelayed(msg)
             }
             // else also waiting network
             else -> {
-                if (!isSites) statusView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
+                if (!isSites) binding.statusView.onShowWithDelayed(getString(R.string.format_deploy_waiting_network))
             }
         }
     }
@@ -884,11 +890,11 @@ class MapFragment :
     }
 
     fun showButtonOnMap() {
-        buttonOnMapGroup.visibility = View.VISIBLE
+        binding.buttonOnMapGroup.visibility = View.VISIBLE
     }
 
     fun hideButtonOnMap() {
-        buttonOnMapGroup.visibility = View.GONE
+        binding.buttonOnMapGroup.visibility = View.GONE
     }
 
     override fun onResume() {
@@ -948,8 +954,8 @@ class MapFragment :
     }
 
     override fun onClicked(project: Project) {
-        projectRecyclerView.visibility = View.GONE
-        projectSwipeRefreshView.visibility = View.GONE
+        binding.projectRecyclerView.visibility = View.GONE
+        binding.projectSwipeRefreshView.visibility = View.GONE
 
         context?.let { context ->
             Preferences.getInstance(context).putInt(Preferences.SELECTED_PROJECT, project.id)
@@ -957,14 +963,14 @@ class MapFragment :
             mainViewModel.retrieveLocations()
         }
 
-        projectNameTextView.text = project.name
+        binding.projectNameTextView.text = project.name
         mainViewModel.combinedData()
 
-        if (siteRecyclerView.visibility == View.VISIBLE) {
-            searchLayout.visibility = View.VISIBLE
+        if (binding.siteRecyclerView.visibility == View.VISIBLE) {
+            binding.searchView.searchLayout.visibility = View.VISIBLE
         } else {
-            searchButton.visibility = View.VISIBLE
-            trackingLayout.visibility = View.VISIBLE
+            binding.searchButton.visibility = View.VISIBLE
+            binding.trackingLayout.visibility = View.VISIBLE
             showButtonOnMap()
             listener?.showBottomAppBar()
         }

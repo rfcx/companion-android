@@ -2,16 +2,15 @@ package org.rfcx.companion.view.profile
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.item_feedback_image.view.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.BaseListItem
+import org.rfcx.companion.databinding.ItemFeedbackImageBinding
 
 class FeedbackImageAdapter :
     ListAdapter<BaseListItem, RecyclerView.ViewHolder>(FeedbackImageAdapterDiffUtil()) {
@@ -89,9 +88,9 @@ class FeedbackImageAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         context = parent.context
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_feedback_image, parent, false)
-        return FeedbackImageAdapterViewHolder(view, onFeedbackImageAdapterClickListener)
+        val binding = ItemFeedbackImageBinding
+            .inflate(LayoutInflater.from(parent.context), parent, false)
+        return FeedbackImageAdapterViewHolder(binding, onFeedbackImageAdapterClickListener)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -111,21 +110,21 @@ class FeedbackImageAdapter :
     }
 
     inner class FeedbackImageAdapterViewHolder(
-        itemView: View,
+        private val binding: ItemFeedbackImageBinding,
         private val onFeedbackImageAdapterClickListener: OnFeedbackImageAdapterClickListener?
-    ) : RecyclerView.ViewHolder(itemView) {
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(imagePath: String) {
 
             val text: List<String>? = imagePath.split("/")
-            itemView.nameImageTextView.text = text?.get(text.size - 1) ?: ""
+            binding.nameImageTextView.text = text?.get(text.size - 1) ?: ""
 
-            Glide.with(itemView.imageFeedbackImageView)
+            Glide.with(binding.imageFeedbackImageView)
                 .load(imagePath)
                 .placeholder(R.drawable.bg_placeholder_light)
                 .error(R.drawable.bg_placeholder_light)
-                .into(itemView.imageFeedbackImageView)
+                .into(binding.imageFeedbackImageView)
 
-            itemView.deleteImageFeedbackButton.setOnClickListener {
+            binding.deleteImageFeedbackButton.setOnClickListener {
                 onFeedbackImageAdapterClickListener?.onDeleteImageClick(adapterPosition)
             }
         }

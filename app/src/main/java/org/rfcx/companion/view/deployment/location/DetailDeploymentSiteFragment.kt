@@ -27,17 +27,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.SphericalUtil
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.altitudeValue
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.changeProjectTextView
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.coordinatesValueTextView
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.currentLocate
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.locationGroupValueTextView
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.nextButton
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.siteValueTextView
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.viewMapBox
-import kotlinx.android.synthetic.main.fragment_detail_deployment_site.withinTextView
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.FragmentDetailDeploymentSiteBinding
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.Stream
@@ -86,6 +78,9 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     private var userLocation: Location? = null
     private var pinLocation: LatLng? = null
 
+    private var _binding: FragmentDetailDeploymentSiteBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -121,7 +116,13 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail_deployment_site, container, false)
+        _binding = FragmentDetailDeploymentSiteBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onAttach(context: Context) {
@@ -138,7 +139,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
         updateView()
 
-        changeProjectTextView.setOnClickListener {
+        binding.changeProjectTextView.setOnClickListener {
             context?.let { it1 ->
                 ProjectActivity.startActivity(
                     it1, this.project?.id ?: -1, Screen.DETAIL_DEPLOYMENT_SITE.id
@@ -147,7 +148,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        nextButton.setOnClickListener {
+        binding.nextButton.setOnClickListener {
             analytics?.trackSaveLocationEvent(Screen.LOCATION.id)
             this.altitude = currentUserLocation?.altitude ?: 0.0
             getLastLocation()
@@ -158,7 +159,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        currentLocate.setOnClickListener {
+        binding.currentLocate.setOnClickListener {
             setWithinText()
             isUseCurrentLocate = true
             if (isCreateNew) {
@@ -174,7 +175,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        viewMapBox.setOnClickListener {
+        binding.viewMapBox.setOnClickListener {
             deploymentProtocol?.let {
                 getLastLocation()
                 val siteLocation = userLocation
@@ -242,7 +243,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun createSite() {
-        val name = siteValueTextView.text.toString()
+        val name = binding.siteValueTextView.text.toString()
         userLocation?.let {
             val locate = Stream(
                 name = name,
@@ -322,17 +323,17 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
                 setLatLngLabel(it.toLatLng(), alt ?: 0.0)
                 pinLocation = it.toLatLng()
             }
-            locationGroupValueTextView.text = site?.project?.name ?: getString(R.string.none)
+            binding.locationGroupValueTextView.text = site?.project?.name ?: getString(R.string.none)
         }
-        siteValueTextView.text = siteName
-        changeProjectTextView.visibility = View.GONE
+        binding.siteValueTextView.text = siteName
+        binding.changeProjectTextView.visibility = View.GONE
     }
 
     private fun setLatLngLabel(location: LatLng, altitude: Double) {
         context?.let {
             val latLng = "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(it)}"
-            coordinatesValueTextView.text = latLng
-            altitudeValue.text = altitude.setFormatLabel()
+            binding.coordinatesValueTextView.text = latLng
+            binding.altitudeValue.text = altitude.setFormatLabel()
         }
     }
 
@@ -430,17 +431,17 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setWithinText() {
-        withinTextView.text = getString(R.string.within)
-        withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+        binding.withinTextView.text = getString(R.string.within)
+        binding.withinTextView.setCompoundDrawablesWithIntrinsicBounds(
             R.drawable.ic_checklist_passed, 0, 0, 0
         )
     }
 
     private fun setNotWithinText(distance: String) {
-        withinTextView.setCompoundDrawablesWithIntrinsicBounds(
+        binding.withinTextView.setCompoundDrawablesWithIntrinsicBounds(
             R.drawable.ic_checklist_cross, 0, 0, 0
         )
-        withinTextView.text = getString(R.string.more_than, distance)
+        binding.withinTextView.text = getString(R.string.more_than, distance)
     }
 
     override fun onResume() {
@@ -452,7 +453,7 @@ class DetailDeploymentSiteFragment : Fragment(), OnMapReadyCallback {
         val selectedEditProject = audioMothDeploymentViewModel.getProjectById(editProjectId)
 
         this.project = selectedEditProject ?: selectedProject
-        locationGroupValueTextView.text = this.project?.name
+        binding.locationGroupValueTextView.text = this.project?.name
     }
 
     private fun bitmapFromVector(context: Context, vectorResId: Int): BitmapDescriptor {

@@ -8,10 +8,11 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.widget_status_view.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.WidgetStatusViewBinding
 
 class StatusView : FrameLayout {
+    private lateinit var binding: WidgetStatusViewBinding
     private var slideOut: Animation? = null
     private var slideIn: Animation? = null
     private var handlerPostDelayed: Handler = Handler(Looper.getMainLooper())
@@ -46,23 +47,25 @@ class StatusView : FrameLayout {
         slideIn = AnimationUtils.loadAnimation(context, R.anim.slide_in)
         slideOut = AnimationUtils.loadAnimation(context, R.anim.slide_out)
 
-        View.inflate(context, R.layout.widget_status_view, this)
+        binding = WidgetStatusViewBinding.inflate(
+            android.view.LayoutInflater.from(context), this, true
+        )
         prepareView()
     }
 
     private fun prepareView() {
         this.visibility = View.GONE
-        root.background = backgroundColor
-        statusText.setTextColor(fontColor)
+        binding.root.background = backgroundColor
+        binding.statusText.setTextColor(fontColor)
     }
 
     fun onShow(msg: String) {
-        statusText.text = msg
+        binding.statusText.text = msg
         enterAnimation(this)
     }
 
     fun onShowWithDelayed(msg: String) {
-        statusText.text = msg
+        binding.statusText.text = msg
         enterAnimation(this)
         handlerPostDelayed.postDelayed({
             exitAnimation(this)

@@ -5,25 +5,26 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import kotlinx.android.synthetic.main.activity_display_image.*
-import kotlinx.android.synthetic.main.toolbar_default.*
-import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ActivityDisplayImageBinding
 
 class DisplayImageActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityDisplayImageBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_display_image)
+        binding = ActivityDisplayImageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val paths = intent.extras?.getStringArray(PATH_IMAGE) ?: arrayOf()
         val labels = intent.extras?.getStringArray(LABEL_IMAGE) ?: arrayOf()
         setupToolbar()
 
         val adapter = DisplayImageAdapter(paths.toList(), this)
-        imageViewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-        imageViewPager.adapter = adapter
+        binding.imageViewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        binding.imageViewPager.adapter = adapter
 
-        imageViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        binding.imageViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 setupToolbarTitle(labels[position])
@@ -31,7 +32,7 @@ class DisplayImageActivity : AppCompatActivity() {
         })
     }
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
