@@ -1,7 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.6.21'
+    // Bumped 1.6.21 -> 1.8.10 (2026-07-15): posthog-android is compiled with
+    // Kotlin 1.8 metadata, which a 1.6 compiler cannot read. 1.8.10 matches the
+    // guardian-app-android app, is supported by AGP 8.1.2 / Gradle 8.0, and works
+    // with Realm 10.15.1 (a kapt bytecode transformer, Kotlin-tolerant).
+    ext.kotlin_version = '1.8.10'
     repositories {
         google()
     }
