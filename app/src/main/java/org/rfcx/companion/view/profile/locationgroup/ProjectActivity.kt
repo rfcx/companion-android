@@ -6,9 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.activity_location_group.*
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ActivityLocationGroupBinding
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Preferences
@@ -18,10 +17,12 @@ class ProjectActivity : AppCompatActivity(), ProjectProtocol {
 
     // For detail page to edit location group
     private var project: String? = null
+    private lateinit var binding: ActivityLocationGroupBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_location_group)
+        binding = ActivityLocationGroupBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setupToolbar()
 
@@ -57,12 +58,12 @@ class ProjectActivity : AppCompatActivity(), ProjectProtocol {
 
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(locationGroupContainer.id, fragment)
+            .replace(binding.locationGroupContainer.id, fragment)
             .commit()
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)

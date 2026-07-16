@@ -23,12 +23,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import io.realm.Realm
-import kotlinx.android.synthetic.main.fragment_edit_location.*
-import kotlinx.android.synthetic.main.fragment_edit_location.altitudeEditText
-import kotlinx.android.synthetic.main.fragment_edit_location.locationGroupValueTextView
-import kotlinx.android.synthetic.main.fragment_edit_location.locationNameEditText
-import kotlinx.android.synthetic.main.fragment_edit_location.locationValueTextView
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.FragmentEditLocationBinding
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.localdb.StreamDb
 import org.rfcx.companion.util.Analytics
@@ -50,6 +46,9 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
     private var editLocationActivityListener: EditLocationActivityListener? = null
 
+    private var _binding: FragmentEditLocationBinding? = null
+    private val binding get() = _binding!!
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         editLocationActivityListener = context as EditLocationActivityListener
@@ -66,7 +65,13 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_edit_location, container, false)
+        _binding = FragmentEditLocationBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,22 +86,22 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
 
         val stream = editLocationActivityListener?.getStream(streamId)
         val streams = streamDb.getStreams().map { it.name }
-        locationNameEditText.setText(stream?.name ?: getString(R.string.none))
-        altitudeEditText.setText(altitude.toString())
-        locationValueTextView.text = context?.let { convertLatLngLabel(it, latitude, longitude) }
+        binding.locationNameEditText.setText(stream?.name ?: getString(R.string.none))
+        binding.altitudeEditText.setText(altitude.toString())
+        binding.locationValueTextView.text = context?.let { convertLatLngLabel(it, latitude, longitude) }
 
-        changeButton.setOnClickListener {
+        binding.changeButton.setOnClickListener {
             openMapPickerPage()
             analytics?.trackChangeLocationEvent(Screen.EDIT_LOCATION.id)
         }
 
-        viewMapBox.setOnClickListener {
+        binding.viewMapBox.setOnClickListener {
             openMapPickerPage()
             analytics?.trackChangeLocationEvent(Screen.EDIT_LOCATION.id)
         }
 
-        saveButton.setOnClickListener {
-            if (locationNameEditText.text.isNullOrBlank()) {
+        binding.saveButton.setOnClickListener {
+            if (binding.locationNameEditText.text.isNullOrBlank()) {
                 Toast.makeText(
                     context,
                     getString(R.string.please_fill_information),
@@ -104,23 +109,23 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
                 ).show()
             } else {
                 analytics?.trackSaveLocationEvent(Screen.EDIT_LOCATION.id)
-                altitude = altitudeEditText.text.toString().toDouble()
-                editLocationActivityListener?.updateDeploymentDetail(locationNameEditText.text.toString(), altitude)
+                altitude = binding.altitudeEditText.text.toString().toDouble()
+                editLocationActivityListener?.updateDeploymentDetail(binding.locationNameEditText.text.toString(), altitude)
             }
         }
 
-        editGroupButton.setOnClickListener {
+        binding.editGroupButton.setOnClickListener {
             analytics?.trackChangeLocationGroupEvent(Screen.EDIT_LOCATION.id)
             editLocationActivityListener?.startLocationGroupPage()
         }
 
-        locationNameEditText.addTextChangedListener(object : TextWatcher {
+        binding.locationNameEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                val name = locationNameEditText.text.toString()
+                val name = binding.locationNameEditText.text.toString()
                 if (streams.contains(name) && (stream?.name ?: getString(R.string.none)) != name) {
-                    locationNameTextInput.error = getString(R.string.site_name_exists)
+                    binding.locationNameTextInput.error = getString(R.string.site_name_exists)
                 } else {
-                    locationNameTextInput.error = null
+                    binding.locationNameTextInput.error = null
                 }
             }
 
@@ -134,7 +139,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         editLocationActivityListener?.startMapPickerPage(
             latitude,
             longitude,
-            altitudeEditText.text.toString().toDouble(),
+            binding.altitudeEditText.text.toString().toDouble(),
             streamId
         )
     }
@@ -145,11 +150,9 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
         view?.getWindowVisibleDisplayFrame(r)
         val keypadHeight: Int = screenHeight - r.bottom
         if (keypadHeight > screenHeight * 0.15) {
-            saveButton.visibility = View.GONE
+            _binding?.saveButton?.visibility = View.GONE
         } else {
-            if (saveButton != null) {
-                saveButton.visibility = View.VISIBLE
-            }
+            _binding?.saveButton?.visibility = View.VISIBLE
         }
     }
 
@@ -162,7 +165,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
                 }
                 false
             }
-        locationNameEditText.setOnEditorActionListener(editorActionListener)
+        binding.locationNameEditText.setOnEditorActionListener(editorActionListener)
     }
 
     private fun initIntent() {
@@ -217,7 +220,7 @@ class EditLocationFragment : Fragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         editLocationActivityListener?.let {
-            locationGroupValueTextView.text = it.getStream(streamId).project?.name
+            binding.locationGroupValueTextView.text = it.getStream(streamId).project?.name
         }
     }
 

@@ -7,15 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_edge_checklist.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.CheckListItem
+import org.rfcx.companion.databinding.FragmentEdgeChecklistBinding
 
 class AudioMothCheckListFragment : Fragment(), (Int, String) -> Unit {
 
     private var deploymentProtocol: AudioMothDeploymentProtocol? = null
 
     private val checkListRecyclerView by lazy { CheckListAdapter(this) }
+
+    private var _binding: FragmentEdgeChecklistBinding? = null
+    private val binding get() = _binding!!
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -27,7 +30,13 @@ class AudioMothCheckListFragment : Fragment(), (Int, String) -> Unit {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_edge_checklist, container, false)
+        _binding = FragmentEdgeChecklistBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,7 +48,7 @@ class AudioMothCheckListFragment : Fragment(), (Int, String) -> Unit {
             it.setToolbarTitle()
         }
 
-        edgeCheckListRecyclerView.apply {
+        binding.edgeCheckListRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             adapter = checkListRecyclerView
         }
@@ -50,8 +59,8 @@ class AudioMothCheckListFragment : Fragment(), (Int, String) -> Unit {
             checkListRecyclerView.setCheckPassed(number)
         }
 
-        edgeChecklistDeployButton.isEnabled = checkListRecyclerView.isEveryCheckListPassed()
-        edgeChecklistDeployButton.setOnClickListener {
+        binding.edgeChecklistDeployButton.isEnabled = checkListRecyclerView.isEveryCheckListPassed()
+        binding.edgeChecklistDeployButton.setOnClickListener {
             deploymentProtocol?.setReadyToDeploy()
         }
     }

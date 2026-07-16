@@ -5,21 +5,23 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.activity_offline_map.*
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ActivityOfflineMapBinding
 
 class OfflineMapActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityOfflineMapBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_offline_map)
+        binding = ActivityOfflineMapBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupToolbar()
 
         startFragment(OfflineMapFragment.newInstance())
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
@@ -34,7 +36,7 @@ class OfflineMapActivity : AppCompatActivity() {
 
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(offlineMapContainer.id, fragment)
+            .replace(binding.offlineMapContainer.id, fragment)
             .commit()
     }
 

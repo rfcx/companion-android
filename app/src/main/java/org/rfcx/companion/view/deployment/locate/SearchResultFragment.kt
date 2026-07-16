@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.layout_search_result.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.LayoutSearchResultBinding
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 
@@ -18,6 +18,9 @@ class SearchResultFragment : Fragment() {
 
     private var searchQuery: String? = null
 
+    private var _binding: LayoutSearchResultBinding? = null
+    private val binding get() = _binding!!
+
     private val latLngRegex =
         Regex("^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?),\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)\$")
 
@@ -26,7 +29,13 @@ class SearchResultFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.layout_search_result, container, false)
+        _binding = LayoutSearchResultBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,7 +69,7 @@ class SearchResultFragment : Fragment() {
     }
 
     private fun setupAdapter() {
-        searchLocationRecyclerView.apply {
+        binding.searchLocationRecyclerView.apply {
             setHasFixedSize(false)
             layoutManager = LinearLayoutManager(context)
             adapter = searchLocationResultAdapter

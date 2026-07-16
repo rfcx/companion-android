@@ -3,9 +3,9 @@ package org.rfcx.companion.view.deployment
 import android.location.Location
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.activity_deployment.*
-import kotlinx.android.synthetic.main.toolbar_default.*
+import org.rfcx.companion.R
 import org.rfcx.companion.entity.Stream
 import org.rfcx.companion.entity.guardian.Deployment
 import org.rfcx.companion.service.DownloadStreamState
@@ -64,7 +64,7 @@ abstract class BaseDeploymentActivity :
 
     fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(contentContainer.id, fragment)
+            .replace(R.id.contentContainer, fragment)
             .commit()
     }
 
@@ -123,11 +123,11 @@ abstract class BaseDeploymentActivity :
     }
 
     override fun showToolbar() {
-        toolbar?.visibility = View.VISIBLE
+        findViewById<Toolbar?>(R.id.toolbar)?.visibility = View.VISIBLE
     }
 
     override fun hideToolbar() {
-        toolbar?.visibility = View.GONE
+        findViewById<Toolbar?>(R.id.toolbar)?.visibility = View.GONE
     }
 
     override fun setToolbarTitle() {

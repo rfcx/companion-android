@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ItemLocationGroupBinding
 import org.rfcx.companion.entity.Permissions
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.isGuest
@@ -23,17 +23,17 @@ class ProjectSelectAdapter(private val projectSelectListener: ProjectListener) :
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectSelectViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_location_group, parent, false)
-        return ProjectSelectViewHolder(view)
+        val binding =
+            ItemLocationGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ProjectSelectViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ProjectSelectViewHolder, position: Int) {
 
         if (selectedPosition == position) {
-            holder.itemView.checkImageView.visibility = View.VISIBLE
+            holder.binding.checkImageView.visibility = View.VISIBLE
         } else {
-            holder.itemView.checkImageView.visibility = View.GONE
+            holder.binding.checkImageView.visibility = View.GONE
         }
 
         holder.bind(items[position])
@@ -61,9 +61,9 @@ class ProjectSelectAdapter(private val projectSelectListener: ProjectListener) :
 
     override fun getItemCount(): Int = items.size
 
-    inner class ProjectSelectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val locationGroupTextView = itemView.locationGroupTextView
-        private val lockImageView = itemView.lockImageView
+    inner class ProjectSelectViewHolder(val binding: ItemLocationGroupBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val locationGroupTextView = binding.locationGroupTextView
+        private val lockImageView = binding.lockImageView
 
         fun bind(project: Project) {
             locationGroupTextView.text = project.name ?: itemView.context.getString(R.string.none)

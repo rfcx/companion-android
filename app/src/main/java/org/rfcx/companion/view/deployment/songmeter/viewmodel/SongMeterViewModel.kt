@@ -62,16 +62,12 @@ class SongMeterViewModel(
         val preferences = Preferences.getInstance(context)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         siteLiveData =
-            Transformations.map(
-                songMeterRepository.getAllResultsAsyncWithinProject(projectId)
-                    .asLiveData()
-            ) { it }
+            songMeterRepository.getAllResultsAsyncWithinProject(projectId)
+                .asLiveData().map { it }
         siteLiveData.observeForever(siteObserve)
 
-        deploymentLiveData = Transformations.map(
-            songMeterRepository.getAllDeploymentResultsAsyncWithinProject(projectId)
-                .asLiveData()
-        ) { it }
+        deploymentLiveData = songMeterRepository.getAllDeploymentResultsAsyncWithinProject(projectId)
+            .asLiveData().map { it }
         deploymentLiveData.observeForever(deploymentObserve)
 
         downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(context)

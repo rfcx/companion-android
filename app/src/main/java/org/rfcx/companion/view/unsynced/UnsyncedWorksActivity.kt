@@ -12,11 +12,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import androidx.work.WorkInfo
-import kotlinx.android.synthetic.main.activity_unsynced_works.*
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.UnsyncedWorksViewItem
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.ActivityUnsyncedWorksBinding
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
 import org.rfcx.companion.repo.api.DeviceApiHelper
@@ -29,6 +28,7 @@ import org.rfcx.companion.view.map.SyncInfo
 class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
 
     private val unsyncedWorksAdapter by lazy { UnsyncedWorksAdapter(this) }
+    private lateinit var binding: ActivityUnsyncedWorksBinding
 
     private lateinit var viewModel: UnsyncedWorksViewModel
 
@@ -77,32 +77,33 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_unsynced_works)
+        binding = ActivityUnsyncedWorksBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setViewModel()
         setObserve()
 
         setupToolbar()
 
-        unsyncedRecyclerView.apply {
+        binding.unsyncedRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = unsyncedWorksAdapter
         }
 
-        confirmButton.setOnClickListener {
+        binding.confirmButton.setOnClickListener {
             viewModel.syncDeployment()
             it.isEnabled = false
         }
     }
 
     private fun showBanner() {
-        TransitionManager.beginDelayedTransition(banner, UnsyncedBannerTransition())
-        banner.visibility = View.VISIBLE
+        TransitionManager.beginDelayedTransition(binding.banner, UnsyncedBannerTransition())
+        binding.banner.visibility = View.VISIBLE
     }
 
     private fun hideBanner() {
-        TransitionManager.beginDelayedTransition(banner, UnsyncedBannerTransition())
-        banner.visibility = View.GONE
+        TransitionManager.beginDelayedTransition(binding.banner, UnsyncedBannerTransition())
+        binding.banner.visibility = View.GONE
     }
 
     private fun setViewModel() {
@@ -131,7 +132,7 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
@@ -156,15 +157,15 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
     private fun setUnsyncedText(deploymentCount: Int) {
         when (deploymentCount) {
             0 -> {
-                bannerText.text = getString(R.string.all_works_synced)
+                binding.bannerText.text = getString(R.string.all_works_synced)
                 unsyncedWorksAdapter.setUnsynceds(listOf())
-                noContentTextView.visibility = View.VISIBLE
-                unsyncedIndicator.visibility = View.GONE
+                binding.noContentTextView.visibility = View.VISIBLE
+                binding.unsyncedIndicator.visibility = View.GONE
                 hideBanner()
             }
             else -> {
-                bannerText.text = getString(R.string.unsynced_deployment_text, deploymentCount)
-                noContentTextView.visibility = View.GONE
+                binding.bannerText.text = getString(R.string.unsynced_deployment_text, deploymentCount)
+                binding.noContentTextView.visibility = View.GONE
                 showBanner()
             }
         }
@@ -209,15 +210,15 @@ class UnsyncedWorksActivity : AppCompatActivity(), UnsyncedWorkListener {
     }
 
     private fun showSyncingState() {
-        confirmButton.text = getString(R.string.syncing)
-        confirmButton.isEnabled = false
-        unsyncedIndicator.visibility = View.VISIBLE
+        binding.confirmButton.text = getString(R.string.syncing)
+        binding.confirmButton.isEnabled = false
+        binding.unsyncedIndicator.visibility = View.VISIBLE
     }
 
     private fun showSyncedState() {
-        confirmButton.text = getString(R.string.sync)
-        confirmButton.isEnabled = true
-        unsyncedIndicator.visibility = View.GONE
+        binding.confirmButton.text = getString(R.string.sync)
+        binding.confirmButton.isEnabled = true
+        binding.unsyncedIndicator.visibility = View.GONE
     }
 
     override fun onDeploymentClick(id: Int) {

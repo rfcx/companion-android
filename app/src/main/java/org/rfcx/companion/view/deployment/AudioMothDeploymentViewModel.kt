@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import androidx.work.WorkInfo
 import org.rfcx.companion.R
 import org.rfcx.companion.entity.*
@@ -67,16 +67,12 @@ class AudioMothDeploymentViewModel(
         val preferences = Preferences.getInstance(context)
         val projectId = preferences.getInt(Preferences.SELECTED_PROJECT)
         siteLiveData =
-            Transformations.map(
-                audioMothDeploymentRepository.getAllResultsAsyncWithinProject(projectId)
-                    .asLiveData()
-            ) { it }
+            audioMothDeploymentRepository.getAllResultsAsyncWithinProject(projectId)
+                .asLiveData().map { it }
         siteLiveData.observeForever(siteObserve)
 
-        deploymentLiveData = Transformations.map(
-            audioMothDeploymentRepository.getAllDeploymentResultsAsyncWithinProject(projectId)
-                .asLiveData()
-        ) { it }
+        deploymentLiveData = audioMothDeploymentRepository.getAllDeploymentResultsAsyncWithinProject(projectId)
+            .asLiveData().map { it }
         deploymentLiveData.observeForever(deploymentObserve)
 
         downloadStreamsWorkInfoLiveData = DownloadStreamsWorker.workInfos(context)

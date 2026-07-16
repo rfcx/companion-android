@@ -30,9 +30,7 @@ class ProjectOfflineMapViewModel(
 
     private fun fetchLiveData() {
         projectsLiveData =
-            Transformations.map(
-                projectOfflineMapRepository.getAllProjectResultsAsync().asLiveData()
-            ) {
+            projectOfflineMapRepository.getAllProjectResultsAsync().asLiveData().map {
                 it
             }
         projectsLiveData.observeForever(projectsObserve)

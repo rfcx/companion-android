@@ -6,8 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_location_group.view.*
-import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ItemLocationGroupBinding
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 
@@ -31,9 +30,9 @@ class ProjectOfflineMapAdapter(
         parent: ViewGroup,
         viewType: Int
     ): ProjectOfflineMapAdapter.ProjectOfflineMapViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_location_group, parent, false)
-        return ProjectOfflineMapViewHolder(view)
+        val binding =
+            ItemLocationGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ProjectOfflineMapViewHolder(binding)
     }
 
     override fun onBindViewHolder(
@@ -41,7 +40,7 @@ class ProjectOfflineMapAdapter(
         position: Int
     ) {
         val project = items[position]
-        with(holder.itemView) {
+        with(holder.binding) {
             locationGroupTextView.text = project.name
 
             downloadButton.setOnClickListener {
@@ -52,7 +51,7 @@ class ProjectOfflineMapAdapter(
                 projectOfflineMapListener.onDeleteClicked(project)
             }
 
-            setViewMapOffline(this, project)
+            setViewMapOffline(holder.binding, project)
 
             if (hideDownloadButton) {
                 downloadButton.isEnabled = false
@@ -68,7 +67,7 @@ class ProjectOfflineMapAdapter(
     ) {
         super.onBindViewHolder(holder, position, payloads)
         if (payloads.firstOrNull() != null) {
-            with(holder.itemView) {
+            with(holder.binding) {
                 (payloads.first() as Bundle).getInt(PROGRESS).also {
                     downloadedTextView.isVisible = it < 99
                     downloadedTextView.text = "$it %"
@@ -87,14 +86,14 @@ class ProjectOfflineMapAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    inner class ProjectOfflineMapViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    inner class ProjectOfflineMapViewHolder(val binding: ItemLocationGroupBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private fun setViewMapOffline(itemView: View, project: Project) {
-        val offlineMapProgress = itemView.offlineMapProgress
-        val downloadedTextView = itemView.downloadedTextView
-        val downloadButton = itemView.downloadButton
-        val deleteButton = itemView.deleteButton
-        val unavailableTextView = itemView.unavailableTextView
+    private fun setViewMapOffline(binding: ItemLocationGroupBinding, project: Project) {
+        val offlineMapProgress = binding.offlineMapProgress
+        val downloadedTextView = binding.downloadedTextView
+        val downloadButton = binding.downloadButton
+        val deleteButton = binding.deleteButton
+        val unavailableTextView = binding.unavailableTextView
 
         when (project.offlineMapState) {
             OfflineMapState.DOWNLOAD_STATE.key -> {

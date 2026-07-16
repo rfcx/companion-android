@@ -23,9 +23,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.android.synthetic.main.fragment_map_picker.*
-import kotlinx.android.synthetic.main.layout_search_view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.FragmentMapPickerBinding
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.util.DefaultSetupMap
@@ -54,6 +53,9 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
 
     private val analytics by lazy { context?.let { Analytics(it) } }
 
+    private var _binding: FragmentMapPickerBinding? = null
+    private val binding get() = _binding!!
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mapPickerProtocol = context as MapPickerProtocol
@@ -70,7 +72,13 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_map_picker, container, false)
+        _binding = FragmentMapPickerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +95,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
 
         showLoading(true)
 
-        selectButton.setOnClickListener {
+        binding.selectButton.setOnClickListener {
             val currentCameraPosition = map.cameraPosition.target
             analytics?.trackSelectLocationEvent()
             mapPickerProtocol?.onSelectedLocation(
@@ -98,7 +106,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
             )
         }
 
-        currentLocationButton.setOnClickListener {
+        binding.currentLocationButton.setOnClickListener {
             selectedLocation = currentUserLocation
             selectedLocation?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
@@ -120,9 +128,9 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        fabProgress.visibility = if (isLoading) View.VISIBLE else View.INVISIBLE
-        currentLocationButton.isEnabled = !isLoading
-        currentLocationButton.supportImageTintList =
+        binding.fabProgress.visibility = if (isLoading) View.VISIBLE else View.INVISIBLE
+        binding.currentLocationButton.isEnabled = !isLoading
+        binding.currentLocationButton.supportImageTintList =
             if (isLoading) resources.getColorStateList(R.color.gray_30) else resources.getColorStateList(
                 R.color.colorPrimary
             )
@@ -186,7 +194,7 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
     private fun setLatLogLabel(location: LatLng) {
         context?.let {
             val latLng = "${location.latitude.latitudeCoordinates(it)}, ${location.longitude.longitudeCoordinates(it)}"
-            locationTextView.text = latLng
+            binding.locationTextView.text = latLng
         }
     }
 
@@ -196,43 +204,43 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupSearch() {
-        searchLayoutSearchEditText.visibility = View.GONE
-        searchLayoutCardView.setOnClickListener {
-            searchLayoutSearchEditText.clearFocus()
+        binding.searchView.searchLayoutSearchEditText.visibility = View.GONE
+        binding.searchView.searchLayoutCardView.setOnClickListener {
+            binding.searchView.searchLayoutSearchEditText.clearFocus()
         }
 
-        searchLayoutSearchEditText.setOnFocusChangeListener { _, hasFocus ->
+        binding.searchView.searchLayoutSearchEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                searchLayout.setBackgroundResource(R.color.backgroundColor)
-                searchViewActionLeftButton.visibility = View.VISIBLE
+                binding.searchView.searchLayout.setBackgroundResource(R.color.backgroundColor)
+                binding.searchView.searchViewActionLeftButton.visibility = View.VISIBLE
                 editLocationActivityListener?.hideAppbar()
                 showSearchFragment()
             } else {
-                searchLayout.setBackgroundResource(R.color.transparent)
-                searchViewActionLeftButton.visibility = View.GONE
-                searchViewActionRightButton.visibility = View.GONE
+                binding.searchView.searchLayout.setBackgroundResource(R.color.transparent)
+                binding.searchView.searchViewActionLeftButton.visibility = View.GONE
+                binding.searchView.searchViewActionRightButton.visibility = View.GONE
                 editLocationActivityListener?.showAppbar()
                 hideSearchFragment()
             }
         }
 
-        searchViewActionRightButton.setOnClickListener {
-            searchLayoutSearchEditText.text = null
+        binding.searchView.searchViewActionRightButton.setOnClickListener {
+            binding.searchView.searchLayoutSearchEditText.text = null
         }
 
         childFragmentManager.addOnBackStackChangedListener {
             if (childFragmentManager.backStackEntryCount == 0) {
-                searchLayoutSearchEditText.clearFocus()
+                binding.searchView.searchLayoutSearchEditText.clearFocus()
             }
         }
 
-        searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
+        binding.searchView.searchLayoutSearchEditText.addTextChangedListener(object : TextWatcher {
             var timer: Timer = Timer()
             override fun afterTextChanged(s: Editable?) {
                 if (s.isNullOrEmpty()) {
-                    searchViewActionRightButton.visibility = View.GONE
+                    binding.searchView.searchViewActionRightButton.visibility = View.GONE
                 } else {
-                    searchViewActionRightButton.visibility = View.VISIBLE
+                    binding.searchView.searchViewActionRightButton.visibility = View.VISIBLE
                 }
                 timer.cancel()
                 timer = Timer()
@@ -252,17 +260,17 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
-        searchLayoutSearchEditText.setOnEditorActionListener { _, actionId, _ ->
+        binding.searchView.searchLayoutSearchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val imm: InputMethodManager? =
                     context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-                imm?.hideSoftInputFromWindow(searchLayoutSearchEditText.windowToken, 0)
+                imm?.hideSoftInputFromWindow(binding.searchView.searchLayoutSearchEditText.windowToken, 0)
                 return@setOnEditorActionListener true
             }
             false
         }
 
-        searchViewActionLeftButton.setOnClickListener {
+        binding.searchView.searchViewActionLeftButton.setOnClickListener {
             clearSearchInputAndHideSoftInput()
         }
     }
@@ -271,8 +279,8 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
         childFragmentManager.beginTransaction().apply {
             setCustomAnimations(R.anim.fragment_slide_in_up, 0, 0, R.anim.fragment_slide_out_up)
         }.addToBackStack(SearchResultFragment.tag).replace(
-            searchResultListContainer.id,
-            SearchResultFragment.newInstance(searchLayoutSearchEditText.text?.toString()),
+            binding.searchResultListContainer.id,
+            SearchResultFragment.newInstance(binding.searchView.searchLayoutSearchEditText.text?.toString()),
             SearchResultFragment.tag
         ).commitAllowingStateLoss()
     }
@@ -290,9 +298,9 @@ class MapPickerFragment : Fragment(), OnMapReadyCallback {
     private fun clearSearchInputAndHideSoftInput() {
         val imm: InputMethodManager? =
             context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-        imm?.hideSoftInputFromWindow(searchLayoutSearchEditText.windowToken, 0)
-        searchLayoutSearchEditText.text = null
-        searchLayoutSearchEditText.clearFocus()
+        imm?.hideSoftInputFromWindow(binding.searchView.searchLayoutSearchEditText.windowToken, 0)
+        binding.searchView.searchLayoutSearchEditText.text = null
+        binding.searchView.searchLayoutSearchEditText.clearFocus()
     }
 
     companion object {

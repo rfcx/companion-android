@@ -12,8 +12,8 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.fragment_deploy.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.FragmentDeployBinding
 import org.rfcx.companion.entity.Device
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.*
@@ -42,6 +42,9 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private var audioMothDeploymentProtocol: BaseDeploymentProtocol? = null
     private var songMeterDeploymentProtocol: BaseDeploymentProtocol? = null
+
+    private var _binding: FragmentDeployBinding? = null
+    private val binding get() = _binding!!
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -120,7 +123,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
     }
 
     private fun setupImageRecycler() {
-        attachImageRecycler.apply {
+        binding.attachImageRecycler.apply {
             adapter = getImageAdapter()
             layoutManager = GridLayoutManager(context, 3)
         }
@@ -131,7 +134,13 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_deploy, container, false)
+        _binding = FragmentDeployBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -145,7 +154,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
         setupImageRecycler()
         updatePhotoTakenNumber()
 
-        finishButton.setOnClickListener {
+        binding.finishButton.setOnClickListener {
             val existing = getImageAdapter().getExistingImages()
             val missing = getImageAdapter().getMissingImages()
             if (missing.isEmpty()) {
@@ -193,7 +202,7 @@ class DeployFragment : Fragment(), ImageClickListener, GuidelineButtonClickListe
 
     private fun updatePhotoTakenNumber() {
         val number = getImageAdapter().getExistingImages().size
-        photoTakenTextView.text =
+        binding.photoTakenTextView.text =
             getString(R.string.photo_taken, number, getImageAdapter().itemCount)
     }
 

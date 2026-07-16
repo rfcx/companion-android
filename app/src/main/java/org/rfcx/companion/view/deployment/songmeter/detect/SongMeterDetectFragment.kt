@@ -13,9 +13,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.fragment_songmeter_detect.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.FragmentSongmeterDetectBinding
 import org.rfcx.companion.entity.songmeter.Advertisement
 import org.rfcx.companion.repo.api.CoreApiHelper
 import org.rfcx.companion.repo.api.CoreApiServiceImpl
@@ -42,6 +42,9 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
     private var setPrefixes = ""
     private var currentStep = 1
     private var isReadyToSet = true
+
+    private var _binding: FragmentSongmeterDetectBinding? = null
+    private val binding get() = _binding!!
 
     private val requestMultiplePermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -75,7 +78,13 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_songmeter_detect, container, false)
+        _binding = FragmentSongmeterDetectBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,12 +98,12 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
             showAlertBluetooth()
         }
 
-        stepTwoRecyclerView.apply {
+        binding.stepTwoRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = songMeterAdapter
         }
 
-        stepFourRecyclerView.apply {
+        binding.stepFourRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = songMeterAdapter
         }
@@ -105,7 +114,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
         observeSetSite()
     }
 
-    private fun setStepButton() {
+    private fun setStepButton() = binding.apply {
         stepOneButton.setOnClickListener {
             showStep(2)
             songMeterViewModel.scanBle(true)
@@ -147,6 +156,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
             selectedAdvertisement = null
             backToBeginning()
         }
+        Unit
     }
 
     private fun observeSetSite() {
@@ -198,7 +208,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
         showStep(1)
     }
 
-    private fun showStep(step: Int) {
+    private fun showStep(step: Int) = binding.apply {
         when (step) {
             1 -> {
                 currentStep = 1
@@ -250,6 +260,7 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
                 stepFourLoading.visibility = View.VISIBLE
             }
         }
+        Unit
     }
 
     private fun setupTopBar() {
@@ -269,21 +280,21 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
                         if (it.data != null) {
                             songMeterAdapter.items = it.data
                             if (currentStep == 2) {
-                                stepTwoLoading.visibility = View.GONE
+                                binding.stepTwoLoading.visibility = View.GONE
                             } else if (currentStep == 4) {
-                                stepFourLoading.visibility = View.GONE
+                                binding.stepFourLoading.visibility = View.GONE
                             }
                             if (currentStep == 3) {
                                 it.data.find { detect -> detect.serialName == selectedAdvertisement?.serialName }
                                     ?.let { filtered ->
                                         if (filtered.isReadyToPair) {
-                                            stepThreeSyncButton.isEnabled = true
+                                            binding.stepThreeSyncButton.isEnabled = true
                                         }
                                     }
                             }
                             if (currentStep == 4) {
                                 it.data.find { detect -> detect.prefixes == setPrefixes }?.let {
-                                    stepFourYesButton.isEnabled = true
+                                    binding.stepFourYesButton.isEnabled = true
                                 }
                             }
                         }
@@ -332,9 +343,9 @@ class SongMeterDetectFragment : Fragment(), (Advertisement) -> Unit {
 
     override fun invoke(ads: Advertisement) {
         selectedAdvertisement = ads
-        stepThreePrefixesTextView.text = ads.prefixes
-        stepThreeSerialNumberTextView.text = ads.serialName
-        stepTwoYesButton.isEnabled = true
+        binding.stepThreePrefixesTextView.text = ads.prefixes
+        binding.stepThreeSerialNumberTextView.text = ads.serialName
+        binding.stepTwoYesButton.isEnabled = true
     }
 
     override fun onResume() {

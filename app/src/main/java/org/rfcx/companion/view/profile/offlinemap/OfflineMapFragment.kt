@@ -10,13 +10,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.fragment_offline_map.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.FragmentOfflineMapBinding
 import org.rfcx.companion.entity.OfflineMapState
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.repo.api.CoreApiHelper
@@ -41,13 +41,22 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     lateinit var projectAdapter: ProjectOfflineMapAdapter
     private var project: Project? = null
 
+    private var _binding: FragmentOfflineMapBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_offline_map, container, false)
+        _binding = FragmentOfflineMapBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -117,7 +126,7 @@ class OfflineMapFragment : Fragment(), ProjectOfflineMapListener {
     }
 
     private fun setupAdapter() {
-        with(projectsRecyclerView) {
+        with(binding.projectsRecyclerView) {
             layoutManager = LinearLayoutManager(context)
             DividerItemDecoration(
                 context,

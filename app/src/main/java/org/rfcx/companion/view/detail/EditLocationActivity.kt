@@ -8,10 +8,9 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.activity_edit_location.*
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.base.ViewModelFactory
+import org.rfcx.companion.databinding.ActivityEditLocationBinding
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.Stream
@@ -35,15 +34,17 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     private var deploymentId: Int? = null
     private var selectedProject: Int? = null
     private var device: String? = null
+    private lateinit var binding: ActivityEditLocationBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_location)
+        binding = ActivityEditLocationBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setViewModel()
         setupToolbar()
         initIntent()
-        toolbarLayout.visibility = View.VISIBLE
+        binding.toolbarLayout.root.visibility = View.VISIBLE
 
         startFragment(
             MapPickerFragment.newInstance(
@@ -103,11 +104,11 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
     }
 
     override fun showAppbar() {
-        toolbarLayout.visibility = View.VISIBLE
+        binding.toolbarLayout.root.visibility = View.VISIBLE
     }
 
     override fun hideAppbar() {
-        toolbarLayout.visibility = View.GONE
+        binding.toolbarLayout.root.visibility = View.GONE
     }
 
     override fun onSelectedLocation(
@@ -116,7 +117,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         siteId: Int,
         name: String
     ) {
-        toolbarLayout.visibility = View.VISIBLE
+        binding.toolbarLayout.root.visibility = View.VISIBLE
         setLatLng(latitude, longitude, altitude)
         startFragment(EditLocationFragment.newInstance(latitude, longitude, altitude, siteId))
     }
@@ -127,7 +128,7 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
         altitude: Double,
         streamId: Int
     ) {
-        toolbarLayout.visibility = View.VISIBLE
+        binding.toolbarLayout.root.visibility = View.VISIBLE
         setLatLng(latitude, longitude, altitude)
         startFragment(MapPickerFragment.newInstance(latitude, longitude, altitude, streamId))
     }
@@ -171,12 +172,12 @@ class EditLocationActivity : AppCompatActivity(), MapPickerProtocol, EditLocatio
 
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(editLocationContainer.id, fragment)
+            .replace(binding.editLocationContainer.id, fragment)
             .commit()
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)

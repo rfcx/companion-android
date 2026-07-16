@@ -12,10 +12,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.fragment_profile.*
 import org.rfcx.companion.BuildConfig
 import org.rfcx.companion.MainActivityListener
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.FragmentProfileBinding
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.Theme
 import org.rfcx.companion.util.*
@@ -27,6 +27,9 @@ import org.rfcx.companion.view.profile.offlinemap.OfflineMapActivity
 class ProfileFragment : Fragment() {
     lateinit var listener: MainActivityListener
     private val analytics by lazy { context?.let { Analytics(it) } }
+
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -42,7 +45,13 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,34 +64,34 @@ class ProfileFragment : Fragment() {
             this.resources.getStringArray(R.array.theme_less_than_10)
         }
 
-        userNameTextView.text = context.getUserNickname()
-        userLocationTextView.text = context?.getDefaultSiteName()
-        versionTextView.text = getString(
+        binding.userNameTextView.text = context.getUserNickname()
+        binding.userLocationTextView.text = context?.getDefaultSiteName()
+        binding.versionTextView.text = getString(
             R.string.version_app,
             BuildConfig.VERSION_NAME,
             BuildConfig.VERSION_CODE.toString()
         )
-        formatCoordinatesTextView.text = context?.getCoordinatesFormat()
-        themeSelectTextView.text = preferences?.getString(DISPLAY_THEME, themeOption[1])
+        binding.formatCoordinatesTextView.text = context?.getCoordinatesFormat()
+        binding.themeSelectTextView.text = preferences?.getString(DISPLAY_THEME, themeOption[1])
 
-        feedbackTextView.setOnClickListener {
+        binding.feedbackTextView.setOnClickListener {
             val intent = Intent(activity, FeedbackActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE)
         }
 
-        logoutTextView.setOnClickListener {
+        binding.logoutTextView.setOnClickListener {
             listener.onLogout()
         }
 
-        offlineMapTextView.setOnClickListener {
+        binding.offlineMapTextView.setOnClickListener {
             context?.let { it1 -> OfflineMapActivity.startActivity(it1) }
         }
 
-        coordinatesLinearLayout.setOnClickListener {
+        binding.coordinatesLinearLayout.setOnClickListener {
             context?.let { it1 -> CoordinatesActivity.startActivity(it1) }
         }
 
-        darkThemeLinearLayout.setOnClickListener {
+        binding.darkThemeLinearLayout.setOnClickListener {
             val builder = context?.let { MaterialAlertDialogBuilder(it, R.style.BaseAlertDialog) }
             val selectedRadioItem =
                 themeOption.indexOf(preferences?.getString(DISPLAY_THEME, themeOption[1]))
@@ -110,7 +119,7 @@ class ProfileFragment : Fragment() {
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                             }
                         }
-                        themeSelectTextView.text = themeOption[which]
+                        binding.themeSelectTextView.text = themeOption[which]
                         dialog.dismiss()
                     }
                 )
@@ -119,12 +128,12 @@ class ProfileFragment : Fragment() {
                 }
                 builder.show()
             }
-            locationGroupLinearLayout.setOnClickListener {
+            binding.locationGroupLinearLayout.setOnClickListener {
                 context?.let { it1 -> ProjectActivity.startActivity(it1) }
             }
         }
 
-        locationGroupLinearLayout.setOnClickListener {
+        binding.locationGroupLinearLayout.setOnClickListener {
             context?.let { it1 -> ProjectActivity.startActivity(it1) }
         }
     }
@@ -141,7 +150,7 @@ class ProfileFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        formatCoordinatesTextView.text = context?.getCoordinatesFormat()
+        binding.formatCoordinatesTextView.text = context?.getCoordinatesFormat()
         analytics?.trackScreen(Screen.PROFILE)
     }
 

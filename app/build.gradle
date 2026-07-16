@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
@@ -18,6 +17,12 @@ android {
         versionName "1.10.7"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Self-hosted PostHog (track.rfcx.org, RFCx project). Public client token.
+        // In defaultConfig so every product flavor (incl. internalDevelop, the
+        // CI-built variant) gets them — the `mode` dimension means a flavor does
+        // not inherit fields defined only on the `common` flavor.
+        buildConfigField 'String', 'POSTHOG_API_KEY', '"phc_zQeWTDJUoE3tXnEcNZPMpC5DL353MDturnpsdtaQEQpe"'
+        buildConfigField 'String', 'POSTHOG_HOST', '"https://track.rfcx.org"'
     }
     flavorDimensions "mode"
     buildTypes {
@@ -36,9 +41,6 @@ android {
     productFlavors {
         common {
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
-            // Self-hosted PostHog (track.rfcx.org, RFCx project). Public client token.
-            buildConfigField 'String', 'POSTHOG_API_KEY', '"phc_zQeWTDJUoE3tXnEcNZPMpC5DL353MDturnpsdtaQEQpe"'
-            buildConfigField 'String', 'POSTHOG_HOST', '"https://track.rfcx.org"'
         }
         internal {
             buildConfigField 'String', 'FIREBASE_AUTH_DOMAIN', '"https://us-central1-rfcx-deployment.cloudfunctions.net/auth/"'
@@ -85,6 +87,10 @@ android {
     lint {
         disable 'MissingTranslation', 'ExtraTranslation'
     }
+    buildFeatures {
+        viewBinding true
+        buildConfig true
+    }
     namespace 'org.rfcx.companion'
 }
 
@@ -98,7 +104,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.20"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
@@ -120,7 +126,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:21.0.5'
 
     // Self-hosted product analytics (track.rfcx.org). Replaces Firebase Analytics.
-    implementation 'com.posthog:posthog-android:3.+'
+    // Pinned to 3.22.0 — the last posthog-android that keeps minSdk 21 (3.23+
+    // raised the library minSdk to 23, which fails the manifest merge against
+    // this app's minSdkVersion 21). Same PostHog API surface we use.
+    implementation 'com.posthog:posthog-android:3.22.0'
 
     // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5'
@@ -179,5 +188,14 @@ ktlint {
     reporters {
         reporter "plain"
         reporter "checkstyle"
+    }
+}
+
+// Kotlin 1.8.10 defaults kapt stub generation to the JDK's target (17), while
+// javac stays at 1.8 (compileOptions above). Align every Kotlin compile task
+// (incl. kaptGenerateStubs) to 1.8 so their jvmTarget matches javac.
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }

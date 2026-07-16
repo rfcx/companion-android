@@ -39,7 +39,7 @@ class TokenAuthenticator(private val context: Context) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
         // No need to refresh token on no-authentication request
-        if (response.request().header("No-Authentication") != null) {
+        if (response.request.header("No-Authentication") != null) {
             return null
         }
 
@@ -53,7 +53,7 @@ class TokenAuthenticator(private val context: Context) : Authenticator {
             val token = Preferences.getInstance(context).getString(Preferences.ID_TOKEN)
 
             // execute failed request again with new access token
-            response.request().newBuilder()
+            response.request.newBuilder()
                 .header("Authorization", "Bearer $token")
                 .build()
         } else {

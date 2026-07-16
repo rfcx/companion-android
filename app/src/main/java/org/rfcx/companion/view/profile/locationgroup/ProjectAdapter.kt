@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_location_group.view.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.ItemLocationGroupBinding
 import org.rfcx.companion.entity.Project
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.isGuest
@@ -25,9 +25,9 @@ class ProjectAdapter(private val projectListener: ProjectListener) :
         parent: ViewGroup,
         viewType: Int
     ): ProjectViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_location_group, parent, false)
-        return ProjectViewHolder(view)
+        val binding =
+            ItemLocationGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ProjectViewHolder(binding)
     }
 
     override fun getItemCount(): Int = items.size
@@ -39,10 +39,10 @@ class ProjectAdapter(private val projectListener: ProjectListener) :
         }
     }
 
-    inner class ProjectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val projectTextView = itemView.locationGroupTextView
-        private val checkImageView = itemView.checkImageView
-        private val lockImageView = itemView.lockImageView
+    inner class ProjectViewHolder(binding: ItemLocationGroupBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val projectTextView = binding.locationGroupTextView
+        private val checkImageView = binding.checkImageView
+        private val lockImageView = binding.lockImageView
 
         fun bind(project: Project) {
             if (screen != Screen.PROFILE.id) {

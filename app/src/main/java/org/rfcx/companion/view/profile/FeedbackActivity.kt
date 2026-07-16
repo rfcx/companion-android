@@ -17,10 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_feedback.*
-import kotlinx.android.synthetic.main.toolbar_default.*
 import org.rfcx.companion.R
 import org.rfcx.companion.adapter.BaseListItem
+import org.rfcx.companion.databinding.ActivityFeedbackBinding
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.entity.StatusEvent
 import org.rfcx.companion.repo.Firestore
@@ -35,16 +34,18 @@ class FeedbackActivity : AppCompatActivity() {
     private var pathListArray: List<String>? = null
     private var menuAll: Menu? = null
     private val analytics by lazy { Analytics(this) }
+    private lateinit var binding: ActivityFeedbackBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_feedback)
+        binding = ActivityFeedbackBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setupToolbar()
         setTextFrom()
         setupFeedbackImages()
 
-        feedbackEditText.addTextChangedListener(object : TextWatcher {
+        binding.feedbackEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if (p0 != null) {
                     if (p0.isEmpty()) {
@@ -62,7 +63,7 @@ class FeedbackActivity : AppCompatActivity() {
     }
 
     private fun setupFeedbackImages() {
-        feedbackRecycler.apply {
+        binding.feedbackRecycler.apply {
             layoutManager = LinearLayoutManager(this@FeedbackActivity)
             adapter = feedbackImageAdapter
         }
@@ -159,10 +160,10 @@ class FeedbackActivity : AppCompatActivity() {
     private fun sendFeedback() {
         val sendFeedbackView = findViewById<View>(R.id.sendFeedbackView)
         val contextView = findViewById<View>(R.id.content)
-        val feedbackInput = feedbackEditText.text.toString()
+        val feedbackInput = binding.feedbackEditText.text.toString()
 
-        feedbackGroupView.visibility = View.GONE
-        feedbackProgressBar.visibility = View.VISIBLE
+        binding.feedbackGroupView.visibility = View.GONE
+        binding.feedbackProgressBar.visibility = View.VISIBLE
 
         setEnableSendFeedbackView(false)
         sendFeedbackView.hideKeyboard()
@@ -180,8 +181,8 @@ class FeedbackActivity : AppCompatActivity() {
 
                     finish()
                 } else {
-                    feedbackGroupView.visibility = View.VISIBLE
-                    feedbackProgressBar.visibility = View.GONE
+                    binding.feedbackGroupView.visibility = View.VISIBLE
+                    binding.feedbackProgressBar.visibility = View.GONE
                     analytics.trackSendFeedbackEvent(StatusEvent.FAILURE.id)
 
                     Snackbar.make(
@@ -199,11 +200,11 @@ class FeedbackActivity : AppCompatActivity() {
     }
 
     private fun setTextFrom() {
-        fromEmailTextView.text = getString(R.string.from, this.getEmailUser())
+        binding.fromEmailTextView.text = getString(R.string.from, this.getEmailUser())
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)

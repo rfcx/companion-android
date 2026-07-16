@@ -7,26 +7,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import kotlinx.android.synthetic.main.fragment_sites_loading.*
-import org.rfcx.companion.R
+import org.rfcx.companion.databinding.FragmentSitesLoadingBinding
 
 class SiteLoadingDialogFragment(private val text: String) : DialogFragment() {
+
+    private var _binding: FragmentSitesLoadingBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_sites_loading, container, false)
+        _binding = FragmentSitesLoadingBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        siteLoadingText.text = this.text
+        binding.siteLoadingText.text = this.text
 
-        siteLoadingButton.setOnClickListener {
+        binding.siteLoadingButton.setOnClickListener {
             dismissDialog()
         }
     }

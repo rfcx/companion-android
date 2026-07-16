@@ -1,16 +1,14 @@
 package org.rfcx.companion.view.deployment.locate
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_search_location_result.view.*
-import kotlinx.android.synthetic.main.item_search_location_result_error.view.*
-import org.rfcx.companion.R
 import org.rfcx.companion.adapter.BaseListItem
+import org.rfcx.companion.databinding.ItemSearchLocationResultBinding
+import org.rfcx.companion.databinding.ItemSearchLocationResultErrorBinding
 import org.rfcx.companion.util.latitudeCoordinates
 import org.rfcx.companion.util.longitudeCoordinates
 
@@ -84,9 +82,9 @@ class SearchLocationResultDiffCallback : DiffUtil.ItemCallback<BaseListItem>() {
 }
 
 class SearchLocationViewHolder(
-    itemView: View,
+    private val binding: ItemSearchLocationResultBinding,
     private val onItemClick: ((position: Int, latitude: Double, longitude: Double, placeName: String) -> Unit)?
-) : RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(binding.root) {
 
     companion object {
         const val itemViewType = 1
@@ -95,8 +93,8 @@ class SearchLocationViewHolder(
             onItemClick: ((position: Int, latitude: Double, longitude: Double, placeName: String) -> Unit)?
         ): SearchLocationViewHolder {
             return SearchLocationViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_search_location_result,
+                ItemSearchLocationResultBinding.inflate(
+                    LayoutInflater.from(parent.context),
                     parent,
                     false
                 ),
@@ -106,12 +104,12 @@ class SearchLocationViewHolder(
     }
 
     fun bind(item: SearchResult) {
-        itemView.placeNameTextView.text = item.placeName
+        binding.placeNameTextView.text = item.placeName
         val locationText =
             "${item.latitude.latitudeCoordinates(itemView.context)}, ${item.longitude.longitudeCoordinates(
                 itemView.context
             )}"
-        itemView.placeLocationTextView.text = locationText
+        binding.placeLocationTextView.text = locationText
 
         itemView.setOnClickListener {
             onItemClick?.invoke(adapterPosition, item.latitude, item.longitude, item.placeName)
@@ -119,14 +117,14 @@ class SearchLocationViewHolder(
     }
 }
 
-class SearchLocationErrorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class SearchLocationErrorViewHolder(private val binding: ItemSearchLocationResultErrorBinding) : RecyclerView.ViewHolder(binding.root) {
 
     companion object {
         const val itemViewType = 2
         fun create(parent: ViewGroup): SearchLocationErrorViewHolder {
             return SearchLocationErrorViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_search_location_result_error,
+                ItemSearchLocationResultErrorBinding.inflate(
+                    LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
@@ -136,10 +134,10 @@ class SearchLocationErrorViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
     fun bind(error: SearchResultError) {
         if (error.icon != 0) {
-            itemView.searchErrorIconImageView.setImageResource(error.icon)
+            binding.searchErrorIconImageView.setImageResource(error.icon)
         }
-        itemView.searchErrorTitleTextView.text = error.title
-        itemView.searchErrorMessageTextView.text = error.message
+        binding.searchErrorTitleTextView.text = error.title
+        binding.searchErrorMessageTextView.text = error.message
     }
 }
 

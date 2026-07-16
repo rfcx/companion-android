@@ -14,8 +14,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_new_sync.*
 import org.rfcx.companion.R
+import org.rfcx.companion.databinding.FragmentNewSyncBinding
 import org.rfcx.companion.entity.Screen
 import org.rfcx.companion.util.Analytics
 import org.rfcx.companion.view.deployment.AudioMothDeploymentProtocol
@@ -29,6 +29,9 @@ class NewSyncFragment : Fragment() {
     private val analytics by lazy { context?.let { Analytics(it) } }
     private var step: Int? = null
 
+    private var _binding: FragmentNewSyncBinding? = null
+    private val binding get() = _binding!!
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         audioMothDeploymentProtocol = (context as AudioMothDeploymentProtocol)
@@ -40,7 +43,13 @@ class NewSyncFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         arguments?.let { step = it.getInt(STEP) }
-        return inflater.inflate(R.layout.fragment_new_sync, container, false)
+        _binding = FragmentNewSyncBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onDetach() {
@@ -83,54 +92,54 @@ class NewSyncFragment : Fragment() {
 
         setLabelColor(view)
 
-        beginSyncButton.setOnClickListener {
+        binding.beginSyncButton.setOnClickListener {
             analytics?.trackPlayToneEvent()
             audioMothDeploymentProtocol?.playTone(100000)
             setStep(2)
         }
-        notHearButton.setOnClickListener {
+        binding.notHearButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
             audioMothDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
-        hearButton.setOnClickListener {
+        binding.hearButton.setOnClickListener {
             setStep(3)
         }
-        notSwitchButton.setOnClickListener {
+        binding.notSwitchButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
             audioMothDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
-        switchButton.setOnClickListener {
+        binding.switchButton.setOnClickListener {
             setStep(4)
         }
-        notSeeLightsAudiomothButton.setOnClickListener {
+        binding.notSeeLightsAudiomothButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
             audioMothDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
-        seeLightsAudiomothButton.setOnClickListener {
+        binding.seeLightsAudiomothButton.setOnClickListener {
             analytics?.trackPlayToneCompletedEvent()
             audioMothDeploymentProtocol?.stopPlaySound()
             setStep(5)
         }
-        syncAudioMothButton.setOnClickListener {
-            movePhoneNearTextView.text = getString(R.string.keep_phone_near)
-            syncAudioMothButton.isEnabled = false
-            syncAudioMothButton.text = getString(R.string.sync_in_progress)
-            syncAudioMothFinishButton.visibility = View.GONE
+        binding.syncAudioMothButton.setOnClickListener {
+            binding.movePhoneNearTextView.text = getString(R.string.keep_phone_near)
+            binding.syncAudioMothButton.isEnabled = false
+            binding.syncAudioMothButton.text = getString(R.string.sync_in_progress)
+            binding.syncAudioMothFinishButton.visibility = View.GONE
             analytics?.trackPlaySyncToneEvent()
             audioMothDeploymentProtocol?.playSyncSound()
         }
-        syncAudioMothFinishButton.setOnClickListener {
+        binding.syncAudioMothFinishButton.setOnClickListener {
             setStep(6)
         }
-        notConfirmLightButton.setOnClickListener {
+        binding.notConfirmLightButton.setOnClickListener {
             analytics?.trackRetryPlayToneEvent()
             audioMothDeploymentProtocol?.stopPlaySound()
             setStep(1)
         }
-        confirmLightButton.setOnClickListener {
+        binding.confirmLightButton.setOnClickListener {
             analytics?.trackPlaySyncToneCompletedEvent()
             audioMothDeploymentProtocol?.stopPlaySound()
             showComplete()
@@ -139,9 +148,9 @@ class NewSyncFragment : Fragment() {
 
     fun showRepeatSync() {
         context?.let {
-            syncAudioMothButton.text = getString(R.string.repeat_sound)
-            syncAudioMothButton.isEnabled = true
-            syncAudioMothFinishButton.visibility = View.VISIBLE
+            _binding?.syncAudioMothButton?.text = getString(R.string.repeat_sound)
+            _binding?.syncAudioMothButton?.isEnabled = true
+            _binding?.syncAudioMothFinishButton?.visibility = View.VISIBLE
         }
     }
 
@@ -176,7 +185,7 @@ class NewSyncFragment : Fragment() {
             spannableString.setSpan(red, 32, 41, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             spannableString.setSpan(green, 44, 58, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-        lightsAudiomothTextView.text = spannableString
+        binding.lightsAudiomothTextView.text = spannableString
 
         val confirmLight = SpannableString(getString(R.string.six))
         if (isPortuguese) {
@@ -189,10 +198,10 @@ class NewSyncFragment : Fragment() {
             confirmLight.setSpan(red, 20, 23, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             confirmLight.setSpan(UnderlineSpan(), 33, 36, 0)
         }
-        stepSixTextView.text = confirmLight
+        binding.stepSixTextView.text = confirmLight
     }
 
-    private fun setStep(step: Int) {
+    private fun setStep(step: Int) = binding.apply {
         when (step) {
             1 -> {
                 setHardwareSwitchToOffLayout.visibility = View.VISIBLE
@@ -273,6 +282,7 @@ class NewSyncFragment : Fragment() {
                 confirmLightLayout.visibility = View.VISIBLE
             }
         }
+        Unit
     }
 
     companion object {
