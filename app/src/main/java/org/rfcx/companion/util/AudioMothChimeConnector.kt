@@ -50,11 +50,9 @@ class AudioMothChimeConnector {
         if (value) {
 
             state.bytes[byte] = state.bytes[byte] or (1 shl bit)
-
         }
 
         state.index += 1
-
     }
 
     private fun setBits(state: State, value: Int, length: Int) {
@@ -64,16 +62,14 @@ class AudioMothChimeConnector {
             val mask = (1 shl i)
 
             setBit(state, (value and mask) == mask)
-
         }
-
     }
 
     private fun encodeTime(calendar: Calendar, state: State) {
 
         /* Calculate timestamp and offset */
 
-        val timestamp: Int = ((calendar.timeInMillis + MILLISECONDS_IN_SECOND / 2 ) / MILLISECONDS_IN_SECOND).toInt()
+        val timestamp: Int = ((calendar.timeInMillis + MILLISECONDS_IN_SECOND / 2) / MILLISECONDS_IN_SECOND).toInt()
 
         val timezoneMinutes: Int =
             (calendar.timeZone.rawOffset + calendar.timeZone.dstSavings) / SECONDS_IN_MINUTE / MILLISECONDS_IN_SECOND
@@ -83,7 +79,6 @@ class AudioMothChimeConnector {
         setBits(state, timestamp, BITS_IN_INT32)
 
         setBits(state, timezoneMinutes, BITS_IN_INT16)
-
     }
 
     private fun encodeLocation(latitude: Double, longitude: Double, state: State) {
@@ -95,7 +90,6 @@ class AudioMothChimeConnector {
         setBits(state, intLatitude, BITS_IN_LATITUDE_AND_LONGITUDE)
 
         setBits(state, intLongitude, BITS_IN_LATITUDE_AND_LONGITUDE)
-
     }
 
     private fun encodeDeploymentID(deploymentID: Array<Int>, state: State) {
@@ -105,9 +99,7 @@ class AudioMothChimeConnector {
             state.bytes[state.index / BITS_PER_BYTE] = deploymentID[LENGTH_OF_DEPLOYMENT_ID - 1 - i] and 0xFF
 
             state.index += BITS_PER_BYTE
-
         }
-
     }
 
     /* Public interface function */
@@ -115,7 +107,6 @@ class AudioMothChimeConnector {
     fun playTone(duration: Int) {
 
         audioMothChime.tone(duration, arrayOf("C5:1"))
-
     }
 
     fun playTime(calendar: Calendar, latitude: Double?, longitude: Double?) {
@@ -168,7 +159,6 @@ class AudioMothChimeConnector {
             data,
             tune
         )
-
     }
 
     fun playTimeAndDeploymentID(calendar: Calendar, latitude: Double?, longitude: Double?, deploymentID: Array<Int>) {
@@ -180,7 +170,6 @@ class AudioMothChimeConnector {
             println("AUDIOMOTH CHIME CONNECTOR: Deployment ID is incorrect length")
 
             return
-
         }
 
         /* Set up array */
@@ -238,7 +227,6 @@ class AudioMothChimeConnector {
             data,
             tune
         )
-
     }
 
     fun stopPlay() {

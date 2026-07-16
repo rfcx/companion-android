@@ -239,8 +239,10 @@ class BleConnectDelegate(private val context: Context) {
     fun registerReceiver() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter(),
-                    Context.RECEIVER_NOT_EXPORTED)
+                context.registerReceiver(
+                    gattUpdateReceiver, makeGattUpdateIntentFilter(),
+                    Context.RECEIVER_NOT_EXPORTED
+                )
             } else {
                 context.registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter())
             }
